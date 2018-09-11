@@ -1,5 +1,9 @@
 # ffmpeg-cxc-build
-Fast cross-compile ffmpeg for Windows with MinGW on linux
+Fast cross-compile ffmpeg for Windows with MinGW on Linux.
+
+**Enabled Features**
+
+  aom fdk-aac mp3lame opus theora vorbis vpx x264 x265 nvenc nvdec
 
 **Package Requirements**
 
