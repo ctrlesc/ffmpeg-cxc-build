@@ -25,8 +25,8 @@ build_die() {
 
 build_make() {
 
-    #make -j $MAKE_JOBS
-    make -j 1
+    local jobs="${1:-1}"
+    make -j $jobs
     [ $? -eq 0 ] || build_die "$SRC_NAME: make stage failed"
 
     make install
@@ -82,7 +82,7 @@ cd_source() {
     cd $SRC_NAME
 }
 
-SCRIPT_VERSION="1.0.1"
+SCRIPT_VERSION="1.0.2"
 
 #build paths
 ROOT_PATH="$HOME"
@@ -137,7 +137,7 @@ cd_source
 autoreconf -fiv
 ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host=$CXC_HOST --enable-static --disable-shared
 [ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make
+build_make $MAKE_JOBS
 
 #lame
 set_source "lame"
@@ -154,7 +154,7 @@ cd_source
 ./autogen.sh
 ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host=$CXC_HOST --enable-static --disable-shared
 [ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make
+build_make $MAKE_JOBS
 
 #opus
 set_source "opus"
@@ -163,7 +163,7 @@ cd_source
 ./autogen.sh
 ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host=$CXC_HOST --enable-static --disable-shared --disable-doc --disable-examples
 [ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make
+build_make $MAKE_JOBS
 
 #theora
 set_source "theora"
@@ -172,7 +172,7 @@ cd_source
 ./autogen.sh
 ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host=$CXC_HOST --enable-static --disable-shared --disable-doc --disable-oggtest --disable-vorbistest --disable-examples
 [ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make
+build_make $MAKE_JOBS
 
 #vorbis
 set_source "vorbis"
@@ -181,7 +181,7 @@ cd_source
 ./autogen.sh
 ./configure --prefix="$ROOT_PATH/$OUT_PATH" --host=$CXC_HOST --enable-static --disable-shared -disable-docs --disable-examples
 [ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make
+build_make $MAKE_JOBS
 
 #aom AV1
 set_source "aom"
@@ -199,7 +199,7 @@ cd_source
 export CROSS="$CXC_HOST"-
 ./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$CXC_CFLAGS" --target=x86_64-win64-gcc --as=yasm --enable-static --disable-shared --disable-examples --disable-tools --disable-docs --disable-unit-tests --enable-vp9 --enable-vp8 --enable-postproc --enable-vp9-postproc --enable-vp9-highbitdepth
 [ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make
+build_make $MAKE_JOBS
 unset CROSS
 
 #x264
@@ -208,7 +208,7 @@ fetch_source  git https://git.videolan.org/git/x264 --depth 1
 cd_source
 ./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$CXC_CFLAGS" --host=$CXC_HOST --bindir="$BIN_PATH" --enable-static --cross-prefix=$CXC_HOST- --disable-cli
 [ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make
+build_make $MAKE_JOBS
 
 #x265
 set_source "x265"
@@ -217,7 +217,7 @@ cd_source
 cd build/linux
 cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DENABLE_SHARED=0 -DENABLE_CLI=0 ../../source
 [ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make
+build_make $MAKE_JOBS
 
 #sdl
 set_source "sdl"
@@ -226,7 +226,7 @@ cd_source
 rm -rf .hg
 CFLAGS=-DDECLSPEC= ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host=$CXC_HOST --bindir="$BIN_PATH" --enable-static --disable-shared
 [ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make
+build_make $MAKE_JOBS
 rm -f "$output"/sdl*
 
 #nvenc
@@ -273,4 +273,4 @@ cd_source
   --enable-nvenc \
   --enable-nvdec
 [ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make
+build_make $MAKE_JOBS
