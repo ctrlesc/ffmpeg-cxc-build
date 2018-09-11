@@ -82,7 +82,7 @@ cd_source() {
     cd $SRC_NAME
 }
 
-SCRIPT_VERSION="1.0.0"
+SCRIPT_VERSION="1.0.1"
 
 #build paths
 ROOT_PATH="$HOME"
@@ -239,8 +239,8 @@ build_message BM_GREEN "$SRC_NAME: built"
 
 #ffmpeg
 set_source "ffmpeg"
-rsync -rvt --progress $HOME/git/ffmpeg .
-#fetch_source git https://git.ffmpeg.org/ffmpeg.git
+#rsync -rvt --progress $HOME/git/ffmpeg .
+fetch_source git https://git.ffmpeg.org/ffmpeg.git
 cd_source
 ./configure \
   --cross-prefix="$CXC_HOST"- \
