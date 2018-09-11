@@ -1,0 +1,276 @@
+#!/bin/bash
+
+build_message() {
+    
+    local BM_WHITE=15
+    local BM_GREEN=10
+    local BM_CYAN=14
+    local BM_MAGENTA=200
+    local BM_YELLOW=11
+    local BM_RED=9
+
+    echo -ne "\e[38;5;${!1}m"  1>&2;
+    shift
+    echo -n "====> "
+    echo -n "$@" 1>&2;
+    echo -n " <===="
+    echo -e "\e[0m"  1>&2;
+}
+
+build_die() {
+
+    build_message BM_RED "$@"
+    exit 1
+}
+
+build_make() {
+
+    #make -j $MAKE_JOBS
+    make -j 1
+    [ $? -eq 0 ] || build_die "$SRC_NAME: make stage failed"
+
+    make install
+    [ $? -eq 0 ] || build_die "$SRC_NAME: install stage failed"
+
+    build_message BM_GREEN "$SRC_NAME: built successfully"
+}
+
+fetch_source() {
+
+    #$1 method
+    #$2 URL
+    #$3 method option(s)
+    local method=$1
+    shift
+    local url=$1
+    shift
+    
+    case "$method" in
+        git)
+            git clone $@ "$url" "$SRC_NAME"
+        ;;
+        svn)
+            svn checkout $@ "$url" "$SRC_NAME"
+        ;;
+        hg)
+            hg clone $@ "$url" "$SRC_NAME"
+        ;;
+        wget)
+            wget -O "$SRC_NAME.$1" "$url"
+        ;;
+        *)
+            build_die "$SRC_NAME: invalid source fetch method -> $method"
+        ;;
+    esac
+    if [ $? -eq 0 ]
+    then
+        build_message BM_MAGENTA "$SRC_NAME: source fetch success -> $method $url"
+    else
+        build_die "$SRC_NAME: source fetch failed -> $method $url"
+    fi
+}
+
+set_source() {
+
+    cd "$ROOT_PATH/$SRC_PATH"
+    SRC_NAME="$1"
+    build_message BM_CYAN "$SRC_NAME"
+}
+
+cd_source() {
+
+    cd $SRC_NAME
+}
+
+SCRIPT_VERSION="1.0.0"
+
+#build paths
+ROOT_PATH="$HOME"
+SRC_PATH="ffmpeg_sources"
+OUT_PATH="ffmpeg_build"
+BIN_PATH="$ROOT_PATH/$OUT_PATH/bin"
+
+#cross compiler settings
+CXC_HOST="x86_64-w64-mingw32"
+CXC_OPTIM="-O2"
+CXC_CFLAGS="-march=core-avx-i -mtune=core-avx-i -pipe"
+
+#make settings
+MAKE_JOBS=$(nproc)
+
+#fix pkg-config paths for cross
+export PKG_CONFIG_DIR=
+export PKG_CONFIG_PATH=
+export PKG_CONFIG_SYSROOT_PATH="$ROOT_PATH"
+export PKG_CONFIG_LIBDIR="$ROOT_PATH/$OUT_PATH/lib/pkgconfig"
+
+#startup banner
+build_message BM_WHITE "ffmpeg-cxc-mingw64: Version $SCRIPT_VERSION"
+
+#ensure clean build
+rm -rf "$ROOT_PATH/$OUT_PATH"
+mkdir "$ROOT_PATH/$OUT_PATH"
+rm -rf "$ROOT_PATH/$SRC_PATH"
+mkdir "$ROOT_PATH/$SRC_PATH"
+
+#cmake toolchain settings
+touch $ROOT_PATH/$SRC_PATH/cross.cmake
+echo 'SET(CMAKE_SYSTEM_NAME Windows)' >> $ROOT_PATH/$SRC_PATH/cross.cmake
+echo 'SET(CMAKE_C_COMPILER   x86_64-w64-mingw32-gcc)' >> $ROOT_PATH/$SRC_PATH/cross.cmake
+echo 'SET(CMAKE_CXX_COMPILER x86_64-w64-mingw32-g++)' >> $ROOT_PATH/$SRC_PATH/cross.cmake
+echo 'SET(CMAKE_RC_COMPILER x86_64-w64-mingw32-windres)' >> $ROOT_PATH/$SRC_PATH/cross.cmake
+echo 'SET(CMAKE_ASM_YASM_COMPILER yasm)' >> $ROOT_PATH/$SRC_PATH/cross.cmake
+echo 'SET(CMAKE_ASM_NASM_COMPILER nasm)' >> $ROOT_PATH/$SRC_PATH/cross.cmake
+echo 'SET(CMAKE_CXX_FLAGS "-O3 -DNDEBUG -pipe")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
+echo 'SET(CMAKE_C_FLAGS "-O3 -DNDEBUG -pipe")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
+echo 'SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
+echo 'SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
+
+#build the sources
+#fdk-aac
+set_source "fdk-aac"
+fetch_source git https://github.com/mstorsjo/fdk-aac.git --depth 1
+cd_source
+#wget -O fdk-aac.zip https://github.com/mstorsjo/fdk-aac/archive/v0.1.6.zip
+#unzip fdk-aac.zip
+#cd fdk-aac-*
+autoreconf -fiv
+./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host=$CXC_HOST --enable-static --disable-shared
+[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+build_make
+
+#lame
+set_source "lame"
+fetch_source svn https://svn.code.sf.net/p/lame/svn/trunk/lame
+cd_source
+./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --enable-nasm --host=$CXC_HOST --disable-shared --disable-frontend
+[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+build_make
+
+#ogg
+set_source "ogg"
+fetch_source git https://github.com/xiph/ogg.git --depth 1
+cd_source
+./autogen.sh
+./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host=$CXC_HOST --enable-static --disable-shared
+[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+build_make
+
+#opus
+set_source "opus"
+fetch_source git https://github.com/xiph/opus.git --depth 1
+cd_source
+./autogen.sh
+./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host=$CXC_HOST --enable-static --disable-shared --disable-doc --disable-examples
+[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+build_make
+
+#theora
+set_source "theora"
+fetch_source git https://github.com/xiph/theora.git --depth 1
+cd_source
+./autogen.sh
+./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host=$CXC_HOST --enable-static --disable-shared --disable-doc --disable-oggtest --disable-vorbistest --disable-examples
+[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+build_make
+
+#vorbis
+set_source "vorbis"
+fetch_source git https://github.com/xiph/vorbis.git --depth 1
+cd_source
+./autogen.sh
+./configure --prefix="$ROOT_PATH/$OUT_PATH" --host=$CXC_HOST --enable-static --disable-shared -disable-docs --disable-examples
+[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+build_make
+
+#aom AV1
+set_source "aom"
+fetch_source git https://aomedia.googlesource.com/aom --depth 1
+mkdir "$SRC_NAME"_build
+cd "$SRC_NAME"_build
+cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="../aom/build/cmake/toolchains/x86_64-mingw-gcc.cmake" -DAOM_TARGET_CPU=x86_64 -DENABLE_NASM=on -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 ../aom
+[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+build_make
+
+#vpx
+set_source "vpx"
+fetch_source git https://chromium.googlesource.com/webm/libvpx.git --depth 1
+cd_source
+export CROSS="$CXC_HOST"-
+./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$CXC_CFLAGS" --target=x86_64-win64-gcc --as=yasm --enable-static --disable-shared --disable-examples --disable-tools --disable-docs --disable-unit-tests --enable-vp9 --enable-vp8 --enable-postproc --enable-vp9-postproc --enable-vp9-highbitdepth
+[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+build_make
+unset CROSS
+
+#x264
+set_source "x264"
+fetch_source  git https://git.videolan.org/git/x264 --depth 1
+cd_source
+./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$CXC_CFLAGS" --host=$CXC_HOST --bindir="$BIN_PATH" --enable-static --cross-prefix=$CXC_HOST- --disable-cli
+[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+build_make
+
+#x265
+set_source "x265"
+fetch_source hg https://bitbucket.org/multicoreware/x265
+cd_source
+cd build/linux
+cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DENABLE_SHARED=0 -DENABLE_CLI=0 ../../source
+[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+build_make
+
+#sdl
+set_source "sdl"
+fetch_source hg http://hg.libsdl.org/SDL
+cd_source
+rm -rf .hg
+CFLAGS=-DDECLSPEC= ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host=$CXC_HOST --bindir="$BIN_PATH" --enable-static --disable-shared
+[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+build_make
+rm -f "$output"/sdl*
+
+#nvenc
+set_source "nv-codec-headers"
+fetch_source git https://github.com/FFmpeg/nv-codec-headers.git --depth 1
+cd_source
+make PREFIX="$ROOT_PATH/$OUT_PATH" install
+[ $? -eq 0 ] || build_die "install stage failed for $SRC_NAME"
+build_message BM_GREEN "$SRC_NAME: built"
+
+#ffmpeg
+set_source "ffmpeg"
+rsync -rvt --progress $HOME/git/ffmpeg .
+#fetch_source git https://git.ffmpeg.org/ffmpeg.git
+cd_source
+./configure \
+  --cross-prefix="$CXC_HOST"- \
+  --arch="x86_64" \
+  --target-os="mingw64" \
+  --disable-debug \
+  --disable-w32threads \
+  --disable-shared \
+  --enable-static \
+  --prefix="$ROOT_PATH/$OUT_PATH" \
+  --pkg-config="pkg-config" \
+  --pkg-config-flags="--static" \
+  --extra-cflags="$CXC_OPTIM $CXC_CFLAGS" \
+  --extra-cflags="-I$ROOT_PATH/$OUT_PATH/include" \
+  --extra-ldflags="-L$ROOT_PATH/$OUT_PATH/lib -static -static-libstdc++ -static-libgcc" \
+  --extra-libs="-lwinpthread" \
+  --bindir="$BIN_PATH" \
+  --enable-gpl \
+  --enable-version3 \
+  --enable-nonfree \
+  --enable-libaom \
+  --enable-libfdk-aac \
+  --enable-libmp3lame \
+  --enable-libopus \
+  --enable-libtheora \
+  --enable-libvorbis \
+  --enable-libvpx \
+  --enable-libx264 \
+  --enable-libx265 \
+  --enable-nvenc \
+  --enable-nvdec
+[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+build_make
