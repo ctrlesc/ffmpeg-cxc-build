@@ -1,0 +1,49 @@
+#!/bin/bash
+
+THIS="get-repo-cur-rev"
+
+exiterr() {
+    echo -e "$THIS: $@" 1>&2;
+    exit 1 
+}
+
+if [ "$1" == "-h" ] || [ "$1" == "--h" ]
+then
+    exiterr "Get the current repository revisions below a base directory.\n\nUSAGE:  $THIS [base dir]\n"
+fi
+
+fpath="${1:-.}"
+
+while IFS=$'\n' read -r rdir
+do
+	[[ "$rdir" =~ ^(.+/(.+)/)\.(git|hg|svn)$ ]]
+	tool="${BASH_REMATCH[3]}"
+	dir="${BASH_REMATCH[1]}"
+	name="${BASH_REMATCH[2]}"
+
+	printf "%s\t%s\t" "$name" "$tool"
+
+	case "$tool" in
+		git)
+			cd "$dir"
+			
+			git rev-parse HEAD
+			cd ..
+		;;
+		hg)
+			cd "$dir"
+			hg id -i | grep -Eo '[a-f0-9]+'
+			cd ..
+			
+		;;
+		svn)
+			cd "$dir"
+			svn info --show-item revision
+			cd ..
+		;;
+		*)
+			echo "unknown"
+		;;
+	esac
+
+done < <(find "$fpath" -mindepth 2 -maxdepth 2 -type d -name ".git" -o -name ".svn" -o -name ".hg")
