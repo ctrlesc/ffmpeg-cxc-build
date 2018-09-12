@@ -301,7 +301,7 @@ rm -rf .hg
 CFLAGS=-DDECLSPEC= ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --bindir="$BIN_PATH" --enable-static --disable-shared
 [ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
 build_make $CXC_JOBS
-rm -f "$output"/sdl*
+rm -f "$BIN_PATH"/sdl*
 
 #nvenc
 set_source "nv-codec-headers" "git" "https://github.com/FFmpeg/nv-codec-headers.git"
