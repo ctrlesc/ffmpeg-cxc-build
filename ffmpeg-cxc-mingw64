@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.1.1"
+SCRIPT_VERSION="1.1.2"
 
 #build paths
 ROOT_PATH="$HOME"
@@ -23,154 +23,154 @@ export PKG_CONFIG_SYSROOT_PATH="$ROOT_PATH"
 export PKG_CONFIG_LIBDIR="$ROOT_PATH/$OUT_PATH/lib/pkgconfig"
 
 build_message() {
-    
-    local BM_WHITE=15
-    local BM_GREEN=10
-    local BM_CYAN=14
-    local BM_MAGENTA=200
-    local BM_YELLOW=11
-    local BM_RED=9
+	
+	local BM_WHITE=15
+	local BM_GREEN=10
+	local BM_CYAN=14
+	local BM_MAGENTA=200
+	local BM_YELLOW=11
+	local BM_RED=9
 
-    echo -ne "\e[38;5;${!1}m"  1>&2;
-    shift
-    echo -n "====> "
-    echo -n "$@" 1>&2;
-    echo -n " <===="
-    echo -e "\e[0m"  1>&2;
+	echo -ne "\e[38;5;${!1}m"  1>&2;
+	shift
+	echo -n "====> "
+	echo -n "$@" 1>&2;
+	echo -n " <===="
+	echo -e "\e[0m"  1>&2;
 }
 
 build_die() {
 
-    build_message BM_RED "$@"
-    exit 1
+	build_message BM_RED "$@"
+	exit 1
 }
 
 build_make() {
 
-    local jobs="${1:-1}"
-    local hint=$(get_hint "$SRC_NAME" "make")
-    jobs="${hint:-$jobs}"
+	local jobs="${1:-1}"
+	local hint=$(get_hint "$SRC_NAME" "make")
+	jobs="${hint:-$jobs}"
 
-    make -j $jobs
-    [ $? -eq 0 ] || build_die "$SRC_NAME: make (jobs = $jobs) stage failed"
+	make -j $jobs
+	[ $? -eq 0 ] || build_die "$SRC_NAME: make (jobs = $jobs) stage failed"
 
-    make install
-    [ $? -eq 0 ] || build_die "$SRC_NAME: install stage failed"
+	make install
+	[ $? -eq 0 ] || build_die "$SRC_NAME: install stage failed"
 
-    build_message BM_GREEN "$SRC_NAME: built successfully (jobs = $jobs)"
+	build_message BM_GREEN "$SRC_NAME: built successfully (jobs = $jobs)"
 }
 
 fetch_source() {
 
-    local revision=$(get_hint "$SRC_NAME" "$SRC_METHOD")
-    local url=$(get_hint "$SRC_NAME" "url")
-    local status=1
+	local revision=$(get_hint "$SRC_NAME" "$SRC_METHOD")
+	local url=$(get_hint "$SRC_NAME" "url")
+	local status=1
 
-    if [ -z "$url" ]
-    then
-        url="$SRC_URL"
-    fi
+	if [ -z "$url" ]
+	then
+		url="$SRC_URL"
+	fi
 
-    case "$SRC_METHOD" in
-        git)
-            git clone "$url" "$SRC_NAME"
-            status=$?
-            if [ ! -z "$revision" ] && [ "$status" -eq 0 ]
-            then
-                cd_source
-                git reset --hard "$revision"
-                cd ..
-            fi
-        ;;
-        svn)
-            svn checkout "$url" "$SRC_NAME"
-            status=$?
-            if [ ! -z "$revision" ] && [ "$status" -eq 0 ]
-            then
-                cd_source
-                svn up -r"$revision"
-                cd ..
-            fi
-        ;;
-        hg)
-            hg clone "$url" "$SRC_NAME"
-            status=$?
-            if [ ! -z "$revision" ] && [ "$status" -eq 0 ]
-            then
-                cd_source
-                hg revert -r "$revision" --all
-                cd ..
-            fi
-        ;;
-        wget)
-            wget -O "$SRC_NAME.$1" "$url"
-        ;;
-        *)
-            build_die "$SRC_NAME: invalid fetch method -> $SRC_METHOD"
-        ;;
-    esac
-    if [ $status -eq 0 ]
-    then
-        build_message BM_MAGENTA "$SRC_NAME: fetch success -> $SRC_METHOD $url $revision"
-    else
-        build_die "$SRC_NAME: fetch failed -> $SRC_METHOD $url"
-    fi
+	case "$SRC_METHOD" in
+		git)
+			git clone "$url" "$SRC_NAME"
+			status=$?
+			if [ ! -z "$revision" ] && [ "$status" -eq 0 ]
+			then
+				cd_source
+				git reset --hard "$revision"
+				cd ..
+			fi
+		;;
+		svn)
+			svn checkout "$url" "$SRC_NAME"
+			status=$?
+			if [ ! -z "$revision" ] && [ "$status" -eq 0 ]
+			then
+				cd_source
+				svn up -r"$revision"
+				cd ..
+			fi
+		;;
+		hg)
+			hg clone "$url" "$SRC_NAME"
+			status=$?
+			if [ ! -z "$revision" ] && [ "$status" -eq 0 ]
+			then
+				cd_source
+				hg revert -r "$revision" --all
+				cd ..
+			fi
+		;;
+		wget)
+			wget -O "$SRC_NAME.$1" "$url"
+		;;
+		*)
+			build_die "$SRC_NAME: invalid fetch method -> $SRC_METHOD"
+		;;
+	esac
+	if [ $status -eq 0 ]
+	then
+		build_message BM_MAGENTA "$SRC_NAME: fetch success -> $SRC_METHOD $url $revision"
+	else
+		build_die "$SRC_NAME: fetch failed -> $SRC_METHOD $url"
+	fi
 }
 
 get_hint() {
 
-    local status=1
-    if [ -r "$HINTS_FILE" ]
-    then
-        #$1 name
-        #$2 hint
-        local name=$1
-        shift
-        local hint=$1
-        shift
+	local status=1
+	if [ -r "$HINTS_FILE" ]
+	then
+		#$1 name
+		#$2 hint
+		local name=$1
+		shift
+		local hint=$1
+		shift
 
-        awk -F'\t' -v name=$name -v hint=$hint \
-        '!($0 ~ /^[[:space:]]*#/) && !($0 ~ /^[[:space:]]*$/) && $1 == name && $2 == hint \
-         {printf "%s", $3; found=1; exit} \
-         END { if (found) {exit 0} else {exit 1}}' "$HINTS_FILE"
-         
-        status=$?
-    fi
-    return $status
+		awk -F'\t' -v name=$name -v hint=$hint \
+		'!($0 ~ /^[[:space:]]*#/) && !($0 ~ /^[[:space:]]*$/) && $1 == name && $2 == hint \
+		 {printf "%s", $3; found=1; exit} \
+		 END { if (found) {exit 0} else {exit 1}}' "$HINTS_FILE"
+		 
+		status=$?
+	fi
+	return $status
 }
 
 get_CXC_hints() {
 
-    if [ -r "$HINTS_FILE" ]
-    then
-        local h
-        local val
-        local var
-        for h in "HOST" "OPTIM" "CFLAGS" "JOBS"
-        do
-            val="$(get_hint "CXC" "$h")"
-            if [ $? -eq 0 ]
-            then
-                var="CXC_$h"
-                eval "$var=\$val"
-            fi
-        done
-    fi
+	if [ -r "$HINTS_FILE" ]
+	then
+		local h
+		local val
+		local var
+		for h in "HOST" "OPTIM" "CFLAGS" "JOBS"
+		do
+			val="$(get_hint "CXC" "$h")"
+			if [ $? -eq 0 ]
+			then
+				var="CXC_$h"
+				eval "$var=\$val"
+			fi
+		done
+	fi
 }
 
 set_source() {
 
-    cd "$ROOT_PATH/$SRC_PATH"
-    SRC_NAME="$1"
-    local src_url=$(get_hint "$SRC_NAME" "url")
-    SRC_METHOD="$2"
-    SRC_URL="${src_url:-$3}"
-    build_message BM_CYAN "$SRC_NAME"
+	cd "$ROOT_PATH/$SRC_PATH"
+	SRC_NAME="$1"
+	local src_url=$(get_hint "$SRC_NAME" "url")
+	SRC_METHOD="$2"
+	SRC_URL="${src_url:-$3}"
+	build_message BM_CYAN "$SRC_NAME"
 }
 
 cd_source() {
 
-    cd $SRC_NAME
+	cd $SRC_NAME
 }
 
 #startup banner
@@ -297,11 +297,12 @@ build_make $CXC_JOBS
 set_source "sdl" "hg" "http://hg.libsdl.org/SDL"
 fetch_source
 cd_source
-rm -rf .hg
+mv .hg .temp_hg
 CFLAGS=-DDECLSPEC= ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --bindir="$BIN_PATH" --enable-static --disable-shared
 [ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
 build_make $CXC_JOBS
 rm -f "$BIN_PATH"/sdl*
+mv .temp_hg .hg
 
 #nvenc
 set_source "nv-codec-headers" "git" "https://github.com/FFmpeg/nv-codec-headers.git"
