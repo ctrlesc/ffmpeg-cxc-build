@@ -12,11 +12,13 @@
 #------------
 #CXC options
 #------------
-#CXC	CFLAGS	-march=core-avx-i -mtune=core-avx-i -pipe
-#CXC	OPTIM	-O3
-CXC	JOBS	6
+CXC	CFLAGS	-march=core-avx-i -mtune=core-avx-i -pipe
+CXC	OPTIM	-O3
+#CXC	JOBS	6
 #use FETCH_ONLY to clone all the repositories without a build
 #CXC	FETCH_ONLY	1
+#display the config only - no fetch/build
+#CXC	SHOW_ONLY	1
 
 #-----------------------
 #constrain parallel make
