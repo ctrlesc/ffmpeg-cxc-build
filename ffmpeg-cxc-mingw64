@@ -1,13 +1,13 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.1.2"
+SCRIPT_VERSION="1.2.5"
 
 #build paths
-ROOT_PATH="$HOME"
+ROOT_PATH="${ROOT_PATH:-$HOME}"
 SRC_PATH="ffmpeg_sources"
 OUT_PATH="ffmpeg_build"
 BIN_PATH="$ROOT_PATH/$OUT_PATH/bin"
-HINTS_FILE="$ROOT_PATH/ffmpeg-cxc-build-hints"
+HINTS_FILE="${HINTS_FILE:-$ROOT_PATH/ffmpeg-cxc-build-hints}"
 
 #cross compiler settings
 CXC_HOST="x86_64-w64-mingw32"
@@ -15,6 +15,7 @@ CXC_OPTIM="-O2"
 CXC_CFLAGS="-mtune=generic -march=x86-64 -pipe"
 #make settings
 CXC_JOBS=$(nproc)
+CXC_FETCH_ONLY="${CXC_FETCH_ONLY:-0}"
 
 #fix pkg-config paths for cross
 export PKG_CONFIG_DIR=
@@ -23,7 +24,7 @@ export PKG_CONFIG_SYSROOT_PATH="$ROOT_PATH"
 export PKG_CONFIG_LIBDIR="$ROOT_PATH/$OUT_PATH/lib/pkgconfig"
 
 build_message() {
-	
+
 	local BM_WHITE=15
 	local BM_GREEN=10
 	local BM_CYAN=14
@@ -65,40 +66,69 @@ fetch_source() {
 	local revision=$(get_hint "$SRC_NAME" "$SRC_METHOD")
 	local url=$(get_hint "$SRC_NAME" "url")
 	local status=1
+	local scheme;
+	local path;
 
 	if [ -z "$url" ]
 	then
 		url="$SRC_URL"
 	fi
 
+	[[ "$url" =~ ^(file://)(.+)$ ]]
+	scheme="${BASH_REMATCH[1]}"
+	path="${BASH_REMATCH[2]}"
+
+	if [ "$scheme" == "file://" ]
+	then
+		mkdir "$SRC_NAME"
+		build_message BM_YELLOW "rsync $path/ ./$SRC_NAME/"
+		eval "rsync -rit --stats $path/ ./$SRC_NAME/"
+		status=$?
+	fi
+
 	case "$SRC_METHOD" in
 		git)
-			git clone "$url" "$SRC_NAME"
-			status=$?
+			if [ "$scheme" != "file://" ]
+			then
+				git clone "$url" "$SRC_NAME"
+				status=$?
+			fi
+
 			if [ ! -z "$revision" ] && [ "$status" -eq 0 ]
 			then
 				cd_source
 				git reset --hard "$revision"
+				$status=$?
 				cd ..
 			fi
 		;;
 		svn)
-			svn checkout "$url" "$SRC_NAME"
-			status=$?
+			if [ "$scheme" != "file://" ]
+			then
+				svn checkout "$url" "$SRC_NAME"
+				status=$?
+			fi
+
 			if [ ! -z "$revision" ] && [ "$status" -eq 0 ]
 			then
 				cd_source
 				svn up -r"$revision"
+				$status=$?
 				cd ..
 			fi
 		;;
 		hg)
-			hg clone "$url" "$SRC_NAME"
-			status=$?
+			if [ "$scheme" != "file://" ]
+			then        
+				hg clone "$url" "$SRC_NAME"
+				status=$?
+			fi
+
 			if [ ! -z "$revision" ] && [ "$status" -eq 0 ]
 			then
 				cd_source
 				hg revert -r "$revision" --all
+				$status=$?
 				cd ..
 			fi
 		;;
@@ -146,7 +176,7 @@ get_CXC_hints() {
 		local h
 		local val
 		local var
-		for h in "HOST" "OPTIM" "CFLAGS" "JOBS"
+		for h in "HOST" "OPTIM" "CFLAGS" "JOBS" "FETCH_ONLY"
 		do
 			val="$(get_hint "CXC" "$h")"
 			if [ $? -eq 0 ]
@@ -180,15 +210,23 @@ build_message BM_WHITE "ffmpeg-cxc-mingw64: Version $SCRIPT_VERSION"
 get_CXC_hints
 
 #ensure clean build
-rm -rf "$ROOT_PATH/$OUT_PATH"
+if [ "$CXC_FETCH_ONLY" -eq 0 ]
+then
+    rm -rf "$ROOT_PATH/$OUT_PATH"
+    [ -d "$ROOT_PATH/$OUT_PATH" ] && build_die "ffmpeg-cxc-mingw64: unable to reset build directory"
+fi
+
 rm -rf "$ROOT_PATH/$SRC_PATH"
+[ -d "$ROOT_PATH/$SRC_PATH" ] && build_die "ffmpeg-cxc-mingw64: unable to reset source directory"
 
-[ -d "$ROOT_PATH/$OUT_PATH" ] || [ -d "$ROOT_PATH/$SRC_PATH" ] && build_die "ffmpeg-cxc-mingw64: unable to reset build directories"
+if [ "$CXC_FETCH_ONLY" -eq 0 ]
+then
+    mkdir "$ROOT_PATH/$OUT_PATH"
+    [ ! -d "$ROOT_PATH/$OUT_PATH" ] && build_die "ffmpeg-cxc-mingw64: unable to create build directory"
+fi
 
-mkdir "$ROOT_PATH/$OUT_PATH"
 mkdir "$ROOT_PATH/$SRC_PATH"
-
-[ ! -d "$ROOT_PATH/$OUT_PATH" ] || [ ! -d "$ROOT_PATH/$SRC_PATH" ] && build_die "ffmpeg-cxc-mingw64: unable to create build directories"
+[ ! -d "$ROOT_PATH/$SRC_PATH" ] && build_die "ffmpeg-cxc-mingw64: unable to create source directory"
 
 #cmake toolchain settings
 touch $ROOT_PATH/$SRC_PATH/cross.cmake
@@ -207,144 +245,183 @@ echo 'SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "-static-libgcc -static-libstdc++ 
 #fdk-aac
 set_source "fdk-aac" "git" "https://github.com/mstorsjo/fdk-aac.git"
 fetch_source
-cd_source
-autoreconf -fiv
-./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
-[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make $CXC_JOBS
+if [ "$CXC_FETCH_ONLY" -eq 0 ]
+then
+	cd_source
+	autoreconf -fiv
+	./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+	[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+	build_make $CXC_JOBS
+fi
 
 #lame
 set_source "lame" "svn" "https://svn.code.sf.net/p/lame/svn/trunk/lame"
 fetch_source
-cd_source
-./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --enable-nasm --host="$CXC_HOST" --disable-shared --disable-frontend
-[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make
+if [ "$CXC_FETCH_ONLY" -eq 0 ]
+then
+	cd_source
+	./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --enable-nasm --host="$CXC_HOST" --disable-shared --disable-frontend
+	[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+	build_make
+fi
 
 #ogg
 set_source "ogg" "git" "https://github.com/xiph/ogg.git"
 fetch_source
-cd_source
-./autogen.sh
-./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
-[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make $CXC_JOBS
+if [ "$CXC_FETCH_ONLY" -eq 0 ]
+then
+	cd_source
+	./autogen.sh
+	./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+	[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+	build_make $CXC_JOBS
+fi
 
 #opus
 set_source "opus" "git" "https://github.com/xiph/opus.git"
 fetch_source
-cd_source
-./autogen.sh
-./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --disable-doc --disable-examples
-[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make $CXC_JOBS
+if [ "$CXC_FETCH_ONLY" -eq 0 ]
+then
+	cd_source
+	./autogen.sh
+	./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --disable-doc --disable-examples
+	[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+	build_make $CXC_JOBS
+fi
 
 #theora
 set_source "theora" "git" "https://github.com/xiph/theora.git"
 fetch_source
-cd_source
-./autogen.sh
-./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --disable-doc --disable-oggtest --disable-vorbistest --disable-examples
-[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make $CXC_JOBS
+if [ "$CXC_FETCH_ONLY" -eq 0 ]
+then
+	cd_source
+	./autogen.sh
+	./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --disable-doc --disable-oggtest --disable-vorbistest --disable-examples
+	[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+	build_make $CXC_JOBS
+fi
 
 #vorbis
 set_source "vorbis" "git" "https://github.com/xiph/vorbis.git"
 fetch_source
-cd_source
-./autogen.sh
-./configure --prefix="$ROOT_PATH/$OUT_PATH" --host="$CXC_HOST" --enable-static --disable-shared -disable-docs --disable-examples
-[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make $CXC_JOBS
+if [ "$CXC_FETCH_ONLY" -eq 0 ]
+then
+	cd_source
+	./autogen.sh
+	./configure --prefix="$ROOT_PATH/$OUT_PATH" --host="$CXC_HOST" --enable-static --disable-shared -disable-docs --disable-examples
+	[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+	build_make $CXC_JOBS
+fi
 
 #aom AV1
 set_source "aom" "git" "https://aomedia.googlesource.com/aom"
 fetch_source
-mkdir "$SRC_NAME"_build
-cd "$SRC_NAME"_build
-cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="../aom/build/cmake/toolchains/x86_64-mingw-gcc.cmake" -DAOM_TARGET_CPU="x86_64" -DENABLE_NASM="on" -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 ../aom
-[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make
+if [ "$CXC_FETCH_ONLY" -eq 0 ]
+then
+	mkdir "$SRC_NAME"_build
+	cd "$SRC_NAME"_build
+	cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="../aom/build/cmake/toolchains/x86_64-mingw-gcc.cmake" -DAOM_TARGET_CPU="x86_64" -DENABLE_NASM="on" -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 ../aom
+	[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+	build_make
+fi
 
 #vpx
 set_source "vpx" "git" "https://chromium.googlesource.com/webm/libvpx.git"
 fetch_source
-cd_source
-export CROSS="$CXC_HOST"-
-./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$CXC_CFLAGS" --target=x86_64-win64-gcc --as=yasm --enable-static --disable-shared --disable-examples --disable-tools --disable-docs --disable-unit-tests --enable-vp9 --enable-vp8 --enable-postproc --enable-vp9-postproc --enable-vp9-highbitdepth
-[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make $CXC_JOBS
-unset CROSS
+if [ "$CXC_FETCH_ONLY" -eq 0 ]
+then
+	cd_source
+	export CROSS="$CXC_HOST"-
+	./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$CXC_CFLAGS" --target=x86_64-win64-gcc --as=yasm --enable-static --disable-shared --disable-examples --disable-tools --disable-docs --disable-unit-tests --enable-vp9 --enable-vp8 --enable-postproc --enable-vp9-postproc --enable-vp9-highbitdepth
+	[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+	build_make $CXC_JOBS
+	unset CROSS
+fi
 
 #x264
 set_source "x264" "git" "https://git.videolan.org/git/x264"
 fetch_source
-cd_source
-./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$CXC_CFLAGS" --host="$CXC_HOST" --bindir="$BIN_PATH" --enable-static --cross-prefix="$CXC_HOST"- --disable-cli
-[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make $CXC_JOBS
+if [ "$CXC_FETCH_ONLY" -eq 0 ]
+then
+	cd_source
+	./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$CXC_CFLAGS" --host="$CXC_HOST" --bindir="$BIN_PATH" --enable-static --cross-prefix="$CXC_HOST"- --disable-cli
+	[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+	build_make $CXC_JOBS
+fi
 
 #x265
 set_source "x265" "hg" "https://bitbucket.org/multicoreware/x265"
 fetch_source
-cd_source
-cd build/linux
-cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DENABLE_SHARED=0 -DENABLE_CLI=0 ../../source
-[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make $CXC_JOBS
+if [ "$CXC_FETCH_ONLY" -eq 0 ]
+then
+	cd_source
+	cd build/linux
+	cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DENABLE_SHARED=0 -DENABLE_CLI=0 ../../source
+	[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+	build_make $CXC_JOBS
+fi
 
 #sdl
 set_source "sdl" "hg" "http://hg.libsdl.org/SDL"
 fetch_source
-cd_source
-mv .hg .temp_hg
-CFLAGS=-DDECLSPEC= ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --bindir="$BIN_PATH" --enable-static --disable-shared
-[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make $CXC_JOBS
-rm -f "$BIN_PATH"/sdl*
-mv .temp_hg .hg
+if [ "$CXC_FETCH_ONLY" -eq 0 ]
+then
+	cd_source
+	mv .hg .temp_hg
+	CFLAGS=-DDECLSPEC= ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --bindir="$BIN_PATH" --enable-static --disable-shared
+	[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+	build_make $CXC_JOBS
+	rm -f "$BIN_PATH"/sdl*
+	mv .temp_hg .hg
+fi
 
 #nvenc
 set_source "nv-codec-headers" "git" "https://github.com/FFmpeg/nv-codec-headers.git"
 fetch_source
-cd_source
-make PREFIX="$ROOT_PATH/$OUT_PATH" install
-[ $? -eq 0 ] || build_die "install stage failed for $SRC_NAME"
-build_message BM_GREEN "$SRC_NAME: built"
+if [ "$CXC_FETCH_ONLY" -eq 0 ]
+then
+	cd_source
+	make PREFIX="$ROOT_PATH/$OUT_PATH" install
+	[ $? -eq 0 ] || build_die "install stage failed for $SRC_NAME"
+	build_message BM_GREEN "$SRC_NAME: built"
+fi
 
 #ffmpeg
 set_source "ffmpeg" "git" "https://git.ffmpeg.org/ffmpeg.git"
 fetch_source
-cd_source
-./configure \
-  --cross-prefix="$CXC_HOST"- \
-  --arch="x86_64" \
-  --target-os="mingw64" \
-  --disable-debug \
-  --disable-w32threads \
-  --disable-shared \
-  --enable-static \
-  --prefix="$ROOT_PATH/$OUT_PATH" \
-  --pkg-config="pkg-config" \
-  --pkg-config-flags="--static" \
-  --extra-cflags="$CXC_OPTIM $CXC_CFLAGS" \
-  --extra-cflags="-I$ROOT_PATH/$OUT_PATH/include" \
-  --extra-ldflags="-L$ROOT_PATH/$OUT_PATH/lib -static -static-libstdc++ -static-libgcc" \
-  --extra-libs="-lwinpthread" \
-  --bindir="$BIN_PATH" \
-  --enable-gpl \
-  --enable-version3 \
-  --enable-nonfree \
-  --enable-libaom \
-  --enable-libfdk-aac \
-  --enable-libmp3lame \
-  --enable-libopus \
-  --enable-libtheora \
-  --enable-libvorbis \
-  --enable-libvpx \
-  --enable-libx264 \
-  --enable-libx265 \
-  --enable-nvenc \
-  --enable-nvdec
-[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
-build_make $CXC_JOBS
+if [ "$CXC_FETCH_ONLY" -eq 0 ]
+then
+	cd_source
+	./configure \
+	  --cross-prefix="$CXC_HOST"- \
+	  --arch="x86_64" \
+	  --target-os="mingw64" \
+	  --disable-debug \
+	  --disable-w32threads \
+	  --disable-shared \
+	  --enable-static \
+	  --prefix="$ROOT_PATH/$OUT_PATH" \
+	  --pkg-config="pkg-config" \
+	  --pkg-config-flags="--static" \
+	  --extra-cflags="$CXC_OPTIM $CXC_CFLAGS" \
+	  --extra-cflags="-I$ROOT_PATH/$OUT_PATH/include" \
+	  --extra-ldflags="-L$ROOT_PATH/$OUT_PATH/lib -static -static-libstdc++ -static-libgcc" \
+	  --extra-libs="-lwinpthread" \
+	  --bindir="$BIN_PATH" \
+	  --enable-gpl \
+	  --enable-version3 \
+	  --enable-nonfree \
+	  --enable-libaom \
+	  --enable-libfdk-aac \
+	  --enable-libmp3lame \
+	  --enable-libopus \
+	  --enable-libtheora \
+	  --enable-libvorbis \
+	  --enable-libvpx \
+	  --enable-libx264 \
+	  --enable-libx265 \
+	  --enable-nvenc \
+	  --enable-nvdec
+	[ $? -eq 0 ] || build_die "$SRC_NAME: configure stage failed"
+	build_make $CXC_JOBS
+fi

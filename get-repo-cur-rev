@@ -3,8 +3,8 @@
 THIS="get-repo-cur-rev"
 
 exiterr() {
-    echo -e "$THIS: $@" 1>&2;
-    exit 1 
+	echo -e "$THIS: $@" 1>&2;
+	exit 1 
 }
 
 if [ "$1" == "-h" ] || [ "$1" == "--h" ]
