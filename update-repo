@@ -1,0 +1,50 @@
+#!/bin/bash
+
+THIS="update-repo"
+
+exiterr() {
+	echo -e "$THIS: $@" 1>&2;
+	exit 1 
+}
+
+if [ "$1" == "-h" ] || [ "$1" == "--h" ]
+then
+    exiterr "Updates all repositories below a base directory.\n\nUSAGE:  $THIS [base dir]\n"
+fi
+
+fpath="${1:-.}"
+
+while IFS=$'\n' read -r rdir
+do
+	[[ "$rdir" =~ ^(.+/(.+)/)\.(git|hg|svn)$ ]]
+	tool="${BASH_REMATCH[3]}"
+	dir="${BASH_REMATCH[1]}"
+	name="${BASH_REMATCH[2]}"
+
+	printf "%s\t%s\t" "$name" "$tool"
+
+	case "$tool" in
+		git)
+			cd "$dir"
+			git fetch --all
+			git reset --hard HEAD
+			cd ..
+		;;
+		hg)
+			cd "$dir"
+			hg update --clean
+			cd ..
+			
+		;;
+		svn)
+			cd "$dir"
+			svn revert -R .
+			svn update
+			cd ..
+		;;
+		*)
+			echo "unknown"
+		;;
+	esac
+
+done < <(find "$fpath" -mindepth 2 -maxdepth 2 -type d -name ".git" -o -name ".svn" -o -name ".hg")
