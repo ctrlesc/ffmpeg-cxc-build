@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.3.1"
+SCRIPT_VERSION="1.3.2"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -247,7 +247,7 @@ then
 	[ -d "$ROOT_PATH/$OUT_PATH" ] && build_die "$THIS: unable to remove build directory -> $ROOT_PATH/$OUT_PATH"
 fi
 
-if [ "$CXC_FETCH_ONLY" -ne 0 ]
+if [ "$BUILD" -ne 0 ] || [ "$CXC_FETCH_ONLY" -ne 0 ]
 then
 	rm -rf "$ROOT_PATH/$SRC_PATH"
 	[ -d "$ROOT_PATH/$SRC_PATH" ] && build_die "$THIS: unable to remove source directory -> $ROOT_PATH/$SRC_PATH"
@@ -259,7 +259,7 @@ then
 	[ ! -d "$ROOT_PATH/$OUT_PATH" ] && build_die "$THIS: unable to create build directory -> $ROOT_PATH/$OUT_PATH"
 fi
 
-if [ "$CXC_FETCH_ONLY" -ne 0 ]
+if [ "$BUILD" -ne 0 ] || [ "$CXC_FETCH_ONLY" -ne 0 ]
 then
 	mkdir "$ROOT_PATH/$SRC_PATH"
 	[ ! -d "$ROOT_PATH/$SRC_PATH" ] && build_die "$THIS: unable to create source directory -> $ROOT_PATH/$SRC_PATH"
