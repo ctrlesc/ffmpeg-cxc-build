@@ -277,6 +277,8 @@ then
 	echo "SET(CMAKE_ASM_NASM_COMPILER                 nasm)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_CXX_FLAGS   \"$CXC_OPTIM $CXC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_C_FLAGS     \"$CXC_OPTIM $CXC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo 'SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS   "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo 'SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
 fi
 
 #build the sources
