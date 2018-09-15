@@ -1,23 +1,22 @@
 #!/bin/bash
 
 SCRIPT_VERSION="1.3.4"
-THIS="ffmpeg-cxc-mingw64"
+THIS="ffmpeg-native"
 
 #build paths
 ROOT_PATH="${ROOT_PATH:-$HOME}"
 SRC_PATH="${SRC_PATH:-ffmpeg_sources}"
 OUT_PATH="${OUT_PATH:-ffmpeg_build}"
 BIN_PATH="${BIN_PATH:-$ROOT_PATH/$OUT_PATH/bin}"
-HINTS_FILE="${HINTS_FILE:-$ROOT_PATH/ffmpeg-cxc-build-hints}"
+HINTS_FILE="${HINTS_FILE:-$ROOT_PATH/ffmpeg-native-build-hints}"
 
-#cross compiler settings
-CXC_HOST="x86_64-w64-mingw32"
-CXC_OPTIM="-O2"
-CXC_CFLAGS="-mtune=generic -march=x86-64 -pipe"
+#compiler settings
+NCC_OPTIM="-O2"
+NCC_CFLAGS="-mtune=generic -march=x86-64 -pipe"
 #make settings
-CXC_JOBS=$(getconf _NPROCESSORS_ONLN)
-CXC_FETCH_ONLY="${CXC_FETCH_ONLY:-0}"
-CXC_SHOW_ONLY="${CXC_SHOW_ONLY:-0}"
+NCC_JOBS=$(getconf _NPROCESSORS_ONLN)
+NCC_FETCH_ONLY="${NCC_FETCH_ONLY:-0}"
+NCC_SHOW_ONLY="${NCC_SHOW_ONLY:-0}"
 
 #fix pkg-config paths for cross
 export PKG_CONFIG_DIR=
@@ -80,7 +79,7 @@ fetch_source() {
 	if [ "$scheme" == "file://" ]
 	then
 		build_message BM_YELLOW "rsync $path/ ./$SRC_NAME/"
-		if [ "$CXC_SHOW_ONLY" -eq 0 ]
+		if [ "$NCC_SHOW_ONLY" -eq 0 ]
 		then
 			mkdir "$SRC_NAME"
 			eval "rsync -rit --stats $path/ ./$SRC_NAME/"
@@ -88,7 +87,7 @@ fetch_source() {
 		fi
 	fi
 
-	if [ "$CXC_SHOW_ONLY" -ne 0 ]
+	if [ "$NCC_SHOW_ONLY" -ne 0 ]
 	then
 		build_message BM_MAGENTA "$SRC_NAME: fetch -> $SRC_METHOD $url $revision"
 		return 0
@@ -177,19 +176,19 @@ get_hint() {
 	return $status
 }
 
-get_CXC_hints() {
+get_NCC_hints() {
 
 	if [ -r "$HINTS_FILE" ]
 	then
 		local h
 		local val
 		local var
-		for h in "HOST" "OPTIM" "CFLAGS" "JOBS" "FETCH_ONLY" "SHOW_ONLY"
+		for h in "OPTIM" "CFLAGS" "JOBS" "FETCH_ONLY" "SHOW_ONLY"
 		do
-			val="$(get_hint "CXC" "$h")"
+			val="$(get_hint "NCC" "$h")"
 			if [ $? -eq 0 ]
 			then
-				var="CXC_$h"
+				var="NCC_$h"
 				eval "$var=\$val"
 			fi
 		done
@@ -198,7 +197,7 @@ get_CXC_hints() {
 
 set_source() {
 
-	if [ "$CXC_SHOW_ONLY" -eq 0 ]
+	if [ "$NCC_SHOW_ONLY" -eq 0 ]
 	then
 		cd "$ROOT_PATH/$SRC_PATH"
 	fi
@@ -218,22 +217,22 @@ cd_source() {
 #startup banner
 build_message BM_WHITE "$THIS: Version $SCRIPT_VERSION"
 
-#load CXC hints
-get_CXC_hints
-if [ "$CXC_SHOW_ONLY" -ne 0 ]
+#load NCC hints
+get_NCC_hints
+if [ "$NCC_SHOW_ONLY" -ne 0 ]
 then
 	for i in "ROOT_PATH" "SRC_PATH" "OUT_PATH" "BIN_PATH" "HINTS_FILE"
 	do
 		echo "$i: ${!i}"
 	done
-	for i in "HOST" "OPTIM" "CFLAGS" "JOBS" "FETCH_ONLY" "SHOW_ONLY"
+	for i in "OPTIM" "CFLAGS" "JOBS" "FETCH_ONLY" "SHOW_ONLY"
 	do
-		var="CXC_$i"
+		var="NCC_$i"
 		echo "$var: ${!var}"
 	done
 fi
 
-if [ "$CXC_FETCH_ONLY" -eq 0 ] && [ "$CXC_SHOW_ONLY" -eq 0 ]
+if [ "$NCC_FETCH_ONLY" -eq 0 ] && [ "$NCC_SHOW_ONLY" -eq 0 ]
 then
 	BUILD=1
 else
@@ -247,7 +246,7 @@ then
 	[ -d "$ROOT_PATH/$OUT_PATH" ] && build_die "$THIS: unable to remove build directory -> $ROOT_PATH/$OUT_PATH"
 fi
 
-if [ "$BUILD" -ne 0 ] || [ "$CXC_FETCH_ONLY" -ne 0 ]
+if [ "$BUILD" -ne 0 ] || [ "$NCC_FETCH_ONLY" -ne 0 ]
 then
 	rm -rf "$ROOT_PATH/$SRC_PATH"
 	[ -d "$ROOT_PATH/$SRC_PATH" ] && build_die "$THIS: unable to remove source directory -> $ROOT_PATH/$SRC_PATH"
@@ -259,7 +258,7 @@ then
 	[ ! -d "$ROOT_PATH/$OUT_PATH" ] && build_die "$THIS: unable to create build directory -> $ROOT_PATH/$OUT_PATH"
 fi
 
-if [ "$BUILD" -ne 0 ] || [ "$CXC_FETCH_ONLY" -ne 0 ]
+if [ "$BUILD" -ne 0 ] || [ "$NCC_FETCH_ONLY" -ne 0 ]
 then
 	mkdir "$ROOT_PATH/$SRC_PATH"
 	[ ! -d "$ROOT_PATH/$SRC_PATH" ] && build_die "$THIS: unable to create source directory -> $ROOT_PATH/$SRC_PATH"
@@ -268,15 +267,15 @@ fi
 if [ "$BUILD" -ne 0 ]
 then
 	#cmake toolchain settings
-	touch $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_SYSTEM_NAME                    Windows)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_C_COMPILER      x86_64-w64-mingw32-gcc)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_CXX_COMPILER    x86_64-w64-mingw32-g++)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_RC_COMPILER x86_64-w64-mingw32-windres)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_ASM_YASM_COMPILER                 yasm)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_ASM_NASM_COMPILER                 nasm)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_CXX_FLAGS   \"$CXC_OPTIM $CXC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_C_FLAGS     \"$CXC_OPTIM $CXC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	touch $ROOT_PATH/$SRC_PATH/native.make
+	echo "SET(CMAKE_SYSTEM_NAME       Linux)" >> $ROOT_PATH/$SRC_PATH/native.make
+	echo "SET(CMAKE_SYSTEM_PROCESSOR x86_64)" >> $ROOT_PATH/$SRC_PATH/native.make
+	echo "SET(CMAKE_C_COMPILER          gcc)" >> $ROOT_PATH/$SRC_PATH/native.make
+	echo "SET(CMAKE_CXX_COMPILER        g++)" >> $ROOT_PATH/$SRC_PATH/native.make
+	echo "SET(CMAKE_ASM_YASM_COMPILER  yasm)" >> $ROOT_PATH/$SRC_PATH/native.make
+	echo "SET(CMAKE_ASM_NASM_COMPILER  nasm)" >> $ROOT_PATH/$SRC_PATH/native.make
+	echo "SET(CMAKE_CXX_FLAGS  \"$NCC_OPTIM $NCC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/native.make
+	echo "SET(CMAKE_C_FLAGS    \"$NCC_OPTIM $NCC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/native.make
 fi
 
 #build the sources
@@ -287,9 +286,9 @@ if [ "$BUILD" -ne 0 ]
 then
 	cd_source
 	autoreconf -fiv
-	./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+	./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --enable-static --disable-shared
 	[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-	build_make $CXC_JOBS
+	build_make $NCC_JOBS
 fi
 
 #lame
@@ -298,9 +297,9 @@ fetch_source
 if [ "$BUILD" -ne 0 ]
 then
 	cd_source
-	./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --enable-nasm --host="$CXC_HOST" --disable-shared --disable-frontend
+	./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --enable-nasm --disable-shared --disable-frontend
 	[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-	build_make $CXC_JOBS
+	build_make $NCC_JOBS
 fi
 
 #ogg
@@ -310,9 +309,9 @@ if [ "$BUILD" -ne 0 ]
 then
 	cd_source
 	./autogen.sh
-	./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+	./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --enable-static --disable-shared
 	[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-	build_make $CXC_JOBS
+	build_make $NCC_JOBS
 fi
 
 #opus
@@ -322,9 +321,9 @@ if [ "$BUILD" -ne 0 ]
 then
 	cd_source
 	./autogen.sh
-	./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --disable-doc --disable-examples
+	./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --enable-static --disable-shared --disable-doc --disable-examples
 	[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-	build_make $CXC_JOBS
+	build_make $NCC_JOBS
 fi
 
 #theora
@@ -334,9 +333,9 @@ if [ "$BUILD" -ne 0 ]
 then
 	cd_source
 	./autogen.sh
-	./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --disable-doc --disable-oggtest --disable-vorbistest --disable-examples
+	./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --enable-static --disable-shared --disable-doc --disable-oggtest --disable-vorbistest --disable-examples
 	[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-	build_make $CXC_JOBS
+	build_make $NCC_JOBS
 fi
 
 #vorbis
@@ -346,9 +345,9 @@ if [ "$BUILD" -ne 0 ]
 then
 	cd_source
 	./autogen.sh
-	./configure --prefix="$ROOT_PATH/$OUT_PATH" --host="$CXC_HOST" --enable-static --disable-shared -disable-docs --disable-examples
+	./configure --prefix="$ROOT_PATH/$OUT_PATH" --enable-static --disable-shared -disable-docs --disable-examples
 	[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-	build_make $CXC_JOBS
+	build_make $NCC_JOBS
 fi
 
 #aom AV1
@@ -358,9 +357,9 @@ if [ "$BUILD" -ne 0 ]
 then
 	mkdir "$SRC_NAME"_build
 	cd "$SRC_NAME"_build
-	cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="../aom/build/cmake/toolchains/x86_64-mingw-gcc.cmake" -DCMAKE_C_FLAGS="$CXC_OPTIM $CXC_CFLAGS" -DCMAKE_CXX_FLAGS="$CXC_OPTIM $CXC_CFLAGS" -DAOM_TARGET_CPU="x86_64" -DENABLE_SHARED=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 ../aom
+	cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.make" -DAOM_TARGET_CPU="x86_64" -DENABLE_SHARED=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 ../aom
 	[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-	build_make $CXC_JOBS
+	build_make $NCC_JOBS
 fi
 
 #vpx
@@ -369,11 +368,9 @@ fetch_source
 if [ "$BUILD" -ne 0 ]
 then
 	cd_source
-	export CROSS="$CXC_HOST"-
-	./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$CXC_CFLAGS" --target=x86_64-win64-gcc --as=yasm --enable-static --disable-shared --disable-examples --disable-tools --disable-docs --disable-unit-tests --enable-vp9 --enable-vp8 --enable-postproc --enable-vp9-postproc --enable-vp9-highbitdepth
+	./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$NCC_CFLAGS" --target=x86_64-linux-gcc --as=yasm --enable-static --disable-shared --disable-examples --disable-tools --disable-docs --disable-unit-tests --enable-vp9 --enable-vp8 --enable-postproc --enable-vp9-postproc --enable-vp9-highbitdepth
 	[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-	build_make $CXC_JOBS
-	unset CROSS
+	build_make $NCC_JOBS
 fi
 
 #x264
@@ -382,9 +379,9 @@ fetch_source
 if [ "$BUILD" -ne 0 ]
 then
 	cd_source
-	./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$CXC_CFLAGS" --host="$CXC_HOST" --bindir="$BIN_PATH" --enable-static --cross-prefix="$CXC_HOST"- --disable-cli
+	./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$NCC_CFLAGS" --bindir="$BIN_PATH" --enable-static --disable-cli
 	[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-	build_make $CXC_JOBS
+	build_make $NCC_JOBS
 fi
 
 #x265
@@ -394,9 +391,9 @@ if [ "$BUILD" -ne 0 ]
 then
 	cd_source
 	cd build/linux
-	cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DENABLE_SHARED=0 -DENABLE_CLI=0 ../../source
+	cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.make" -DENABLE_SHARED=0 -DENABLE_CLI=0 ../../source
 	[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-	build_make $CXC_JOBS
+	build_make $NCC_JOBS
 fi
 
 #sdl
@@ -406,9 +403,9 @@ if [ "$BUILD" -ne 0 ]
 then
 	cd_source
 	mv .hg .temp_hg
-	CFLAGS=-DDECLSPEC= ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --bindir="$BIN_PATH" --enable-static --disable-shared
+	CFLAGS=-DDECLSPEC= ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --bindir="$BIN_PATH" --enable-static --disable-shared
 	[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-	build_make $CXC_JOBS
+	build_make $NCC_JOBS
 	rm -f "$BIN_PATH"/sdl*
 	mv .temp_hg .hg
 fi
@@ -431,20 +428,14 @@ if [ "$BUILD" -ne 0 ]
 then
 	cd_source
 	./configure \
-	  --cross-prefix="$CXC_HOST"- \
-	  --arch="x86_64" \
-	  --target-os="mingw64" \
-	  --disable-debug \
-	  --disable-w32threads \
-	  --disable-shared \
 	  --enable-static \
 	  --prefix="$ROOT_PATH/$OUT_PATH" \
 	  --pkg-config="pkg-config" \
 	  --pkg-config-flags="--static" \
-	  --extra-cflags="$CXC_OPTIM $CXC_CFLAGS" \
+	  --extra-cflags="$NCC_OPTIM $NCC_CFLAGS -no-pie" \
 	  --extra-cflags="-I$ROOT_PATH/$OUT_PATH/include" \
-	  --extra-ldflags="-L$ROOT_PATH/$OUT_PATH/lib -static-libgcc -static-libstdc++ -static -s" \
-	  --extra-libs="-lwinpthread" \
+	  --extra-ldflags="-L$ROOT_PATH/$OUT_PATH/lib -no-pie" \
+	  --extra-libs="-lpthread -lm" \
 	  --bindir="$BIN_PATH" \
 	  --enable-gpl \
 	  --enable-version3 \
@@ -461,5 +452,5 @@ then
 	  --enable-nvenc \
 	  --enable-nvdec
 	[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-	build_make $CXC_JOBS
+	build_make $NCC_JOBS
 fi

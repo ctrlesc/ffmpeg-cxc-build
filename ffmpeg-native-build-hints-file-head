@@ -1,0 +1,65 @@
+#-------------------------------------------------
+#ffmpeg-native-build-hints
+#-------------------------------------------------
+
+#place this file in the directory specified by the script's ROOT_PATH 
+#fields are TAB delimited triplets enabling control of the build
+
+#source	key	value
+
+#------------
+#NCC options
+#------------
+NCC	CFLAGS	-march=core-avx-i -mtune=core-avx-i -pipe
+NCC	OPTIM	-O3
+#NCC	JOBS	6
+#use FETCH_ONLY to clone all the repositories without a build
+#NCC	FETCH_ONLY	1
+#display the config only - no fetch/build
+#NCC	SHOW_ONLY	1
+
+#-----------------------
+#constrain parallel make
+#-----------------------
+#source	make	job_count
+aom	make	4
+lame	make	1
+
+#---------------------------
+#set override URL for source
+#---------------------------
+#source	url	url_string
+#ffmpeg	url	https://git.videolan.org/git/ffmpeg.git
+
+ffmpeg	url	file://~/src/ffmpeg
+aom	url	file://~/src/aom
+fdk-aac	url	file://~/src/fdk-aac
+lame	url	file://~/src/lame
+nv-codec-headers	url	file://~/src/nv-codec-headers
+ogg	url	file://~/src/ogg
+opus	url	file://~/src/opus
+sdl	url	file://~/src/sdl
+theora	url	file://~/src/theora
+vorbis	url	file://~/src/vorbis
+vpx	url	file://~/src/vpx
+x264	url	file://~/src/x264
+x265	url	file://~/src/x265
+
+#------------------------
+#fetch specified revision
+#------------------------
+#source	fetch_method	revision_id
+ffmpeg	git	
+aom	git	
+fdk-aac	git	
+lame	svn	
+nv-codec-headers	git	
+ogg	git	
+opus	git	
+sdl	hg	
+theora	git	
+vorbis	git	
+vpx	git	
+x264	git	
+x265	hg	
+
