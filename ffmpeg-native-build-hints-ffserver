@@ -1,0 +1,70 @@
+#-------------------------------------------------
+#ffmpeg-native-build-hints-ffserver - last commit
+#-------------------------------------------------
+
+#place this file in the directory specified by the script's ROOT_PATH or
+#set via the command line:
+#HINTS_FILE=/media/user/usb/my-build-hints ffmpeg-native
+
+#fields are TAB delimited triplets enabling control of the build
+#source	key	value
+
+#------------
+#NCC options
+#------------
+NCC	CFLAGS	-march=core-avx-i -mtune=core-avx-i -pipe
+NCC	OPTIM	-O3
+#NCC	JOBS	6
+#use FETCH_ONLY to clone all the repositories without a build
+#NCC	FETCH_ONLY	1
+#display the config only - no fetch/build
+#NCC	SHOW_ONLY	1
+
+#-----------------------
+#constrain parallel make
+#-----------------------
+#source	make	job_count
+
+#aom must be disabled for ffserver
+aom	disable
+
+#---------------------------
+#set override URL for source
+#---------------------------
+#source	url	url_string
+#ffmpeg	url	https://git.videolan.org/git/ffmpeg.git
+
+#file:// url can be used to rsync from a local source repository
+#ffmpeg	url	file://~/src/ffmpeg
+#aom	url	file://~/src/aom
+#fdk-aac	url	file://~/src/fdk-aac
+#lame	url	file://~/src/lame
+#nv-codec-headers	url	file://~/src/nv-codec-headers
+#ogg	url	file://~/src/ogg
+#opus	url	file://~/src/opus
+#sdl	url	file://~/src/sdl
+#theora	url	file://~/src/theora
+#vorbis	url	file://~/src/vorbis
+#vpx	url	file://~/src/vpx
+#x264	url	file://~/src/x264
+#x265	url	file://~/src/x265
+
+#------------------------
+#fetch specified revision
+#------------------------
+#source	fetch_method	revision_id
+
+aom	git	0b3fd892e1e56d56279d531302855c7d36e2e12e
+fdk-aac	git	74c1a2a
+ffmpeg	git	2ca65fc
+lame	svn	6432
+nv-codec-headers	git	e6f3a414a599529ce5da0863f3e060c19c8a19ce
+ogg	git	bc82844df068429d209e909da47b1f730b53b689
+opus	git	5cbd7d5f7d981385fb948a161a7cd5a0146d9039
+sdl	hg	02509665751f
+theora	git	e5d205bfe849f1b41f45b91a0b71a3bdc6cd458f
+vorbis	git	46e70fa6573e206c2555cd99a53204ffd6bf58fd
+vpx	git	edc203c4c7a0cff746a8f340ad21d91cb8cba852
+x264	git	303c484ec828ed0d8bfe743500e70314d026c3bd
+x265	hg	88ee12651e30
+
