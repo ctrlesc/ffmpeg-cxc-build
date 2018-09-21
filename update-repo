@@ -27,12 +27,16 @@ do
 		git)
 			cd "$dir"
 			git fetch --all
-			git reset --hard HEAD
+			#git reset --hard HEAD
+			git reset --hard origin/master
+			#git rev-parse HEAD
+			git log -n 1 --oneline --decorate origin/master
 			cd ..
 		;;
 		hg)
 			cd "$dir"
 			hg update --clean
+                        hg id -i | grep -Eo '[a-f0-9]+'
 			cd ..
 			
 		;;
@@ -40,6 +44,7 @@ do
 			cd "$dir"
 			svn revert -R .
 			svn update
+                        svn info --show-item revision
 			cd ..
 		;;
 		*)
