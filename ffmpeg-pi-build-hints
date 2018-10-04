@@ -1,0 +1,57 @@
+#-------------------------------------------------
+#ffmpeg-pi-build-hints
+#-------------------------------------------------
+
+#place this file in the directory specified by the script's ROOT_PATH 
+#fields are TAB delimited triplets enabling control of the build
+
+#source	key	value
+
+#------------
+#NCC options
+#------------
+NCC	CFLAGS	-march=armv8-a+crc -mtune=cortex-a53  -mfpu=neon-fp-armv8 -mfloat-abi=hard -mlittle-endian -munaligned-access -pipe
+#NCC	OPTIM	-O2
+NCC	JOBS	3
+#use FETCH_ONLY to clone all the repositories without a build
+#NCC	FETCH_ONLY	1
+#display the config only - no fetch/build
+#NCC	SHOW_ONLY	1
+
+#-----------------------
+#constrain parallel make
+#-----------------------
+#source	make	job_count
+
+
+#---------------------------
+#set override URL for source
+#---------------------------
+#source	url	url_string
+#ffmpeg	url	https://git.videolan.org/git/ffmpeg.git
+
+ffmpeg	url	file://~/src/ffmpeg
+userland	url	file://~/src/userland
+fdk-aac	url	file://~/src/fdk-aac
+lame	url	file://~/src/lame
+ogg	url	file://~/src/ogg
+opus	url	file://~/src/opus
+theora	url	file://~/src/theora
+vorbis	url	file://~/src/vorbis
+vpx	url	file://~/src/vpx
+x264	url	file://~/src/x264
+
+#------------------------
+#fetch specified revision
+#------------------------
+#source	fetch_method	revision_id
+ffmpeg	git	f515c978f63f818d22d94eac9b6ba47f762e6ad9
+userland	git	de4a7f2e3c391e2d3bc76af31864270e7802d9ac
+fdk-aac	git	e6bb25613016ecd64ccbcb354768b4794ffd6351
+lame	svn	6432
+ogg	git	bc82844df068429d209e909da47b1f730b53b689
+opus	git	a8e2a2b1a8ab2cb9d9e7d4fe21128ac9e769fe4e
+theora	git	e5d205bfe849f1b41f45b91a0b71a3bdc6cd458f
+vorbis	git	46e70fa6573e206c2555cd99a53204ffd6bf58fd
+vpx	git	129e6fe52463d192f6b48f7d42ac4a3a93c61f3b
+x264	git	545de2ffec6ae9a80738de1b2c8cf820249a2530
