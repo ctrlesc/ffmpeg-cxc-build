@@ -505,7 +505,7 @@ fi
 #fi
 
 #rpi userland
-set_source "userland" "git" "https://github.com/raspberrypi/userland.git" "mmal" "omx" "omx-rpi" "decoder=h264_mmal" "decoder=mpeg2_mmal" "decoder=vc1_mmal" "encoder=h264_omx"
+set_source "userland" "git" "https://github.com/raspberrypi/userland.git" "mmal" "omx" "omx-rpi"
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
 	fetch_source

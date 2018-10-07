@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_VERSION="1.4.0"
-THIS="ffmpeg-native"
+THIS="ffmpeg-native-x86"
 
 #build paths
 ROOT_PATH="${ROOT_PATH:-$HOME}"
@@ -16,7 +16,7 @@ NCC_PATH_LIST=\
 
 #compiler settings
 NCC_OPTIM="-O2"
-NCC_CFLAGS="-mtune=native"
+NCC_CFLAGS="-mtune=native -pipe"
 #make settings
 NCC_JOBS=$(getconf _NPROCESSORS_ONLN)
 NCC_FETCH_ONLY="${NCC_FETCH_ONLY:-0}"

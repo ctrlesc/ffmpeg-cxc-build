@@ -1,5 +1,5 @@
 #-------------------------------------------------
-#ffmpeg-pi-build-hints
+#ffmpeg-pi-build-hints - 2018-10-06 working build
 #-------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH 
@@ -10,7 +10,7 @@
 #------------
 #NCC options
 #------------
-NCC	CFLAGS	-march=armv8-a+crc -mtune=cortex-a53  -mfpu=neon-fp-armv8 -mfloat-abi=hard -mlittle-endian -munaligned-access -pipe
+NCC	CFLAGS	-march=armv8-a+crc -mtune=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard -mlittle-endian -munaligned-access -pipe
 #NCC	OPTIM	-O2
 NCC	JOBS	3
 #use FETCH_ONLY to clone all the repositories without a build
@@ -30,16 +30,16 @@ NCC	JOBS	3
 #source	url	url_string
 #ffmpeg	url	https://git.videolan.org/git/ffmpeg.git
 
-ffmpeg	url	file://~/src/ffmpeg
-userland	url	file://~/src/userland
-fdk-aac	url	file://~/src/fdk-aac
-lame	url	file://~/src/lame
-ogg	url	file://~/src/ogg
-opus	url	file://~/src/opus
-theora	url	file://~/src/theora
-vorbis	url	file://~/src/vorbis
-vpx	url	file://~/src/vpx
-x264	url	file://~/src/x264
+#ffmpeg	url	file://~/src/ffmpeg
+#userland	url	file://~/src/userland
+#fdk-aac	url	file://~/src/fdk-aac
+#lame	url	file://~/src/lame
+#ogg	url	file://~/src/ogg
+#opus	url	file://~/src/opus
+#theora	url	file://~/src/theora
+#vorbis	url	file://~/src/vorbis
+#vpx	url	file://~/src/vpx
+#x264	url	file://~/src/x264
 
 #------------------------
 #fetch specified revision
