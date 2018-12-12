@@ -21,7 +21,7 @@ do
 	dir="${BASH_REMATCH[1]}"
 	name="${BASH_REMATCH[2]}"
 
-	printf "%s\t%s\t" "$name" "$tool"
+	printf "%s\n%s\t%s:\n" "===============================================================================" "$name" "$tool"
 
 	case "$tool" in
 		git)
@@ -36,7 +36,8 @@ do
 		hg)
 			cd "$dir"
 			hg update --clean
-                        hg id -i | grep -Eo '[a-f0-9]+'
+			hg id -i | grep -Eo '[a-f0-9]+'
+			hg log --limit 1
 			cd ..
 			
 		;;
@@ -44,7 +45,8 @@ do
 			cd "$dir"
 			svn revert -R .
 			svn update
-                        svn info --show-item revision
+			#svn log -r $(svn info --show-item revision)
+			svn log --limit 1
 			cd ..
 		;;
 		*)
