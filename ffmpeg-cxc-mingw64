@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.4.0"
+SCRIPT_VERSION="1.4.5"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -29,9 +29,10 @@ CXC_OPTION_LIST=\
 )
 CXC_SOURCE_LIST=\
 ( \
-"aom" "fdk-aac" "ffmpeg" "lame" \
-"nv-codec-headers" "ogg" "opus" "sdl" \
-"theora" "vorbis" "vpx" "x264" "x265" \
+"aom" "ass" "fdk-aac" "freetype" "ffmpeg" "fribidi" "lame" \
+"nv-codec-headers" "ogg" "opus" "png" "sdl" \
+"sofa" "theora" "vorbis" "vpx" \
+"x264" "x265" "zlib" \
 )
 
 #fix pkg-config paths for cross
@@ -63,10 +64,11 @@ build_die() {
 build_make() {
 
 	local jobs="${1:-1}"
+	shift
 	local hint=$(get_hint "$SRC_NAME" "make")
 	jobs="${hint:-$jobs}"
 
-	make -j $jobs
+	make -j $jobs "$@"
 	[ $? -eq 0 ] || build_die "$THIS: make stage failed (jobs = $jobs) -> $SRC_NAME"
 
 	make install
@@ -98,7 +100,7 @@ fetch_source() {
 		if [ "$CXC_SHOW_ONLY" -eq 0 ]
 		then
 			mkdir "$SRC_NAME"
-			eval "rsync -rit --stats $path/ ./$SRC_NAME/"
+			eval "rsync -ritl --stats $path/ ./$SRC_NAME/"
 			status=$?
 		fi
 	fi
@@ -350,19 +352,125 @@ if [ "$BUILD" -ne 0 ]
 then
 	#cmake toolchain settings
 	touch $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_SYSTEM_NAME                    Windows)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_C_COMPILER      x86_64-w64-mingw32-gcc)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_CXX_COMPILER    x86_64-w64-mingw32-g++)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_RC_COMPILER x86_64-w64-mingw32-windres)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_ASM_YASM_COMPILER                 yasm)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_ASM_NASM_COMPILER                 nasm)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_CXX_FLAGS   \"$CXC_OPTIM $CXC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_C_FLAGS     \"$CXC_OPTIM $CXC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_SYSTEM_NAME                      Windows)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_C_COMPILER        x86_64-w64-mingw32-gcc)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_CXX_COMPILER      x86_64-w64-mingw32-g++)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_RC_COMPILER   x86_64-w64-mingw32-windres)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_ASM_YASM_COMPILER                   yasm)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_ASM_NASM_COMPILER                   nasm)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_CXX_FLAGS     \"$CXC_OPTIM $CXC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_C_FLAGS       \"$CXC_OPTIM $CXC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo 'SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS   "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo 'SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
 fi
 
 #build the sources
+
+#zlib
+set_source "zlib" "git" "https://github.com/madler/zlib.git" "zlib"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+		cp $ROOT_PATH/$OUT_PATH/lib/libzlibstatic.a $ROOT_PATH/$OUT_PATH/lib/libz.a
+	fi
+fi
+
+#png16
+set_source "png" "git" "https://git.code.sf.net/p/libpng/code"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		autoreconf -fiv
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="-I$ROOT_PATH/$OUT_PATH/include" LDFLAGS="-L$ROOT_PATH/$OUT_PATH/lib" --host="$CXC_HOST" --enable-static --disable-shared
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+	fi
+fi
+
+#freetype
+set_source "freetype" "git" "https://github.com/aseprite/freetype2.git" "libfreetype"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		./autogen.sh
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+	fi
+fi
+
+#fribidi 
+set_source "fribidi" "git" "https://github.com/fribidi/fribidi.git" "libfribidi"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		autoreconf -fiv
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS -C lib
+	fi
+fi
+
+#libxml2
+set_source "xml2" "git" "https://github.com/GNOME/libxml2.git" "libxml2"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		autoreconf -fiv
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --with-python=no
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+	fi
+fi
+
+#fontconfig
+set_source "fontconfig" "git" "https://gitlab.freedesktop.org/fontconfig/fontconfig.git" "libfontconfig"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		autoreconf -fiv
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+	fi
+fi
+
+#libass
+set_source "ass" "git" "https://github.com/libass/libass.git" "libass"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		autoreconf -fiv
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+	fi
+fi
+
 #fdk-aac
 set_source "fdk-aac" "git" "https://github.com/mstorsjo/fdk-aac.git" "libfdk-aac"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -461,7 +569,7 @@ fetch_source
 	then
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="../aom/build/cmake/toolchains/x86_64-mingw-gcc.cmake" -DCMAKE_C_FLAGS="$CXC_OPTIM $CXC_CFLAGS" -DCMAKE_CXX_FLAGS="$CXC_OPTIM $CXC_CFLAGS" -DAOM_TARGET_CPU="x86_64" -DENABLE_SHARED=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 ../aom
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="../aom/build/cmake/toolchains/x86_64-mingw-gcc.cmake" -DCMAKE_C_FLAGS="$CXC_OPTIM $CXC_CFLAGS" -DCMAKE_CXX_FLAGS="$CXC_OPTIM $CXC_CFLAGS" -DAOM_TARGET_CPU="x86_64" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 -DENABLE_TOOLS=0 ../aom
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -507,6 +615,20 @@ then
 		cd_source
 		cd build/linux
 		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DENABLE_SHARED=0 -DENABLE_CLI=0 ../../source
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+	fi
+fi
+
+#sofa
+set_source "sofa" "git" "https://github.com/hoene/libmysofa.git" "libmysofa"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DZLIB_LIBRARY="$ROOT_PATH/$OUT_PATH/lib/libz.a" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
