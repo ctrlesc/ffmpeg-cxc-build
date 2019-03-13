@@ -3,7 +3,7 @@ Fast cross-compile ffmpeg for Windows with MinGW on Linux.
 
 **Enabled Features**
 
-  aom fdk-aac mp3lame opus theora vorbis vpx x264 x265 nvenc nvdec
+  aom fdk-aac mp3lame opus theora vorbis vpx x264 x265 nvenc nvdec sofalizer fontconfig ass/ssa (subtitles)
 
 **Package Requirements**
 
