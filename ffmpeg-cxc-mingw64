@@ -378,7 +378,7 @@ then
 		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
-		cp $ROOT_PATH/$OUT_PATH/lib/libzlibstatic.a $ROOT_PATH/$OUT_PATH/lib/libz.a
+		cp "$ROOT_PATH/$OUT_PATH/lib/libzlibstatic.a" "$ROOT_PATH/$OUT_PATH/lib/libz.a"
 	fi
 fi
 
