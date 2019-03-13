@@ -1,5 +1,5 @@
 #-------------------------------------------------
-#ffmpeg-cxc-build-hints - 2019-03-11 working build
+#ffmpeg-cxc-build-hints - 2019-03-12 working build
 #-------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -29,6 +29,7 @@ CXC	OPTIM	-O3
 #vpx	disable	
 #lame	make	1
 fribidi	make	1
+fontconfig	make	1
 #freetype	disable	
 #ass	disable	
 
@@ -38,27 +39,27 @@ fribidi	make	1
 #source	url	url_string
 #ffmpeg	url	https://git.videolan.org/git/ffmpeg.git
 
-#aom	url	file://~/src/aom
-#ass	url	file://~/src/ass
-#fdk-aac	url	file://~/src/fdk-aac
-#ffmpeg	url	file://~/src/ffmpeg
-#fontconfig	url	file://~/src/fontconfig
-#freetype	url	file://~/src/freetype
-#fribidi	url	file://~/src/fribidi
-#lame	url	file://~/src/lame
-#nv-codec-headers	url	file://~/src/nv-codec-headers
-#ogg	url	file://~/src/ogg
-#opus	url	file://~/src/opus
-#png	url	file://~/src/png
-#sdl	url	file://~/src/sdl
-#sofa	url	file://~/src/sofa
-#theora	url	file://~/src/theora
-#vorbis	url	file://~/src/vorbis
-#vpx	url	file://~/src/vpx
-#x264	url	file://~/src/x264
-#x265	url	file://~/src/x265
-#xml2	url	file://~/src/xml2
-#zlib	url	file://~/src/zlib
+aom	url	file://~/src/aom
+ass	url	file://~/src/ass
+fdk-aac	url	file://~/src/fdk-aac
+ffmpeg	url	file://~/src/ffmpeg
+fontconfig	url	file://~/src/fontconfig
+freetype	url	file://~/src/freetype
+fribidi	url	file://~/src/fribidi
+lame	url	file://~/src/lame
+nv-codec-headers	url	file://~/src/nv-codec-headers
+ogg	url	file://~/src/ogg
+opus	url	file://~/src/opus
+png	url	file://~/src/png
+sdl	url	file://~/src/sdl
+sofa	url	file://~/src/sofa
+theora	url	file://~/src/theora
+vorbis	url	file://~/src/vorbis
+vpx	url	file://~/src/vpx
+x264	url	file://~/src/x264
+x265	url	file://~/src/x265
+xml2	url	file://~/src/xml2
+zlib	url	file://~/src/zlib
 
 #------------------------
 #fetch specified revision
@@ -68,7 +69,7 @@ aom	git	cf6a19d06f8748f56a3cdcbf1727f22e3bc7271e
 ass	git	fa49852cd7fbab79653e62e1e52cedeb33a536ea
 fdk-aac	git	95858d7bd36f19bde4a9595e2bd68f195215b164
 ffmpeg	git	d227ed5d598340e719eff7156b1aa0a4469e9a6a
-fontconfig	git	dba84600e1485000f358d8259b92721cf7066034
+fontconfig	git	b546940435ebfb0df575bc7a2350d1e913919c34
 freetype	git	ae3afbc47184db5c7753318b36237af261c66b09
 fribidi	git	58c6cb390a9a18c98b2cbaac555d8ea9352a9e4f
 lame	svn	6440
