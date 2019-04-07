@@ -1,0 +1,84 @@
+#-------------------------------------------------
+#ffmpeg-native-build-hints - 2019-04-07 working build
+#-------------------------------------------------
+
+#place this file in the directory specified by the script's ROOT_PATH 
+#fields are TAB delimited triplets enabling control of the build
+
+#source	key	value
+
+#------------
+#NCC options
+#------------
+NCC	CFLAGS	-march=ivybridge -mtune=ivybridge -pipe
+#skylake broadwell haswell ivybridge sandybridge westmere nehalem
+NCC	OPTIM	-O3
+#NCC	JOBS	6
+#use FETCH_ONLY to clone all the repositories without a build
+#NCC	FETCH_ONLY	1
+#display the config only - no fetch/build
+#NCC	SHOW_ONLY	1
+
+#-----------------------
+#constrain parallel make
+#-----------------------
+#source	make	job_count
+#aom	disable	
+#vpx	disable	
+#lame	make	1
+fribidi	make	1
+
+
+#---------------------------
+#set override URL for source
+#---------------------------
+#source	url	url_string
+#ffmpeg	url	https://git.videolan.org/git/ffmpeg.git
+
+#aom	url	file://~/src/aom
+#ass	url	file://~/src/ass
+#fdk-aac	url	file://~/src/fdk-aac
+#ffmpeg	url	file://~/src/ffmpeg
+#fontconfig	url	file://~/src/fontconfig
+#freetype	url	file://~/src/freetype
+#fribidi	url	file://~/src/fribidi
+#lame	url	file://~/src/lame
+#nv-codec-headers	url	file://~/src/nv-codec-headers
+#ogg	url	file://~/src/ogg
+#opus	url	file://~/src/opus
+#png	url	file://~/src/png
+#sdl	url	file://~/src/sdl
+#sofa	url	file://~/src/sofa
+#theora	url	file://~/src/theora
+#vorbis	url	file://~/src/vorbis
+#vpx	url	file://~/src/vpx
+#x264	url	file://~/src/x264
+#x265	url	file://~/src/x265
+#xml2	url	file://~/src/xml2
+#zlib	url	file://~/src/zlib
+
+#------------------------
+#fetch specified revision
+#------------------------
+#source	fetch_method	revision_id
+aom	git	c79fd24cfc38ba9850e1c7582bc2ed92238ed66e
+ass	git	fa49852cd7fbab79653e62e1e52cedeb33a536ea
+fdk-aac	git	4edc5c4808c2a21e6dc8dc6c8d5a00290d042528
+ffmpeg	git	d234ed76330a447a2d01f9e9772259803aa884db
+fontconfig	git	97fa77d27facc6a31486fdca5b3b853c591f792c
+freetype	git	fbbcf50367403a6316a013b51690071198962920
+fribidi	git	58c6cb390a9a18c98b2cbaac555d8ea9352a9e4f
+lame	svn	6440
+nv-codec-headers	git	96a6db017b096ad48612890083464a7214902afa
+ogg	git	f7dadaaf75634289f7ead64ed1802b627d761ee3
+opus	git	3765a248489e902b5e1b26e1d68aa10d6e02ff67
+png	git	8439534daa1d3a5705ba92e653eda9251246dd61
+sdl	hg	0cc2592ed0f4
+sofa	git	7faf40cf06b70f0f69da7e86a96c1d5051392132
+theora	git	e5d205bfe849f1b41f45b91a0b71a3bdc6cd458f
+vorbis	git	9eadeccdc4247127d91ac70555074239f5ce3529
+vpx	git	6fd9a17c92c676d0406ac82729c4a6aaeb8b67de
+x264	git	d4099dd4c722f52c4f3c14575d7d39eb8fadb97f
+x265	hg	b36242b9f354
+xml2	git	b9bdb9dbfda8f591f1797ad90f900bf44ad39d45
+zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f
