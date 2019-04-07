@@ -13,4 +13,4 @@ Debian/Ubuntu/Mint:
   
 Fedora:
 
-  sudo yum install make autogen automake cmake gcc gcc-c++ git gperf kernel-devel libtool mercurial mingw64-gcc mingw64-gcc-c++ mingw64-winpthreads-static nasm python2-lxml subversion yasm
+  sudo yum install make autogen automake cmake gcc gcc-c++ git gettext-devel gperf kernel-devel libtool mercurial mingw64-gcc mingw64-gcc-c++ mingw64-winpthreads-static nasm python2-lxml subversion uuid-devel yasm
