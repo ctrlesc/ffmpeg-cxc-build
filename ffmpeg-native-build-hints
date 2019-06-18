@@ -1,5 +1,5 @@
 #-------------------------------------------------
-#ffmpeg-native-build-hints - 2019-04-07 working build
+#ffmpeg-native-build-hints - 2019-06-17 working build
 #-------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH 
@@ -10,14 +10,14 @@
 #------------
 #NCC options
 #------------
-NCC	CFLAGS	-march=ivybridge -mtune=ivybridge -pipe
-#skylake broadwell haswell ivybridge sandybridge westmere nehalem
+NCC	CFLAGS	-march=x86-64 -mtune=generic
+#generic skylake broadwell haswell ivybridge sandybridge westmere nehalem
 NCC	OPTIM	-O3
 #NCC	JOBS	6
 #use FETCH_ONLY to clone all the repositories without a build
-#NCC	FETCH_ONLY	1
+NCC	FETCH_ONLY	0
 #display the config only - no fetch/build
-#NCC	SHOW_ONLY	1
+NCC	SHOW_ONLY	0
 
 #-----------------------
 #constrain parallel make
@@ -37,11 +37,13 @@ fribidi	make	1
 
 #aom	url	file://~/src/aom
 #ass	url	file://~/src/ass
+#bzip2	url	file://~/src/bzip2
 #fdk-aac	url	file://~/src/fdk-aac
 #ffmpeg	url	file://~/src/ffmpeg
 #fontconfig	url	file://~/src/fontconfig
 #freetype	url	file://~/src/freetype
 #fribidi	url	file://~/src/fribidi
+#harfbuzz	url	file://~/src/harfbuzz
 #lame	url	file://~/src/lame
 #nv-codec-headers	url	file://~/src/nv-codec-headers
 #ogg	url	file://~/src/ogg
@@ -61,24 +63,27 @@ fribidi	make	1
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
-aom	git	c79fd24cfc38ba9850e1c7582bc2ed92238ed66e
-ass	git	fa49852cd7fbab79653e62e1e52cedeb33a536ea
+aom	git	f75b9848acc97cdab76f975b5a676a154a0af393
+ass	git	8088d2dcfb8e3c0631ea4f065a1a1f9975f75fdd
+bzip2	git	288acf97a15d558f96c24c89f578b724d6e06b0c
 fdk-aac	git	4edc5c4808c2a21e6dc8dc6c8d5a00290d042528
-ffmpeg	git	d234ed76330a447a2d01f9e9772259803aa884db
+ffmpeg	git	756dd981202843788132687dabbef5c88291d646
 fontconfig	git	b546940435ebfb0df575bc7a2350d1e913919c34
 freetype	git	fbbcf50367403a6316a013b51690071198962920
-fribidi	git	58c6cb390a9a18c98b2cbaac555d8ea9352a9e4f
-lame	svn	6440
+fribidi	git	49196f3f98ad73881bf382ce0663279b4ebe34fb
+harfbuzz	git	d6cb244f7d63338e0cbfa774c2a32e6e7e06f15b
+lame	svn	6442
 nv-codec-headers	git	96a6db017b096ad48612890083464a7214902afa
-ogg	git	f7dadaaf75634289f7ead64ed1802b627d761ee3
-opus	git	3765a248489e902b5e1b26e1d68aa10d6e02ff67
-png	git	8439534daa1d3a5705ba92e653eda9251246dd61
-sdl	hg	0cc2592ed0f4
-sofa	git	7faf40cf06b70f0f69da7e86a96c1d5051392132
+ogg	git	ec2d16de7c530ed53cbc968abc120d3b2a7c7c97
+opus	git	ad8fe90db79b7d2a135e3dfd2ed6631b0c5662ab
+png	git	301f7a14295a3bdfaf406dbb5004d0784dc137ea
+sdl	hg	71ddabe9ad73
+sofa	git	3dba53f9c14795b109577519a0df2e25e15fcd6a
 theora	git	e5d205bfe849f1b41f45b91a0b71a3bdc6cd458f
 vorbis	git	9eadeccdc4247127d91ac70555074239f5ce3529
-vpx	git	6fd9a17c92c676d0406ac82729c4a6aaeb8b67de
+vpx	git	bb9511684f70a735b3b909712666021e178c93e7
 x264	git	d4099dd4c722f52c4f3c14575d7d39eb8fadb97f
-x265	hg	b36242b9f354
-xml2	git	b9bdb9dbfda8f591f1797ad90f900bf44ad39d45
+x265	hg	a46ded2c1411
+xml2	git	f824a4bd4d341d765a0fb6102a03a733faa15cbb
 zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f
+

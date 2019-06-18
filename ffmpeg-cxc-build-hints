@@ -1,5 +1,5 @@
 #-------------------------------------------------
-#ffmpeg-cxc-build-hints - 2019-03-12 working build
+#ffmpeg-cxc-build-hints - 2019-06-17 working build
 #-------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -17,7 +17,7 @@ CXC	CFLAGS	-march=x86-64 -mtune=generic
 CXC	OPTIM	-O3
 #CXC	JOBS	6
 #use FETCH_ONLY to clone all the repositories without a build
-#CXC	FETCH_ONLY	1
+CXC	FETCH_ONLY	0
 #display the config only - no fetch/build
 #CXC	SHOW_ONLY	1
 
@@ -41,11 +41,13 @@ fontconfig	make	1
 
 #aom	url	file://~/src/aom
 #ass	url	file://~/src/ass
+#bzip2	url	file://~/src/bzip2
 #fdk-aac	url	file://~/src/fdk-aac
 #ffmpeg	url	file://~/src/ffmpeg
 #fontconfig	url	file://~/src/fontconfig
 #freetype	url	file://~/src/freetype
 #fribidi	url	file://~/src/fribidi
+#harfbuzz	url	file://~/src/harfbuzz
 #lame	url	file://~/src/lame
 #nv-codec-headers	url	file://~/src/nv-codec-headers
 #ogg	url	file://~/src/ogg
@@ -65,25 +67,27 @@ fontconfig	make	1
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
-aom	git	cf6a19d06f8748f56a3cdcbf1727f22e3bc7271e
-ass	git	fa49852cd7fbab79653e62e1e52cedeb33a536ea
-fdk-aac	git	95858d7bd36f19bde4a9595e2bd68f195215b164
-ffmpeg	git	d227ed5d598340e719eff7156b1aa0a4469e9a6a
+aom	git	f75b9848acc97cdab76f975b5a676a154a0af393
+ass	git	8088d2dcfb8e3c0631ea4f065a1a1f9975f75fdd
+bzip2	git	288acf97a15d558f96c24c89f578b724d6e06b0c
+fdk-aac	git	4edc5c4808c2a21e6dc8dc6c8d5a00290d042528
+ffmpeg	git	756dd981202843788132687dabbef5c88291d646
 fontconfig	git	b546940435ebfb0df575bc7a2350d1e913919c34
-freetype	git	ae3afbc47184db5c7753318b36237af261c66b09
-fribidi	git	58c6cb390a9a18c98b2cbaac555d8ea9352a9e4f
-lame	svn	6440
-libxml2	git	09797c139e5b0168c87f41b2cea1078d7244638d
+freetype	git	fbbcf50367403a6316a013b51690071198962920
+fribidi	git	49196f3f98ad73881bf382ce0663279b4ebe34fb
+harfbuzz	git	d6cb244f7d63338e0cbfa774c2a32e6e7e06f15b
+lame	svn	6442
 nv-codec-headers	git	96a6db017b096ad48612890083464a7214902afa
-ogg	git	a394849e79930f39f7a62b223c1ab1f05e30ff33
-opus	git	db082963b98323d88535f4522ba710208ba93a1a
-png	git	8439534daa1d3a5705ba92e653eda9251246dd61
-sdl	hg	0010b9a064d3
-sofa	git	50ee637814c51f80c9bb4d6921a610a3f1490b27
+ogg	git	ec2d16de7c530ed53cbc968abc120d3b2a7c7c97
+opus	git	ad8fe90db79b7d2a135e3dfd2ed6631b0c5662ab
+png	git	301f7a14295a3bdfaf406dbb5004d0784dc137ea
+sdl	hg	71ddabe9ad73
+sofa	git	3dba53f9c14795b109577519a0df2e25e15fcd6a
 theora	git	e5d205bfe849f1b41f45b91a0b71a3bdc6cd458f
 vorbis	git	9eadeccdc4247127d91ac70555074239f5ce3529
-vpx	git	e751879df258b91804b21b8ba247d773f066e67e
-x264	git	72db437770fd1ce3961f624dd57a8e75ff65ae0b
-x265	hg	c7e5878bdd31
+vpx	git	bb9511684f70a735b3b909712666021e178c93e7
+x264	git	d4099dd4c722f52c4f3c14575d7d39eb8fadb97f
+x265	hg	a46ded2c1411
+xml2	git	f824a4bd4d341d765a0fb6102a03a733faa15cbb
 zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f
 

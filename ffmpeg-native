@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.4.8"
+SCRIPT_VERSION="1.5.0"
 THIS="ffmpeg-native"
 
 #build paths
@@ -17,6 +17,7 @@ NCC_PATH_LIST=\
 #compiler settings
 NCC_OPTIM="-O2"
 NCC_CFLAGS="-mtune=generic -march=x86-64 -pipe"
+NCC_CPPFLAGS="-DNDEBUG -I$ROOT_PATH/$OUT_PATH/include"
 #make settings
 NCC_JOBS=$(getconf _NPROCESSORS_ONLN)
 NCC_FETCH_ONLY="${NCC_FETCH_ONLY:-0}"
@@ -28,12 +29,15 @@ NCC_OPTION_LIST=\
 )
 NCC_SOURCE_LIST=\
 ( \
-"aom" "ass" "fdk-aac" "freetype" "ffmpeg" \
-"fribidi" "fontconfig" "lame" "lame" \
+"aom" "ass" "bzip2" "fdk-aac" "freetype" "ffmpeg" \
+"fribidi" "fontconfig" "harfbuzz" "lame" "lame" \
 "nv-codec-headers" "ogg" "opus" "png" "sdl" \
 "sofa" "theora" "vorbis" "vpx" \
 "xml2" "x264" "x265" "zlib" \
 )
+
+#lib options
+NCC_FFMPEG_EXTRA_LIBS="-lpthread -lm"
 
 #fix pkg-config paths for cross
 export PKG_CONFIG_DIR=
@@ -71,7 +75,8 @@ build_make() {
 	make -j $jobs "$@"
 	[ $? -eq 0 ] || build_die "$THIS: make stage failed (jobs = $jobs) -> $SRC_NAME"
 
-	make install
+	grep install <<< "$@" &> /dev/null
+	[ $? -eq 0 ] || make install
 	[ $? -eq 0 ] || build_die "$THIS: install stage failed -> $SRC_NAME"
 
 	build_message BM_GREEN "$SRC_NAME: built successfully (jobs = $jobs)"
@@ -246,7 +251,7 @@ get_NCC_hints() {
 				fi
 			else
 				val="$(get_hint "$h" "enable")"
-				 if [ $? -eq 0 ]
+				if [ $? -eq 0 ]
 				then
 					val=1
 				else
@@ -264,7 +269,13 @@ set_source() {
 	then
 		cd "$ROOT_PATH/$SRC_PATH"
 	fi
+
 	SRC_NAME="$1"
+	if [ "$#" -eq 1 ]
+	then
+		return
+	fi
+
 	shift
 	SRC_ENABLE="NCC_ENABLE_$SRC_NAME"
 	SRC_ENABLE="${SRC_ENABLE//[^A-Za-z0-9]/_}"
@@ -279,11 +290,10 @@ set_source() {
 	then
 		for arg in "$@"
 		do
-				NCC_FFMPEG_LIB_OPTIONS="$NCC_FFMPEG_LIB_OPTIONS --enable-$arg"
+			NCC_FFMPEG_LIB_OPTIONS="$NCC_FFMPEG_LIB_OPTIONS --enable-$arg"
 		done
 		build_message BM_CYAN "$SRC_NAME"
 	fi
-
 }
 
 cd_source() {
@@ -356,13 +366,15 @@ then
 	echo "SET(CMAKE_SYSTEM_PROCESSOR x86_64)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_C_COMPILER          gcc)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_CXX_COMPILER        g++)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo "SET(CMAKE_C_FLAGS    \"$NCC_OPTIM $NCC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo "SET(CMAKE_CXX_FLAGS  \"$NCC_OPTIM $NCC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo "SET(CMAKE_CPP_FLAGS     \"$NCC_CPPFLAGS\")"       >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_ASM_YASM_COMPILER  yasm)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_ASM_NASM_COMPILER  nasm)" >> $ROOT_PATH/$SRC_PATH/native.cmake
-	echo "SET(CMAKE_CXX_FLAGS  \"$NCC_OPTIM $NCC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/native.cmake
-	echo "SET(CMAKE_C_FLAGS    \"$NCC_OPTIM $NCC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/native.cmake
 fi
 
 #build the sources
+
 #zlib
 set_source "zlib" "git" "https://github.com/madler/zlib.git" "zlib"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -378,6 +390,19 @@ then
 	fi
 fi
 
+#bzip2
+set_source "bzip2" "git" "https://github.com/enthought/bzip2-1.0.6.git" "bzlib"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $NCC_JOBS PREFIX="$ROOT_PATH/$OUT_PATH" libbz2.a install
+	fi
+fi
+
 #png16
 set_source "png" "git" "https://git.code.sf.net/p/libpng/code"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -387,7 +412,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="-I$ROOT_PATH/$OUT_PATH/include" LDFLAGS="-L$ROOT_PATH/$OUT_PATH/lib" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" LDFLAGS="-L$ROOT_PATH/$OUT_PATH/lib" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -402,7 +427,7 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -417,7 +442,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS -C lib
 	fi
@@ -432,7 +457,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --enable-static --disable-shared --with-python=no
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared --with-python=no
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -447,9 +472,33 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --enable-static --disable-shared --disable-docs --enable-libxml2
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared --disable-docs --enable-libxml2
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
+	fi
+fi
+
+#harfbuzz - handle the freetype circular dependency
+set_source "harfbuzz" "git" "https://github.com/harfbuzz/harfbuzz.git"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		./autogen.sh
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared --with-cairo=no --with-glib=no --with-icu=no --with-freetype=yes
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $NCC_JOBS
+		#now rebuild freetype to be harfbuzz aware
+		set_source "freetype"
+		cd_source
+		make clean
+		./autogen.sh
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $NCC_JOBS
+		NCC_FFMPEG_EXTRA_LIBS="$NCC_FFMPEG_EXTRA_LIBS -lfreetype"
 	fi
 fi
 
@@ -462,11 +511,12 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
 fi
+
 #fdk-aac
 set_source "fdk-aac" "git" "https://github.com/mstorsjo/fdk-aac.git" "libfdk-aac"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -476,7 +526,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -490,7 +540,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --enable-nasm --disable-shared --disable-frontend
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-nasm --disable-shared --disable-frontend
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -505,7 +555,7 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -520,7 +570,7 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --enable-static --disable-shared --disable-doc --disable-examples
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared --disable-doc --disable-examples
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -535,7 +585,7 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --enable-static --disable-shared --disable-doc --disable-oggtest --disable-vorbistest --disable-examples
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared --disable-doc --disable-oggtest --disable-vorbistest --disable-examples
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -550,7 +600,7 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" --enable-static --disable-shared -disable-docs --disable-examples
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared -disable-docs --disable-examples
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -579,7 +629,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$NCC_CFLAGS" --target=x86_64-linux-gcc --as=yasm --enable-static --disable-shared --disable-examples --disable-tools --disable-docs --disable-unit-tests --enable-vp9 --enable-vp8 --enable-postproc --enable-vp9-postproc --enable-vp9-highbitdepth
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$NCC_CFLAGS" --disable-debug --target=x86_64-linux-gcc --as=yasm --enable-static --disable-shared --disable-examples --disable-tools --disable-docs --disable-unit-tests --enable-vp9 --enable-vp8 --enable-postproc --enable-vp9-postproc --enable-vp9-highbitdepth
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -614,8 +664,6 @@ then
 	fi
 fi
 
-
-
 #sofa
 set_source "sofa" "git" "https://github.com/hoene/libmysofa.git" "libmysofa"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -639,7 +687,7 @@ then
 	then
 		cd_source
 		mv .hg .temp_hg
-		CFLAGS=-DDECLSPEC= ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" --bindir="$BIN_PATH" --enable-static --disable-shared
+		CFLAGS=-DDECLSPEC= ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --bindir="$BIN_PATH" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 		rm -f "$BIN_PATH"/sdl*
@@ -655,9 +703,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		make PREFIX="$ROOT_PATH/$OUT_PATH" install
-		[ $? -eq 0 ] || build_die "install stage failed for $SRC_NAME"
-		build_message BM_GREEN "$SRC_NAME: built"
+		build_make $NCC_JOBS PREFIX="$ROOT_PATH/$OUT_PATH" install
 	fi
 fi
 
@@ -677,7 +723,7 @@ then
 		  --extra-cflags="$NCC_OPTIM $NCC_CFLAGS -no-pie" \
 		  --extra-cflags="-I$ROOT_PATH/$OUT_PATH/include" \
 		  --extra-ldflags="-L$ROOT_PATH/$OUT_PATH/lib -no-pie" \
-		  --extra-libs="-lpthread -lm" \
+		  --extra-libs="$NCC_FFMPEG_EXTRA_LIBS" \
 		  --bindir="$BIN_PATH"\
 		  $NCC_FFMPEG_LIB_OPTIONS
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"

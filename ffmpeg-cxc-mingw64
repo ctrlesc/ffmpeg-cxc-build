@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.4.8"
+SCRIPT_VERSION="1.5.0"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -18,6 +18,10 @@ CXC_PATH_LIST=\
 CXC_HOST="x86_64-w64-mingw32"
 CXC_OPTIM="-O2"
 CXC_CFLAGS="-mtune=generic -march=x86-64 -pipe"
+CXC_CPPFLAGS="-DNDEBUG -I$ROOT_PATH/$OUT_PATH/include"
+CXC_BUILD=""
+CXC_MACHINE="$(uname -m | tr '[:upper:]' '[:lower:]')"
+CXC_OS="$(uname -o | tr '[:upper:]' '[:lower:]')"
 #make settings
 CXC_JOBS=$(getconf _NPROCESSORS_ONLN)
 CXC_FETCH_ONLY="${CXC_FETCH_ONLY:-0}"
@@ -29,12 +33,15 @@ CXC_OPTION_LIST=\
 )
 CXC_SOURCE_LIST=\
 ( \
-"aom" "ass" "fdk-aac" "freetype" "ffmpeg" \
-"fribidi" "fontconfig" "lame" "lame" \
+"aom" "ass" "bzip2" "fdk-aac" "freetype" "ffmpeg" \
+"fribidi" "fontconfig" "harfbuzz" "lame" "lame" \
 "nv-codec-headers" "ogg" "opus" "png" "sdl" \
 "sofa" "theora" "vorbis" "vpx" \
 "xml2" "x264" "x265" "zlib" \
 )
+
+#lib options
+CXC_FFMPEG_EXTRA_LIBS="-lwinpthread"
 
 #fix pkg-config paths for cross
 export PKG_CONFIG_DIR=
@@ -72,7 +79,8 @@ build_make() {
 	make -j $jobs "$@"
 	[ $? -eq 0 ] || build_die "$THIS: make stage failed (jobs = $jobs) -> $SRC_NAME"
 
-	make install
+	grep install <<< "$@" &> /dev/null
+	[ $? -eq 0 ] || make install
 	[ $? -eq 0 ] || build_die "$THIS: install stage failed -> $SRC_NAME"
 
 	build_message BM_GREEN "$SRC_NAME: built successfully (jobs = $jobs)"
@@ -247,7 +255,7 @@ get_CXC_hints() {
 				fi
 			else
 				val="$(get_hint "$h" "enable")"
-				 if [ $? -eq 0 ]
+				if [ $? -eq 0 ]
 				then
 					val=1
 				else
@@ -265,7 +273,13 @@ set_source() {
 	then
 		cd "$ROOT_PATH/$SRC_PATH"
 	fi
+
 	SRC_NAME="$1"
+	if [ "$#" -eq 1 ]
+	then
+		return
+	fi
+
 	shift
 	SRC_ENABLE="CXC_ENABLE_$SRC_NAME"
 	SRC_ENABLE="${SRC_ENABLE//[^A-Za-z0-9]/_}"
@@ -284,7 +298,6 @@ set_source() {
 		done
 		build_message BM_CYAN "$SRC_NAME"
 	fi
-
 }
 
 cd_source() {
@@ -359,10 +372,25 @@ then
 	echo "SET(CMAKE_RC_COMPILER   x86_64-w64-mingw32-windres)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_ASM_YASM_COMPILER                   yasm)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_ASM_NASM_COMPILER                   nasm)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_CXX_FLAGS     \"$CXC_OPTIM $CXC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_C_FLAGS       \"$CXC_OPTIM $CXC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_CXX_FLAGS     \"$CXC_OPTIM $CXC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_CPP_FLAGS     \"$CXC_CPPFLAGS\")"          >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_C_FLAGS   "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_CXX_FLAGS "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
+fi
+
+#test and fix cross for cygwin build environment
+if [[ "$CXC_OS" == *cygwin* ]]
+then
+	find /usr -ipath "*x86_64*mingw*sys-root*mingw/bin/iconv.dll" 2> /dev/null | grep -Ev "^$" &> /dev/null
+	[ $? -eq 0 ] || build_die "$THIS: mingw win-iconv package is required and not found in PATH"
+	if [[ "$PATH" == *x86_64*mingw*sys-root*mingw/bin* ]]
+	then
+		CXC_BUILD='--build=x86_64-pc-cygwin'
+	else
+		build_die "$THIS: mingw 'sys-root/bin' must be in PATH"
+	fi
+	build_message BM_YELLOW "$THIS: Cygwin build detected - ensure sys-root contains a symlink to construct a valid path for '$OUT_PATH/include'"
 fi
 
 #build the sources
@@ -378,7 +406,21 @@ then
 		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DBUILD_SHARED_LIBS=0 .
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
-		cp $ROOT_PATH/$OUT_PATH/lib/libzlibstatic.a $ROOT_PATH/$OUT_PATH/lib/libz.a
+		cp "$ROOT_PATH/$OUT_PATH/lib/libzlibstatic.a" "$ROOT_PATH/$OUT_PATH/lib/libz.a"
+	fi
+fi
+
+#bzip2
+set_source "bzip2" "git" "https://github.com/enthought/bzip2-1.0.6.git" "bzlib"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		sed -ir 's/<sys\\stat.h>/<sys\/stat.h>/' bzip2.c
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS PREFIX="$ROOT_PATH/$OUT_PATH" CC="x86_64-w64-mingw32-gcc" AR="x86_64-w64-mingw32-ar" RANLIB="x86_64-w64-mingw32-ranlib" -i libbz2.a install
 	fi
 fi
 
@@ -391,7 +433,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="-I$ROOT_PATH/$OUT_PATH/include" LDFLAGS="-L$ROOT_PATH/$OUT_PATH/lib" --host="$CXC_HOST" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" LDFLAGS="-L$ROOT_PATH/$OUT_PATH/lib" --host="$CXC_HOST" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -406,7 +448,7 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" LDFLAGS="-L$ROOT_PATH/$OUT_PATH/lib" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -421,7 +463,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS -C lib
 	fi
@@ -436,7 +478,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --with-python=no
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --with-python=no
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -451,9 +493,33 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --disable-docs --enable-libxml2
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --disable-docs --enable-libxml2
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
+	fi
+fi
+
+#harfbuzz - handle the freetype circular dependency
+set_source "harfbuzz" "git" "https://github.com/harfbuzz/harfbuzz.git"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		./autogen.sh
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" LIBS="-lwinpthread" --host="$CXC_HOST" --enable-static --disable-shared --with-cairo=no --with-glib=no --with-icu=no --with-freetype=yes
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+		#now rebuild freetype to be harfbuzz aware
+		set_source "freetype"
+		cd_source
+		make clean
+		./autogen.sh
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" LDFLAGS="-L$ROOT_PATH/$OUT_PATH/lib" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+		CXC_FFMPEG_EXTRA_LIBS="$CXC_FFMPEG_EXTRA_LIBS -lfreetype"
 	fi
 fi
 
@@ -466,7 +532,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -481,7 +547,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -495,7 +561,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --enable-nasm --host="$CXC_HOST" --disable-shared --disable-frontend
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --enable-nasm --host="$CXC_HOST" --disable-shared --disable-frontend
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -510,7 +576,7 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -525,7 +591,7 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --disable-doc --disable-examples
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --disable-doc
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -540,7 +606,7 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --disable-doc --disable-oggtest --disable-vorbistest --disable-examples
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --disable-doc --disable-oggtest --disable-vorbistest --disable-examples
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -555,7 +621,7 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" --host="$CXC_HOST" --enable-static --disable-shared -disable-docs --disable-examples
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared -disable-docs --disable-examples
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -570,7 +636,7 @@ fetch_source
 	then
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="../aom/build/cmake/toolchains/x86_64-mingw-gcc.cmake" -DCMAKE_C_FLAGS="$CXC_OPTIM $CXC_CFLAGS" -DCMAKE_CXX_FLAGS="$CXC_OPTIM $CXC_CFLAGS" -DAOM_TARGET_CPU="x86_64" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 -DENABLE_TOOLS=0 ../aom
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="../aom/build/cmake/toolchains/x86_64-mingw-gcc.cmake" -DCMAKE_C_FLAGS="$CXC_OPTIM $CXC_CFLAGS" -DCMAKE_CXX_FLAGS="$CXC_OPTIM $CXC_CFLAGS" -DCMAKE_CPP_FLAGS="$CXC_CPPFLAGS" -DAOM_TARGET_CPU="x86_64" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 -DENABLE_TOOLS=0 ../aom
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -585,7 +651,7 @@ then
 	then
 		cd_source
 		export CROSS="$CXC_HOST"-
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$CXC_CFLAGS" --target=x86_64-win64-gcc --as=yasm --enable-static --disable-shared --disable-examples --disable-tools --disable-docs --disable-unit-tests --enable-vp9 --enable-vp8 --enable-postproc --enable-vp9-postproc --enable-vp9-highbitdepth
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$CXC_CFLAGS" --disable-debug --target=x86_64-win64-gcc --as=yasm --enable-static --disable-shared --disable-examples --disable-tools --disable-docs --disable-unit-tests --enable-vp9 --enable-vp8 --enable-postproc --enable-vp9-postproc --enable-vp9-highbitdepth
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 		unset CROSS
@@ -644,7 +710,7 @@ then
 	then
 		cd_source
 		mv .hg .temp_hg
-		CFLAGS=-DDECLSPEC= ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --bindir="$BIN_PATH" --enable-static --disable-shared
+		CFLAGS=-DDECLSPEC= ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --bindir="$BIN_PATH" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 		rm -f "$BIN_PATH"/sdl*
@@ -660,9 +726,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		make PREFIX="$ROOT_PATH/$OUT_PATH" install
-		[ $? -eq 0 ] || build_die "install stage failed for $SRC_NAME"
-		build_message BM_GREEN "$SRC_NAME: built"
+		build_make $CXC_JOBS PREFIX="$ROOT_PATH/$OUT_PATH" install
 	fi
 fi
 
@@ -688,7 +752,7 @@ then
 		  --extra-cflags="$CXC_OPTIM $CXC_CFLAGS" \
 		  --extra-cflags="-I$ROOT_PATH/$OUT_PATH/include" \
 		  --extra-ldflags="-L$ROOT_PATH/$OUT_PATH/lib -static-libgcc -static-libstdc++ -static -s" \
-		  --extra-libs="-lwinpthread" \
+		  --extra-libs="$CXC_FFMPEG_EXTRA_LIBS" \
 		  --bindir="$BIN_PATH"\
 		  $CXC_FFMPEG_LIB_OPTIONS
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
