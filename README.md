@@ -17,7 +17,7 @@ sudo yum install make autogen automake cmake gcc gcc-c++ git gettext-devel gperf
   
   Cygwin:
   
- After a baseline install, run setup install the packages: autoconf autoconf2.1 autoconf2.5 autogen automake automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.15 automake1.9 binutils cmake gcc-core gcc-g++ gettext gettext-devel gettext-doc git gperf libtool libuuid-devel make mercurial mingw64-x86_64-binutils mingw64-x86_64-gcc-core mingw64-x86_64-gcc-g++ mingw64-x86_64-gettext mingw64-x86_64-headers mingw64-x86_64-runtime mingw64-x86_64-win-iconv mingw64-x86_64-windows-default-manifest mingw64-x86_64-winpthreads nasm python27 python27-lxml python27-six ragel rsync subversion wget yasm
+ After a baseline install, run setup and install the packages: autoconf autoconf2.1 autoconf2.5 autogen automake automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.15 automake1.9 binutils cmake gcc-core gcc-g++ gettext gettext-devel gettext-doc git gperf libtool libuuid-devel make mercurial mingw64-x86_64-binutils mingw64-x86_64-gcc-core mingw64-x86_64-gcc-g++ mingw64-x86_64-gettext mingw64-x86_64-headers mingw64-x86_64-runtime mingw64-x86_64-win-iconv mingw64-x86_64-windows-default-manifest mingw64-x86_64-winpthreads nasm python27 python27-lxml python27-six ragel rsync subversion wget yasm
  
  *Cygwin Preconditions:*
  
