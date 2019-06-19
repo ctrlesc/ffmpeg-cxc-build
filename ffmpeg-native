@@ -75,7 +75,7 @@ build_make() {
 	make -j $jobs "$@"
 	[ $? -eq 0 ] || build_die "$THIS: make stage failed (jobs = $jobs) -> $SRC_NAME"
 
-	grep install <<< "$@" &> /dev/null
+	grep -E '(^[[:space:]]*|[[:space:]]*)install[[:space:]]*$' <<< "$@" &> /dev/null
 	[ $? -eq 0 ] || make install
 	[ $? -eq 0 ] || build_die "$THIS: install stage failed -> $SRC_NAME"
 
