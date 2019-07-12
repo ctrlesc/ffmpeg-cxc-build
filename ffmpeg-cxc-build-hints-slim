@@ -1,6 +1,6 @@
-#-------------------------------------------------
-#ffmpeg-cxc-build-hints - 2019-07-10 working build
-#-------------------------------------------------
+#------------------------------------------------------
+#ffmpeg-cxc-build-hints-slim - 2019-07-10 working build
+#------------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
 #set via the command line:
@@ -28,12 +28,33 @@ CXC	SHOW_ONLY	0
 #source	make	job_count
 #source	disable	
 #source	enable	
-lame	make	1
-fribidi	make	1
-fontconfig	make	1
-freetype	make	1
-harfbuzz	make	1
+
+#disabled
+aom	disable	
+ass	disable	
+bzip2	disable	
+fontconfig	disable	
+freetype	disable	
+fribidi	disable	
+harfbuzz	disable	
+png	disable	
+sofa	disable	
+xml2	disable	
+
+#enabled
+fdk-aac	enable	
+lame	enable	
+nv-codec-headers	enable	
+ogg	enable	
 openssl	make	1
+opus	enable	
+sdl	enable	
+theora	enable	
+vorbis	enable	
+vpx	enable	
+x264	enable	
+x265	enable	
+zlib	enable	
 
 #---------------------------
 #set override URL for source
@@ -44,18 +65,19 @@ openssl	make	1
 #aom	url	file://~/src/aom
 #ass	url	file://~/src/ass
 #bzip2	url	file://~/src/bzip2
-#fdk-aac	url	file://~/src/fdk-aac
-#ffmpeg	url	file://~/src/ffmpeg
 #fontconfig	url	file://~/src/fontconfig
 #freetype	url	file://~/src/freetype
 #fribidi	url	file://~/src/fribidi
 #harfbuzz	url	file://~/src/harfbuzz
+#png	url	file://~/src/png
+#xml2	url	file://~/src/xml2
+
+#fdk-aac	url	file://~/src/fdk-aac
 #lame	url	file://~/src/lame
 #nv-codec-headers	url	file://~/src/nv-codec-headers
 #ogg	url	file://~/src/ogg
 #openssl	url	file://~/src/openssl
 #opus	url	file://~/src/opus
-#png	url	file://~/src/png
 #sdl	url	file://~/src/sdl
 #sofa	url	file://~/src/sofa
 #theora	url	file://~/src/theora
@@ -63,8 +85,9 @@ openssl	make	1
 #vpx	url	file://~/src/vpx
 #x264	url	file://~/src/x264
 #x265	url	file://~/src/x265
-#xml2	url	file://~/src/xml2
 #zlib	url	file://~/src/zlib
+
+#ffmpeg	url	file://~/src/ffmpeg
 
 #------------------------
 #fetch specified revision

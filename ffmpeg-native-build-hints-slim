@@ -1,26 +1,23 @@
-#-------------------------------------------------
-#ffmpeg-cxc-build-hints - 2019-07-10 working build
-#-------------------------------------------------
+#---------------------------------------------------------
+#ffmpeg-native-build-hints-slim - 2019-07-10 working build
+#---------------------------------------------------------
 
-#place this file in the directory specified by the script's ROOT_PATH or
-#set via the command line:
-#HINTS_FILE=/media/user/usb/my-build-hints ffmpeg-cxc-mingw64
-
+#place this file in the directory specified by the script's ROOT_PATH 
 #fields are TAB delimited triplets enabling control of the build
+
 #source	key	value
 
 #------------
-#CXC options
+#NCC options
 #------------
-CXC	CFLAGS	-march=x86-64 -mtune=generic
+NCC	CFLAGS	-march=x86-64 -mtune=generic
 #generic skylake broadwell haswell ivybridge sandybridge westmere nehalem
-CXC	OPTIM	-O3
-#override getconf _NPROCESSORS_ONLN
-#CXC	JOBS	6
+NCC	OPTIM	-O3
+#NCC	JOBS	6
 #use FETCH_ONLY to clone all the repositories without a build
-CXC	FETCH_ONLY	0
+NCC	FETCH_ONLY	0
 #display the config only - no fetch/build
-CXC	SHOW_ONLY	0
+NCC	SHOW_ONLY	0
 
 #-----------------------------------------------
 #constrain parallel make or disable/enable build
@@ -28,12 +25,33 @@ CXC	SHOW_ONLY	0
 #source	make	job_count
 #source	disable	
 #source	enable	
-lame	make	1
-fribidi	make	1
-fontconfig	make	1
-freetype	make	1
-harfbuzz	make	1
-openssl	make	1
+
+#disabled
+aom	disable	
+ass	disable	
+bzip2	disable	
+fontconfig	disable	
+freetype	disable	
+fribidi	disable	
+harfbuzz	disable	
+png	disable	
+sofa	disable	
+xml2	disable	
+
+#enabled
+fdk-aac	enable	
+lame	enable	
+nv-codec-headers	enable	
+ogg	enable	
+openssl	enable	1
+opus	enable	
+sdl	enable	
+theora	enable	
+vorbis	enable	
+vpx	enable	
+x264	enable	
+x265	enable	
+zlib	enable	
 
 #---------------------------
 #set override URL for source
@@ -44,18 +62,19 @@ openssl	make	1
 #aom	url	file://~/src/aom
 #ass	url	file://~/src/ass
 #bzip2	url	file://~/src/bzip2
-#fdk-aac	url	file://~/src/fdk-aac
-#ffmpeg	url	file://~/src/ffmpeg
 #fontconfig	url	file://~/src/fontconfig
 #freetype	url	file://~/src/freetype
 #fribidi	url	file://~/src/fribidi
 #harfbuzz	url	file://~/src/harfbuzz
+#png	url	file://~/src/png
+#xml2	url	file://~/src/xml2
+
+#fdk-aac	url	file://~/src/fdk-aac
 #lame	url	file://~/src/lame
 #nv-codec-headers	url	file://~/src/nv-codec-headers
 #ogg	url	file://~/src/ogg
 #openssl	url	file://~/src/openssl
 #opus	url	file://~/src/opus
-#png	url	file://~/src/png
 #sdl	url	file://~/src/sdl
 #sofa	url	file://~/src/sofa
 #theora	url	file://~/src/theora
@@ -63,8 +82,9 @@ openssl	make	1
 #vpx	url	file://~/src/vpx
 #x264	url	file://~/src/x264
 #x265	url	file://~/src/x265
-#xml2	url	file://~/src/xml2
 #zlib	url	file://~/src/zlib
+
+#ffmpeg	url	file://~/src/ffmpeg
 
 #------------------------
 #fetch specified revision
@@ -75,7 +95,7 @@ ass	git	8088d2dcfb8e3c0631ea4f065a1a1f9975f75fdd
 bzip2	git	288acf97a15d558f96c24c89f578b724d6e06b0c
 fdk-aac	git	4edc5c4808c2a21e6dc8dc6c8d5a00290d042528
 ffmpeg	git	b1febda061955c6f4bfbc1a75918b5e75e7d7f80
-fontconfig	git	b546940435ebfb0df575bc7a2350d1e913919c34
+fontconfig	git	2960391699ab3b417a17a0a2ac29e97e9c3d3c99
 freetype	git	fbbcf50367403a6316a013b51690071198962920
 fribidi	git	49196f3f98ad73881bf382ce0663279b4ebe34fb
 harfbuzz	git	2e7021da7d1726a37822e6a001b9218f82255bc8

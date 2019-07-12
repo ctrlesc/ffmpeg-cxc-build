@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.5.0"
+SCRIPT_VERSION="1.5.1"
 THIS="ffmpeg-native"
 
 #build paths
@@ -31,7 +31,7 @@ NCC_SOURCE_LIST=\
 ( \
 "aom" "ass" "bzip2" "fdk-aac" "freetype" "ffmpeg" \
 "fribidi" "fontconfig" "harfbuzz" "lame" "lame" \
-"nv-codec-headers" "ogg" "opus" "png" "sdl" \
+"nv-codec-headers" "ogg" "openssl" "opus" "png" "sdl" \
 "sofa" "theora" "vorbis" "vpx" \
 "xml2" "x264" "x265" "zlib" \
 )
@@ -75,7 +75,7 @@ build_make() {
 	make -j $jobs "$@"
 	[ $? -eq 0 ] || build_die "$THIS: make stage failed (jobs = $jobs) -> $SRC_NAME"
 
-	grep -E '(^[[:space:]]*|[[:space:]]*)install[[:space:]]*$' <<< "$@" &> /dev/null
+	grep -E '((^[ ]*)|([ ]*))[^ ]*install[^ ]*[ ]*$' <<< "$@" &> /dev/null
 	[ $? -eq 0 ] || make install
 	[ $? -eq 0 ] || build_die "$THIS: install stage failed -> $SRC_NAME"
 
@@ -362,15 +362,20 @@ if [ "$BUILD" -ne 0 ]
 then
 	#cmake toolchain settings
 	touch $ROOT_PATH/$SRC_PATH/native.cmake
-	echo "SET(CMAKE_SYSTEM_NAME       Linux)" >> $ROOT_PATH/$SRC_PATH/native.cmake
-	echo "SET(CMAKE_SYSTEM_PROCESSOR x86_64)" >> $ROOT_PATH/$SRC_PATH/native.cmake
-	echo "SET(CMAKE_C_COMPILER          gcc)" >> $ROOT_PATH/$SRC_PATH/native.cmake
-	echo "SET(CMAKE_CXX_COMPILER        g++)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo "SET(CMAKE_SYSTEM_NAME                     Linux)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo "SET(CMAKE_BUILD_TYPE                    Release)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo "SET(CMAKE_SYSTEM_PROCESSOR               x86_64)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo "SET(CMAKE_C_COMPILER                        gcc)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo "SET(CMAKE_CXX_COMPILER                      g++)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_C_FLAGS    \"$NCC_OPTIM $NCC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_CXX_FLAGS  \"$NCC_OPTIM $NCC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/native.cmake
-	echo "SET(CMAKE_CPP_FLAGS     \"$NCC_CPPFLAGS\")"       >> $ROOT_PATH/$SRC_PATH/native.cmake
-	echo "SET(CMAKE_ASM_YASM_COMPILER  yasm)" >> $ROOT_PATH/$SRC_PATH/native.cmake
-	echo "SET(CMAKE_ASM_NASM_COMPILER  nasm)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo "SET(CMAKE_CPP_FLAGS  \"$NCC_CPPFLAGS\")"          >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo "SET(CMAKE_ASM_YASM_COMPILER                yasm)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo "SET(CMAKE_ASM_NASM_COMPILER                nasm)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo "SET(CMAKE_FIND_LIBRARY_SUFFIXES              .a)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_C_FLAGS   "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_CXX_FLAGS "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo 'SET(CMAKE_EXE_LINKER_FLAGS              "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/native.cmake
 fi
 
 #build the sources
@@ -707,6 +712,20 @@ then
 	fi
 fi
 
+#openssl
+set_source "openssl" "git" "https://github.com/openssl/openssl.git" "openssl"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		./config no-shared no-legacy no-engine no-module no-fips no-tests zlib --prefix="$ROOT_PATH/$OUT_PATH" --with-zlib-include="$ROOT_PATH/$OUT_PATH/include" --with-zlib-lib=$ROOT_PATH/$OUT_PATH/lib
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $NCC_JOBS install_sw
+	fi
+fi
+
 #ffmpeg
 set_source "ffmpeg" "git" "https://git.ffmpeg.org/ffmpeg.git" "gpl" "version3" "nonfree" "avresample"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -716,6 +735,9 @@ then
 	then
 		cd_source
 		./configure \
+		  --arch="x86_64" \
+		  --disable-debug \
+		  --disable-shared \
 		  --enable-static \
 		  --prefix="$ROOT_PATH/$OUT_PATH" \
 		  --pkg-config="pkg-config" \

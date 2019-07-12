@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.5.0"
+SCRIPT_VERSION="1.5.1"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -35,7 +35,7 @@ CXC_SOURCE_LIST=\
 ( \
 "aom" "ass" "bzip2" "fdk-aac" "freetype" "ffmpeg" \
 "fribidi" "fontconfig" "harfbuzz" "lame" "lame" \
-"nv-codec-headers" "ogg" "opus" "png" "sdl" \
+"nv-codec-headers" "ogg" "openssl" "opus" "png" "sdl" \
 "sofa" "theora" "vorbis" "vpx" \
 "xml2" "x264" "x265" "zlib" \
 )
@@ -79,7 +79,7 @@ build_make() {
 	make -j $jobs "$@"
 	[ $? -eq 0 ] || build_die "$THIS: make stage failed (jobs = $jobs) -> $SRC_NAME"
 
-	grep -E '(^[[:space:]]*|[[:space:]]*)install[[:space:]]*$' <<< "$@" &> /dev/null
+	grep -E '((^[ ]*)|([ ]*))[^ ]*install[^ ]*[ ]*$' <<< "$@" &> /dev/null
 	[ $? -eq 0 ] || make install
 	[ $? -eq 0 ] || build_die "$THIS: install stage failed -> $SRC_NAME"
 
@@ -367,16 +367,20 @@ then
 	#cmake toolchain settings
 	touch $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_SYSTEM_NAME                      Windows)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_BUILD_TYPE                       Release)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_SYSTEM_PROCESSOR                  x86_64)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_C_COMPILER        x86_64-w64-mingw32-gcc)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_CXX_COMPILER      x86_64-w64-mingw32-g++)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_RC_COMPILER   x86_64-w64-mingw32-windres)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_ASM_YASM_COMPILER                   yasm)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_ASM_NASM_COMPILER                   nasm)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_C_FLAGS       \"$CXC_OPTIM $CXC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_CXX_FLAGS     \"$CXC_OPTIM $CXC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_CPP_FLAGS     \"$CXC_CPPFLAGS\")"          >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_ASM_YASM_COMPILER                   yasm)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_ASM_NASM_COMPILER                   nasm)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_FIND_LIBRARY_SUFFIXES                 .a)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_C_FLAGS   "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_CXX_FLAGS "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo 'SET(CMAKE_EXE_LINKER_FLAGS              "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
 fi
 
 #test and fix cross for cygwin build environment
@@ -727,6 +731,20 @@ then
 	then
 		cd_source
 		build_make $CXC_JOBS PREFIX="$ROOT_PATH/$OUT_PATH" install
+	fi
+fi
+
+#openssl
+set_source "openssl" "git" "https://github.com/openssl/openssl.git" "openssl"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		./Configure no-shared no-legacy no-engine no-module no-fips no-tests zlib --prefix="$ROOT_PATH/$OUT_PATH" --with-zlib-include="$ROOT_PATH/$OUT_PATH/include" --with-zlib-lib=$ROOT_PATH/$OUT_PATH/lib  --cross-compile-prefix="$CXC_HOST-" mingw64
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS -i install_sw
 	fi
 fi
 
