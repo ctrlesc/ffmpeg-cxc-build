@@ -2,7 +2,10 @@
 #ffmpeg-native-build-hints-slim - 2019-07-10 working build
 #---------------------------------------------------------
 
-#place this file in the directory specified by the script's ROOT_PATH 
+#place this file in the directory specified by the script's ROOT_PATH or
+#set via the command line:
+#HINTS_FILE=/media/user/usb/my-build-hints ffmpeg-native
+
 #fields are TAB delimited triplets enabling control of the build
 
 #source	key	value
@@ -43,7 +46,7 @@ fdk-aac	enable
 lame	enable	
 nv-codec-headers	enable	
 ogg	enable	
-openssl	enable	1
+openssl	make	1
 opus	enable	
 sdl	enable	
 theora	enable	
