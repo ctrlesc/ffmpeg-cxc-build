@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.5.1"
+SCRIPT_VERSION="1.5.2"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -415,7 +415,7 @@ then
 fi
 
 #bzip2
-set_source "bzip2" "git" "https://github.com/enthought/bzip2-1.0.6.git" "bzlib"
+set_source "bzip2" "git" "https://sourceware.org/git/bzip2.git" "bzlib"
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
 	fetch_source
