@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.5.1"
+SCRIPT_VERSION="1.5.3"
 THIS="ffmpeg-native-pi"
 
 #build paths
@@ -509,7 +509,7 @@ then
 fi
 
 #x264
-set_source "x264" "git" "https://git.videolan.org/git/x264" "libx264"
+set_source "x264" "git" "https://code.videolan.org/videolan/x264.git" "libx264"
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
 	fetch_source
