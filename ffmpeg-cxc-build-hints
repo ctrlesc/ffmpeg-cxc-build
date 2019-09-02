@@ -1,5 +1,5 @@
 #-------------------------------------------------
-#ffmpeg-cxc-build-hints - 2019-07-10 working build
+#ffmpeg-cxc-build-hints - 2019-09-01 working build
 #-------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -18,9 +18,9 @@ CXC	OPTIM	-O3
 #override getconf _NPROCESSORS_ONLN
 #CXC	JOBS	6
 #use FETCH_ONLY to clone all the repositories without a build
-CXC	FETCH_ONLY	0
+#CXC	FETCH_ONLY	0
 #display the config only - no fetch/build
-CXC	SHOW_ONLY	0
+#CXC	SHOW_ONLY	0
 
 #-----------------------------------------------
 #constrain parallel make or disable/enable build
@@ -70,27 +70,28 @@ openssl	make	1
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
-aom	git	b3f260e636f09b651beadbdcca497f4a7dbfb12a
+aom	git	05b33047c42ce8c245237d044af09fb4853ab313
 ass	git	8088d2dcfb8e3c0631ea4f065a1a1f9975f75fdd
-bzip2	git	288acf97a15d558f96c24c89f578b724d6e06b0c
-fdk-aac	git	4edc5c4808c2a21e6dc8dc6c8d5a00290d042528
-ffmpeg	git	b1febda061955c6f4bfbc1a75918b5e75e7d7f80
+bzip2	git	475173c2d021b1bb1d0fe1845c66cf913260c03e
+fdk-aac	git	cc5c85dd70f04178abccfd2c5539b13e01da78d8
+ffmpeg	git	cc78783ce5e8837d4f4ca43eedf2d299651e65ff
 fontconfig	git	b546940435ebfb0df575bc7a2350d1e913919c34
-freetype	git	fbbcf50367403a6316a013b51690071198962920
-fribidi	git	49196f3f98ad73881bf382ce0663279b4ebe34fb
-harfbuzz	git	2e7021da7d1726a37822e6a001b9218f82255bc8
-lame	svn	6444
+freetype	git	cbee985a2bc14750ff850192f9ee8c1efe2bd7c7
+fribidi	git	0f849e344d446934b4ecdbe9edc32abd29029731
+harfbuzz	git	4375858792f3e3cc2fae72c3ae3327f52884f780
+lame	svn	6448
 nv-codec-headers	git	96a6db017b096ad48612890083464a7214902afa
-ogg	git	ec2d16de7c530ed53cbc968abc120d3b2a7c7c97
-openssl	git	7a228c391e0a35e1dc1223e3af3371968376857b
+ogg	git	d50b8d7ac0fe9d0089062d0efdbd64a083d5f4c6
+openssl	git	2f9789f7e7e8f17da32e1cadbbc3c398f99f2d23
 opus	git	ad8fe90db79b7d2a135e3dfd2ed6631b0c5662ab
 png	git	301f7a14295a3bdfaf406dbb5004d0784dc137ea
-sdl	hg	fe7caa031d3e
-sofa	git	3dba53f9c14795b109577519a0df2e25e15fcd6a
+sdl	hg	08db6a6f6c23
+sofa	git	29b1162b1c136cf956b4034f1708014716fb4266
 theora	git	e5d205bfe849f1b41f45b91a0b71a3bdc6cd458f
 vorbis	git	9eadeccdc4247127d91ac70555074239f5ce3529
-vpx	git	741f5dc77c031bfbe0ad637e20622dfb584ff7e6
-x264	git	d4099dd4c722f52c4f3c14575d7d39eb8fadb97f
-x265	hg	4f6dde51a5db
-xml2	git	87125732cc6c7a6251e4d0bc116387c84e09592d
+vpx	git	101f370a426884e9a1fe2b327b437218a1d1de33
+x264	git	3759fcb7b48037a5169715ab89f80a0ab4801cdf
+x265	hg	de920e0a3183
+xml2	git	5a02583c7e683896d84878bd90641d8d9b0d0549
 zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f
+
