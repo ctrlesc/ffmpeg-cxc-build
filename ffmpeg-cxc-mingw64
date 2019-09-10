@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.5.3"
+SCRIPT_VERSION="1.5.4"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -31,6 +31,12 @@ CXC_OPTION_LIST=\
 ( \
 "HOST" "OPTIM" "CFLAGS" "JOBS" "FETCH_ONLY" "SHOW_ONLY" "DISABLE_DEFAULT" \
 )
+
+CXC_SYSTEM_LIST=\
+( \
+"MACHINE" "OS" \
+)
+
 CXC_SOURCE_LIST=\
 ( \
 "aom" "ass" "bzip2" "fdk-aac" "freetype" "ffmpeg" \
@@ -397,6 +403,23 @@ then
 	build_message BM_YELLOW "$THIS: Cygwin build detected - ensure sys-root contains a symlink to construct a valid path for '$OUT_PATH/include'"
 fi
 
+#display the detected system type and hints file in use
+if [ "$BUILD" -ne 0 ]
+then
+	for i in "${CXC_SYSTEM_LIST[@]}"
+	do
+		var="CXC_$i"
+		echo "$var: ${!var}"
+	done
+	echo -n "HINTS_FILE: $HINTS_FILE"
+	if [ ! -e "$HINTS_FILE" ] || [ ! -r "$HINTS_FILE" ]
+	then
+		echo " (unreadable)"
+	else
+		echo " (readable)"
+	fi
+fi
+
 #build the sources
 
 #zlib
@@ -655,7 +678,7 @@ then
 	then
 		cd_source
 		export CROSS="$CXC_HOST"-
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$CXC_CFLAGS" --disable-debug --target=x86_64-win64-gcc --as=yasm --enable-static --disable-shared --disable-examples --disable-tools --disable-docs --disable-unit-tests --enable-vp9 --enable-vp8 --enable-postproc --enable-vp9-postproc --enable-vp9-highbitdepth
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$CXC_CFLAGS -fno-asynchronous-unwind-tables" --disable-debug --target=x86_64-win64-gcc --as=yasm --enable-static --disable-shared --disable-examples --disable-tools --disable-docs --disable-unit-tests --enable-vp9 --enable-vp8 --enable-postproc --enable-vp9-postproc --enable-vp9-highbitdepth
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 		unset CROSS
@@ -742,14 +765,14 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		./Configure no-shared no-legacy no-engine no-module no-fips no-tests zlib --prefix="$ROOT_PATH/$OUT_PATH" --with-zlib-include="$ROOT_PATH/$OUT_PATH/include" --with-zlib-lib=$ROOT_PATH/$OUT_PATH/lib  --cross-compile-prefix="$CXC_HOST-" mingw64
+		./Configure no-shared no-legacy no-engine no-module no-fips no-tests zlib --prefix="$ROOT_PATH/$OUT_PATH" --openssldir="$ROOT_PATH/$OUT_PATH" "$CXC_OPTIM $CXC_CFLAGS" --with-zlib-include="$ROOT_PATH/$OUT_PATH/include" --with-zlib-lib=$ROOT_PATH/$OUT_PATH/lib --cross-compile-prefix="$CXC_HOST-" mingw64
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS -i install_sw
 	fi
 fi
 
 #ffmpeg
-set_source "ffmpeg" "git" "https://git.ffmpeg.org/ffmpeg.git" "gpl" "version3" "nonfree" "avresample"
+set_source "ffmpeg" "git" "https://git.ffmpeg.org/ffmpeg.git" "gpl" "version3" "nonfree"
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
 	fetch_source
