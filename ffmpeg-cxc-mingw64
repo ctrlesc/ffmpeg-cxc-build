@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.5.4"
+SCRIPT_VERSION="1.5.5"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -765,7 +765,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		./Configure no-shared no-legacy no-engine no-module no-fips no-tests zlib --prefix="$ROOT_PATH/$OUT_PATH" --openssldir="$ROOT_PATH/$OUT_PATH" "$CXC_OPTIM $CXC_CFLAGS" --with-zlib-include="$ROOT_PATH/$OUT_PATH/include" --with-zlib-lib=$ROOT_PATH/$OUT_PATH/lib --cross-compile-prefix="$CXC_HOST-" mingw64
+		./Configure no-ssl2 no-ssl3 no-weak-ssl-ciphers no-shared no-hw no-engine no-dso no-err no-tests zlib --prefix="$ROOT_PATH/$OUT_PATH" --openssldir="$ROOT_PATH/$OUT_PATH" "$CXC_OPTIM $CXC_CFLAGS" --with-zlib-include="$ROOT_PATH/$OUT_PATH/include" --with-zlib-lib=$ROOT_PATH/$OUT_PATH/lib --cross-compile-prefix="$CXC_HOST-" mingw64
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS -i install_sw
 	fi

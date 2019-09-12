@@ -1,5 +1,5 @@
 #----------------------------------------------------
-#ffmpeg-native-build-hints - 2019-09-01 working build
+#ffmpeg-native-build-hints - 2019-09-11 working build
 #----------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -12,8 +12,8 @@
 #------------
 #NCC options
 #------------
-NCC	CFLAGS	-march=x86-64 -mtune=generic
-#generic skylake broadwell haswell ivybridge sandybridge westmere nehalem
+NCC	CFLAGS	-mtune=generic -march=x86-64 -pipe
+#generic skylake broadwell haswell ivybridge sandybridge corei7-avx westmere nehalem
 NCC	OPTIM	-O3
 #override getconf _NPROCESSORS_ONLN
 #NCC	JOBS	6
@@ -70,28 +70,28 @@ openssl	make	1
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
-aom	git	05b33047c42ce8c245237d044af09fb4853ab313
+aom	git	466fde92d2878920bc5723e9a3264624903693df
 ass	git	8088d2dcfb8e3c0631ea4f065a1a1f9975f75fdd
 bzip2	git	475173c2d021b1bb1d0fe1845c66cf913260c03e
-fdk-aac	git	cc5c85dd70f04178abccfd2c5539b13e01da78d8
-ffmpeg	git	cc78783ce5e8837d4f4ca43eedf2d299651e65ff
+fdk-aac	git	5ab5496af95674e9ee741cba178d5b981bccbe45
+ffmpeg	git	1faedb9a119ac4a8c5126255e3855f3bfb30ffb6
 fontconfig	git	65087ac7ce4cc5f2109967c1380b474955dcb590
-freetype	git	cbee985a2bc14750ff850192f9ee8c1efe2bd7c7
+freetype	git	3de1b8d0b0983cf49a187a4227e7950395a3b08f
 fribidi	git	0f849e344d446934b4ecdbe9edc32abd29029731
-harfbuzz	git	4375858792f3e3cc2fae72c3ae3327f52884f780
+harfbuzz	git	229ef1d29d5c7a370ebb10a1131c04719f34dc81
 lame	svn	6448
 nv-codec-headers	git	96a6db017b096ad48612890083464a7214902afa
-ogg	git	d50b8d7ac0fe9d0089062d0efdbd64a083d5f4c6
-openssl	git	2f9789f7e7e8f17da32e1cadbbc3c398f99f2d23
+ogg	git	c8fca6b4a02d695b1ceea39b330d4406001c03ed
+openssl	git	894da2fb7ed5d314ee5c2fc9fd2d9b8b74111596
 opus	git	ad8fe90db79b7d2a135e3dfd2ed6631b0c5662ab
 png	git	301f7a14295a3bdfaf406dbb5004d0784dc137ea
-sdl	hg	08db6a6f6c23
-sofa	git	29b1162b1c136cf956b4034f1708014716fb4266
+sdl	hg	2ede888544ac
+sofa	git	e07edb39e9ecc796127cd748ada4a4bac88cb5d2
 theora	git	e5d205bfe849f1b41f45b91a0b71a3bdc6cd458f
 vorbis	git	9eadeccdc4247127d91ac70555074239f5ce3529
-vpx	git	101f370a426884e9a1fe2b327b437218a1d1de33
+vpx	git	802569640731033bd649c2d3b0f065a0ff674010
 x264	git	3759fcb7b48037a5169715ab89f80a0ab4801cdf
-x265	hg	de920e0a3183
+x265	hg	a092e82e6acf
 xml2	git	5a02583c7e683896d84878bd90641d8d9b0d0549
 zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f
 
