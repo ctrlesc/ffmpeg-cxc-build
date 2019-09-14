@@ -14,12 +14,16 @@ sudo apt-get -y install autoconf automake build-essential cmake git-core gperf g
 Fedora:
 
 sudo yum install make autogen automake cmake gcc gcc-c++ git gettext-devel gperf kernel-devel libtool mercurial mingw64-gcc mingw64-gcc-c++ mingw64-winpthreads-static nasm python2-lxml ragel subversion uuid-devel yasm
+
+Arch/Manjaro:
+
+autoconf automake cmake git gperf libtool mercurial mingw-w64-binutils mingw-w64-crt mingw-w64-gcc mingw-w64-headers mingw-w64-tools mingw-w64-winpthreads nasm python-lxml ragel subversion wget yasm
   
-  Cygwin:
+Cygwin:
   
  After a baseline install, run setup and install the packages: autoconf autoconf2.1 autoconf2.5 autogen automake automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.15 automake1.9 binutils cmake gcc-core gcc-g++ gettext gettext-devel gettext-doc git gperf libtool libuuid-devel make mercurial mingw64-x86_64-binutils mingw64-x86_64-gcc-core mingw64-x86_64-gcc-g++ mingw64-x86_64-gettext mingw64-x86_64-headers mingw64-x86_64-runtime mingw64-x86_64-win-iconv mingw64-x86_64-windows-default-manifest mingw64-x86_64-winpthreads nasm python27 python27-lxml python27-six ragel rsync subversion wget yasm
  
- *Cygwin Preconditions:*
+*Cygwin Preconditions:*
  
 The mingw toolchain files must be in the path, and a link from the mingw sys-root directory to the sanbox build path must be created.  As an example, assuming the default configuration is used for the ROOT_PATH variable,  *ffmpeg-cxc-build-hints* has been placed in the user's home directory, and *ffmpeg-cxc-mingw64* is executable in the environment's path:
  
@@ -36,4 +40,4 @@ Assumptions: ROOT_PATH is left to the default ($HOME) and *ffmpeg-cxc-mingw64* i
 	ROOT_PATH=~/ SRC_PATH=src HINTS_FILE=/dev/null CXC_FETCH_ONLY=1 ffmpeg-cxc-mingw64
 	#copy ffmpeg-cxc-build-hints to ~/ and edit to fetch files from ~/src via URL override
 	ffmpeg-cxc-mingw64
-Using this technique, the script *update-repo* can be used to maintain up to date repositories by cd'ing into ~/src and running it.  Subsequent builds will then pull via the file URL override allowing up to date builds of ffmpeg.
+Using this technique, the script *update-repo* can be used to maintain up to date repositories by cd'ing into ~/src and running it.  Subsequent builds will then pull via the file URL override allowing up to date builds of ffmpeg and libraries if you edit the hints file and remove the commit hashes (empty means latest).  Note that fontconfig and openssl will likely require the hashes specified in the hints file to build and operate as expected.
