@@ -41,3 +41,12 @@ Assumptions: ROOT_PATH is left to the default ($HOME) and *ffmpeg-cxc-mingw64* i
 	#copy ffmpeg-cxc-build-hints to ~/ and edit to fetch files from ~/src via URL override
 	ffmpeg-cxc-mingw64
 Using this technique, the script *update-repo* can be used to maintain up to date repositories by cd'ing into ~/src and running it.  Subsequent builds will then pull via the file URL override allowing up to date builds of ffmpeg and libraries if you edit the hints file and remove the commit hashes (empty means latest).  Note that fontconfig and openssl will likely require the hashes specified in the hints file to build and operate as expected.
+
+**FFmpeg Latest Build Procedure**
+
+
+	#using the ~/src directory as above - update and specify the path to ffmpeg-cxc-build-hints-file-head
+	cd ~/src
+	update-repo
+	HINTS_FILE=~/ffmpeg-cxc-build-hints-file-head ffmpeg-cxc-mingw64
+
