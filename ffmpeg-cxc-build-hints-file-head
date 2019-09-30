@@ -1,26 +1,26 @@
-#----------------------------------------------------
-#ffmpeg-native-build-hints - local source, head/tip
-#----------------------------------------------------
+#---------------------------------------------------------
+#ffmpeg-cxc-build-hints-file-head - local source, head/tip
+#---------------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
 #set via the command line:
-#HINTS_FILE=/media/user/usb/my-build-hints ffmpeg-native
-#fields are TAB delimited triplets enabling control of the build
+#HINTS_FILE=/media/user/usb/my-build-hints ffmpeg-cxc-mingw64
 
+#fields are TAB delimited triplets enabling control of the build
 #source	key	value
 
 #------------
-#NCC options
+#CXC options
 #------------
-NCC	CFLAGS	-march=corei7-avx -mtune=corei7-avx
+CXC	CFLAGS	-march=corei7-avx -mtune=corei7-avx
 #generic skylake broadwell haswell ivybridge sandybridge corei7-avx westmere nehalem
-NCC	OPTIM	-O3
+CXC	OPTIM	-O3
 #override getconf _NPROCESSORS_ONLN
-#NCC	JOBS	6
+#CXC	JOBS	6
 #use FETCH_ONLY to clone all the repositories without a build
-NCC	FETCH_ONLY	0
+CXC	FETCH_ONLY	0
 #display the config only - no fetch/build
-NCC	SHOW_ONLY	0
+CXC	SHOW_ONLY	0
 
 #-----------------------------------------------
 #constrain parallel make or disable/enable build
@@ -75,7 +75,9 @@ ass	git
 bzip2	git	
 fdk-aac	git	
 ffmpeg	git	
-fontconfig	git	
+#commit below is for fontconfig 2.12.6, head may not build/work as expected
+fontconfig	git	b546940435ebfb0df575bc7a2350d1e913919c34
+#fontconfig	git	
 freetype	git	
 fribidi	git	
 harfbuzz	git	
@@ -83,8 +85,8 @@ lame	svn
 nv-codec-headers	git	
 ogg	git	
 #commit below is for openssl 1.1.1.d, head may not build/work as expected
-#openssl	git	7a228c391e0a35e1dc1223e3af3371968376857b
-openssl	git	
+openssl	git	7a228c391e0a35e1dc1223e3af3371968376857b
+#openssl	git	
 opus	git	
 png	git	
 sdl	hg	
