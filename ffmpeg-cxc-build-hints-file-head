@@ -85,7 +85,7 @@ lame	svn
 nv-codec-headers	git	
 ogg	git	
 #commit below is for openssl 1.1.1.d, head may not build/work as expected
-openssl	git	7a228c391e0a35e1dc1223e3af3371968376857b
+openssl	git	894da2fb7ed5d314ee5c2fc9fd2d9b8b74111596
 #openssl	git	
 opus	git	
 png	git	

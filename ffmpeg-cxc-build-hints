@@ -1,5 +1,5 @@
 #-------------------------------------------------
-#ffmpeg-cxc-build-hints - 2019-09-11 working build
+#ffmpeg-cxc-build-hints - 2019-11-01 working build
 #-------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -70,28 +70,28 @@ openssl	make	1
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
-aom	git	466fde92d2878920bc5723e9a3264624903693df
-ass	git	8088d2dcfb8e3c0631ea4f065a1a1f9975f75fdd
+aom	git	12cacdd6043cb2ee715a206fe1bcfa768b5a7d02
+ass	git	be0d1613f79a95073d18d96a60e1394abf9316a2
 bzip2	git	475173c2d021b1bb1d0fe1845c66cf913260c03e
-fdk-aac	git	5ab5496af95674e9ee741cba178d5b981bccbe45
-ffmpeg	git	1faedb9a119ac4a8c5126255e3855f3bfb30ffb6
+fdk-aac	git	10fcf89a3ee22443ac47374c3fcbf0cf2eee7f07
+ffmpeg	git	2dd71bf95e369b6c03fd6f5c66ff1d143e752192
 fontconfig	git	b546940435ebfb0df575bc7a2350d1e913919c34
-freetype	git	3de1b8d0b0983cf49a187a4227e7950395a3b08f
-fribidi	git	0f849e344d446934b4ecdbe9edc32abd29029731
-harfbuzz	git	229ef1d29d5c7a370ebb10a1131c04719f34dc81
+freetype	git	b75031a26eed8838222ddb3a81bc1672a0e463a8
+fribidi	git	034c6e9a1d296286305f4cfd1e0072b879f52568
+harfbuzz	git	486754a888d067c990d6a4351ccd41570f08c956
 lame	svn	6448
-nv-codec-headers	git	96a6db017b096ad48612890083464a7214902afa
+nv-codec-headers	git	becedd2b3543ee913b1512b7c7447e3401ec2405
 ogg	git	c8fca6b4a02d695b1ceea39b330d4406001c03ed
-openssl	git	894da2fb7ed5d314ee5c2fc9fd2d9b8b74111596
+openssl	git	7a228c391e0a35e1dc1223e3af3371968376857b
 opus	git	ad8fe90db79b7d2a135e3dfd2ed6631b0c5662ab
 png	git	301f7a14295a3bdfaf406dbb5004d0784dc137ea
-sdl	hg	2ede888544ac
+sdl	hg	50a9f9c538c5
 sofa	git	e07edb39e9ecc796127cd748ada4a4bac88cb5d2
 theora	git	e5d205bfe849f1b41f45b91a0b71a3bdc6cd458f
 vorbis	git	9eadeccdc4247127d91ac70555074239f5ce3529
-vpx	git	802569640731033bd649c2d3b0f065a0ff674010
+vpx	git	70d8d72ffee5c510a90d55940f995ce48a91dcbe
 x264	git	3759fcb7b48037a5169715ab89f80a0ab4801cdf
-x265	hg	a092e82e6acf
-xml2	git	5a02583c7e683896d84878bd90641d8d9b0d0549
+x265	hg	971180b100f8
+xml2	git	aec2bf715346251ad0fd59e62184e82ed786e618
 zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f
 
