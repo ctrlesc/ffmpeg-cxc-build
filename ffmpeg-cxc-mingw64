@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.5.5"
+SCRIPT_VERSION="1.5.6"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -618,7 +618,7 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --disable-doc
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS  -D_FORTIFY_SOURCE=0" --host="$CXC_HOST" --enable-static --disable-shared --disable-doc
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
