@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.5.6"
+SCRIPT_VERSION="1.6.0"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -40,7 +40,7 @@ CXC_SYSTEM_LIST=\
 CXC_SOURCE_LIST=\
 ( \
 "aom" "ass" "bzip2" "fdk-aac" "freetype" "ffmpeg" \
-"fribidi" "fontconfig" "harfbuzz" "lame" "lame" \
+"fribidi" "fontconfig" "harfbuzz" "lame" "lame" "mfx" \
 "nv-codec-headers" "ogg" "openssl" "opus" "png" "sdl" \
 "sofa" "theora" "vorbis" "vpx" \
 "xml2" "x264" "x265" "zlib" \
@@ -742,6 +742,20 @@ then
 		build_make $CXC_JOBS
 		rm -f "$BIN_PATH"/sdl*
 		mv .temp_hg .hg
+	fi
+fi
+
+#mfx
+set_source "mfx" "git" "https://github.com/lu-zero/mfx_dispatch.git" "libmfx"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		autoreconf -fiv
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --bindir="$BIN_PATH" --enable-static --disable-shared
+		build_make $CXC_JOBS
 	fi
 fi
 

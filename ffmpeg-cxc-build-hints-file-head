@@ -18,9 +18,9 @@ CXC	OPTIM	-O3
 #override getconf _NPROCESSORS_ONLN
 #CXC	JOBS	6
 #use FETCH_ONLY to clone all the repositories without a build
-CXC	FETCH_ONLY	0
+#CXC	FETCH_ONLY	0
 #display the config only - no fetch/build
-CXC	SHOW_ONLY	0
+#CXC	SHOW_ONLY	0
 
 #-----------------------------------------------
 #constrain parallel make or disable/enable build
@@ -51,6 +51,7 @@ freetype	url	file://~/src/freetype
 fribidi	url	file://~/src/fribidi
 harfbuzz	url	file://~/src/harfbuzz
 lame	url	file://~/src/lame
+mfx	url	file://~/src/mfx
 nv-codec-headers	url	file://~/src/nv-codec-headers
 ogg	url	file://~/src/ogg
 openssl	url	file://~/src/openssl
@@ -82,6 +83,7 @@ freetype	git
 fribidi	git	
 harfbuzz	git	
 lame	svn	
+mfx	git	
 nv-codec-headers	git	
 ogg	git	
 #commit below is for openssl 1.1.1.d, head may not build/work as expected
