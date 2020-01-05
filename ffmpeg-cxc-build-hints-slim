@@ -30,6 +30,7 @@ CXC	OPTIM	-O3
 #source	enable	
 
 #disabled
+amf	disable	
 aom	disable	
 ass	disable	
 bzip2	disable	
