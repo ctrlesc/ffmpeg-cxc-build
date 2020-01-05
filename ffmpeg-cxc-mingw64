@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.6.0"
+SCRIPT_VERSION="1.6.1"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -39,7 +39,7 @@ CXC_SYSTEM_LIST=\
 
 CXC_SOURCE_LIST=\
 ( \
-"aom" "ass" "bzip2" "fdk-aac" "freetype" "ffmpeg" \
+"amf" "aom" "ass" "bzip2" "fdk-aac" "freetype" "ffmpeg" \
 "fribidi" "fontconfig" "harfbuzz" "lame" "lame" "mfx" \
 "nv-codec-headers" "ogg" "openssl" "opus" "png" "sdl" \
 "sofa" "theora" "vorbis" "vpx" \
@@ -742,6 +742,19 @@ then
 		build_make $CXC_JOBS
 		rm -f "$BIN_PATH"/sdl*
 		mv .temp_hg .hg
+	fi
+fi
+
+#amf
+set_source "amf" "git" "https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git" "amf"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		mkdir --parents "$ROOT_PATH/$OUT_PATH"/include/AMF
+		cp --verbose -r amf/public/include/* "$ROOT_PATH/$OUT_PATH"/include/AMF
 	fi
 fi
 

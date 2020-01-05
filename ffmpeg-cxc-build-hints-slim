@@ -1,5 +1,5 @@
 #------------------------------------------------------
-#ffmpeg-cxc-build-hints-slim - 2020-01-01 working build
+#ffmpeg-cxc-build-hints-slim - 2020-01-05 working build
 #------------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -64,6 +64,7 @@ zlib	enable
 #source	url	url_string
 #ffmpeg	url	https://git.videolan.org/git/ffmpeg.git
 
+#amf	url	file://~/src/amf
 #aom	url	file://~/src/aom
 #ass	url	file://~/src/ass
 #bzip2	url	file://~/src/bzip2
@@ -96,6 +97,7 @@ zlib	enable
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
+amf	git	acbd8778c120eb8f92e036d0ffc4976a74796785
 aom	git	3aca301999ceb657fb81e543b133d5aeeed79e61
 ass	git	0527f023f764976a6848b54af542c1141ae3f09e
 bzip2	git	475173c2d021b1bb1d0fe1845c66cf913260c03e
