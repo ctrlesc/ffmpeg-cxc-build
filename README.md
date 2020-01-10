@@ -3,25 +3,25 @@ Fast cross-compile ffmpeg for Windows with MinGW on Linux and Cygwin to produce 
 
 **Enabled Features**
 
-amf aom ass/ssa bzip2 fdk-aac fontconfig freetype fribidi harfbuzz lame nvenc/nvdec ogg openssl opus png qsv sdl sofalizer theora vorbis vpx x264 x265 xml2 zlib
+amf aom ass/ssa bzip2 dav1d fdk-aac fontconfig freetype fribidi harfbuzz lame nvenc/nvdec ogg openssl opus png qsv sdl sofalizer theora vorbis vpx x264 x265 xml2 zlib
 
 **Package Requirements**
 
 Debian/Ubuntu/Mint:
 
-sudo apt-get -y install autoconf automake build-essential cmake git-core gperf g++-mingw-w64 libtool mercurial nasm pkg-config python-lxml ragel subversion texinfo yasm wget
+sudo apt-get -y install autoconf automake build-essential cmake git-core gperf g++-mingw-w64 libtool mercurial meson nasm pkg-config python-lxml ragel subversion texinfo yasm wget
   
 Fedora:
 
-sudo yum install make autogen automake cmake gcc gcc-c++ git gettext-devel gperf kernel-devel libtool mercurial mingw64-gcc mingw64-gcc-c++ mingw64-winpthreads-static nasm python2-lxml ragel subversion uuid-devel yasm
+sudo yum install make autogen automake cmake gcc gcc-c++ git gettext-devel gperf kernel-devel libtool mercurial meson mingw64-gcc mingw64-gcc-c++ mingw64-winpthreads-static nasm python2-lxml ragel subversion uuid-devel yasm
 
 Arch/Manjaro:
 
-autoconf automake cmake git gperf libtool mercurial mingw-w64-binutils mingw-w64-crt mingw-w64-gcc mingw-w64-headers mingw-w64-tools mingw-w64-winpthreads nasm python-lxml ragel subversion wget yasm
+autoconf automake cmake git gperf libtool mercurial meson mingw-w64-binutils mingw-w64-crt mingw-w64-gcc mingw-w64-headers mingw-w64-tools mingw-w64-winpthreads nasm python-lxml ragel subversion wget yasm
   
 Cygwin:
   
- After a baseline install, run setup and install the packages: autoconf autoconf2.1 autoconf2.5 autogen automake automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.15 automake1.9 binutils cmake gcc-core gcc-g++ gettext gettext-devel gettext-doc git gperf libtool libuuid-devel make mercurial mingw64-x86_64-binutils mingw64-x86_64-gcc-core mingw64-x86_64-gcc-g++ mingw64-x86_64-gettext mingw64-x86_64-headers mingw64-x86_64-runtime mingw64-x86_64-win-iconv mingw64-x86_64-windows-default-manifest mingw64-x86_64-winpthreads nasm python27 python27-lxml python27-six ragel rsync subversion wget yasm
+ After a baseline install, run setup and install the packages: autoconf autoconf2.1 autoconf2.5 autogen automake automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.15 automake1.9 binutils cmake gcc-core gcc-g++ gettext gettext-devel gettext-doc git gperf libtool libuuid-devel make mercurial meson mingw64-x86_64-binutils mingw64-x86_64-gcc-core mingw64-x86_64-gcc-g++ mingw64-x86_64-gettext mingw64-x86_64-headers mingw64-x86_64-runtime mingw64-x86_64-win-iconv mingw64-x86_64-windows-default-manifest mingw64-x86_64-winpthreads nasm python27 python27-lxml python27-six ragel rsync subversion wget yasm
  
 *Cygwin Preconditions:*
  
