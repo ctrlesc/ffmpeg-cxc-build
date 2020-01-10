@@ -1,5 +1,5 @@
 #------------------------------------------------------
-#ffmpeg-cxc-build-hints-slim - 2020-01-05 working build
+#ffmpeg-cxc-build-hints-slim - 2020-01-09 working build
 #------------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -13,7 +13,7 @@
 #CXC options
 #------------
 CXC	CFLAGS	-mtune=generic -march=x86-64 -pipe
-#generic skylake broadwell haswell ivybridge sandybridge corei7-avx westmere nehalem
+#x86-64 generic skylake broadwell haswell ivybridge sandybridge corei7-avx westmere nehalem
 CXC	OPTIM	-O3
 #override getconf _NPROCESSORS_ONLN
 #CXC	JOBS	6
@@ -47,8 +47,9 @@ vpx	disable
 xml2	disable	
 
 #enabled
+dav1d	enable	
 fdk-aac	enable	
-lame	enable	
+lame	make	1
 ogg	enable	
 openssl	make	1
 opus	enable	
@@ -62,7 +63,6 @@ zlib	enable
 #set override URL for source
 #---------------------------
 #source	url	url_string
-#source	url	url_string
 #ffmpeg	url	https://git.videolan.org/git/ffmpeg.git
 
 #amf	url	file://~/src/amf
@@ -73,13 +73,15 @@ zlib	enable
 #freetype	url	file://~/src/freetype
 #fribidi	url	file://~/src/fribidi
 #harfbuzz	url	file://~/src/harfbuzz
-#png	url	file://~/src/png
-#xml2	url	file://~/src/xml2
-
-#fdk-aac	url	file://~/src/fdk-aac
-#lame	url	file://~/src/lame
 #mfx	url	file://~/src/mfx
 #nv-codec-headers	url	file://~/src/nv-codec-headers
+#png	url	file://~/src/png
+#vpx	url	file://~/src/vpx
+#xml2	url	file://~/src/xml2
+
+#dav1d	url	file://~/src/dav1d
+#fdk-aac	url	file://~/src/fdk-aac
+#lame	url	file://~/src/lame
 #ogg	url	file://~/src/ogg
 #openssl	url	file://~/src/openssl
 #opus	url	file://~/src/opus
@@ -87,7 +89,6 @@ zlib	enable
 #sofa	url	file://~/src/sofa
 #theora	url	file://~/src/theora
 #vorbis	url	file://~/src/vorbis
-#vpx	url	file://~/src/vpx
 #x264	url	file://~/src/x264
 #x265	url	file://~/src/x265
 #zlib	url	file://~/src/zlib
@@ -99,15 +100,16 @@ zlib	enable
 #------------------------
 #source	fetch_method	revision_id
 amf	git	acbd8778c120eb8f92e036d0ffc4976a74796785
-aom	git	3aca301999ceb657fb81e543b133d5aeeed79e61
-ass	git	0527f023f764976a6848b54af542c1141ae3f09e
+aom	git	7e48669d25a939833f548a66992f5af2a43bbec4
+ass	git	abf1144e61ffffc04f8ca9d7baa225e5fac65da8
 bzip2	git	475173c2d021b1bb1d0fe1845c66cf913260c03e
-fdk-aac git	10fcf89a3ee22443ac47374c3fcbf0cf2eee7f07
-ffmpeg	git	d4d6280ab2e8552dfad0a7d1f0dd2c440192e97f
+dav1d	git	5462c2a80de6f7f6c0b1b0d20cbe571b09510a19
+fdk-aac	git	d47c2c625940d2bd62b0cd581605c5122c3d2cfd
+ffmpeg	git	3ea705767720033754e8d85566460390191ae27d
 fontconfig	git	b546940435ebfb0df575bc7a2350d1e913919c34
-freetype	git	a4df0373c71f426711fb77e3a21d4b58b7c42e66
-fribidi git	f503e576c8345dd32d7438569346d6ca9aa50044
-harfbuzz	git	9e48c6e9ef3f6d398c7140933a2cd90980f0ed5b
+freetype	git	50b013871c53f7624b5351dd4820a137303fe14b
+fribidi	git	f503e576c8345dd32d7438569346d6ca9aa50044
+harfbuzz	git	8ed46c3678cd4518efe5c9907bb9d22e6161bbd5
 lame	svn	6448
 mfx	git	ff3d2ee3aed29c473190a6d35294e09fb624e933
 nv-codec-headers	git	250292dd20af60edc6e0d07f1d6e489a2f8e1c44
@@ -115,13 +117,14 @@ ogg	git	c8fca6b4a02d695b1ceea39b330d4406001c03ed
 openssl git	894da2fb7ed5d314ee5c2fc9fd2d9b8b74111596
 opus	git	ad8fe90db79b7d2a135e3dfd2ed6631b0c5662ab
 png	git	301f7a14295a3bdfaf406dbb5004d0784dc137ea
-sdl	hg	7bcf24416ca6
+sdl	hg	b7cea35fa5ea
 sofa	git	be7ac155734a435034a912c06d388ef17ccb234a
 theora	git	e5d205bfe849f1b41f45b91a0b71a3bdc6cd458f
 vorbis	git	9eadeccdc4247127d91ac70555074239f5ce3529
-vpx	git	50d1a4aa725fbc78ee89ffde5e83b4ee4fe4893e
+vpx	git	ccb06a9fb15b9c10099cef28ff1240eb9ffa9390
 x264	git	1771b556ee45207f8711744ccbd5d42a3949b14c
-x265	hg	52135ffd9bcd
-xml2	git	0815302dee2b78139832c2080348086a0564836b
+x265	hg	c5ff72937e9c
+xml2	git	3e7e75bed2cf2853b0d42d635d36676b3330d475
 zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f
+
 

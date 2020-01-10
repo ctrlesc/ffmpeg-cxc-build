@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.6.1"
+SCRIPT_VERSION="1.6.2"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -39,7 +39,7 @@ CXC_SYSTEM_LIST=\
 
 CXC_SOURCE_LIST=\
 ( \
-"amf" "aom" "ass" "bzip2" "fdk-aac" "freetype" "ffmpeg" \
+"amf" "aom" "ass" "bzip2" "dav1d" "fdk-aac" "freetype" "ffmpeg" \
 "fribidi" "fontconfig" "harfbuzz" "lame" "lame" "mfx" \
 "nv-codec-headers" "ogg" "openssl" "opus" "png" "sdl" \
 "sofa" "theora" "vorbis" "vpx" \
@@ -52,7 +52,7 @@ CXC_FFMPEG_EXTRA_LIBS="-lwinpthread"
 #fix pkg-config paths for cross
 export PKG_CONFIG_DIR=
 export PKG_CONFIG_PATH=
-export PKG_CONFIG_SYSROOT_PATH="$ROOT_PATH"
+export PKG_CONFIG_SYSROOT_PATH="$ROOT_PATH/$OUT_PATH"
 export PKG_CONFIG_LIBDIR="$ROOT_PATH/$OUT_PATH/lib/pkgconfig:$ROOT_PATH/$OUT_PATH/share/pkgconfig"
 
 build_message() {
@@ -387,6 +387,22 @@ then
 	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_C_FLAGS   "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_CXX_FLAGS "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo 'SET(CMAKE_EXE_LINKER_FLAGS              "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
+
+	#meson toolchain settings
+	touch $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "[binaries]"                                          >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "c = 'x86_64-w64-mingw32-gcc'"                        >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "cpp = 'x86_64-w64-mingw32-g++'"                      >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "windres = 'x86_64-w64-mingw32-windres'"              >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "strip = 'x86_64-w64-mingw32-strip'"                  >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "[properties]"                                        >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "c_args = ['$(echo "$CXC_CFLAGS" | sed -r "s/\s+/','/g")']"    >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "c_link_args = ['-static-libgcc','-static','-s']"     >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "[host_machine]"                                      >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "system = 'windows'"                                  >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "cpu_family = 'x86_64'"                               >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "cpu = 'x86_64'"                                      >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "endian = 'little'"                                   >> $ROOT_PATH/$SRC_PATH/cross.meson
 fi
 
 #test and fix cross for cygwin build environment
@@ -669,6 +685,25 @@ fetch_source
 	fi
 fi
 
+#dav1d
+set_source "dav1d" "git" "https://code.videolan.org/videolan/dav1d" "libdav1d"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		mkdir "$SRC_NAME"_build
+		cd "$SRC_NAME"_build
+		CPPFLAGS="$CXC_CPPFLAGS" meson --prefix="$ROOT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_tools=false -Denable_tests=false --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" ../dav1d
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		ninja -C .
+		[ $? -eq 0 ] || build_die "$THIS: make stage failed -> $SRC_NAME"
+		ninja -C . install
+		[ $? -eq 0 ] || build_die "$THIS: install stage failed -> $SRC_NAME"
+		
+	fi
+fi
+
 #vpx
 set_source "vpx" "git" "https://chromium.googlesource.com/webm/libvpx.git" "libvpx"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -819,7 +854,8 @@ then
 		  --pkg-config-flags="--static" \
 		  --extra-cflags="$CXC_OPTIM $CXC_CFLAGS" \
 		  --extra-cflags="-I$ROOT_PATH/$OUT_PATH/include" \
-		  --extra-ldflags="-L$ROOT_PATH/$OUT_PATH/lib -static-libgcc -static-libstdc++ -static -s" \
+		  --extra-ldflags="-static-libgcc -static-libstdc++ -static -s" \
+		  --extra-ldflags="-L$ROOT_PATH/$OUT_PATH/lib" \
 		  --extra-libs="$CXC_FFMPEG_EXTRA_LIBS" \
 		  --bindir="$BIN_PATH"\
 		  $CXC_FFMPEG_LIB_OPTIONS

@@ -1,26 +1,26 @@
-#----------------------------------------------------
-#ffmpeg-native-build-hints - local source, head/tip
-#----------------------------------------------------
+#------------------------------------------------------------
+#ffmpeg-native-build-hints-file-head - local source, head/tip
+#------------------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
 #set via the command line:
 #HINTS_FILE=/media/user/usb/my-build-hints ffmpeg-native
-#fields are TAB delimited triplets enabling control of the build
 
+#fields are TAB delimited triplets enabling control of the build
 #source	key	value
 
 #------------
 #NCC options
 #------------
-NCC	CFLAGS	-march=corei7-avx -mtune=corei7-avx
-#generic skylake broadwell haswell ivybridge sandybridge corei7-avx westmere nehalem
+NCC	CFLAGS	-mtune=generic -march=x86-64 -pipe
+#x86-64 generic skylake broadwell haswell ivybridge sandybridge corei7-avx westmere nehalem
 NCC	OPTIM	-O3
 #override getconf _NPROCESSORS_ONLN
 #NCC	JOBS	6
 #use FETCH_ONLY to clone all the repositories without a build
-NCC	FETCH_ONLY	0
+#NCC	FETCH_ONLY	0
 #display the config only - no fetch/build
-NCC	SHOW_ONLY	0
+#NCC	SHOW_ONLY	0
 
 #-----------------------------------------------
 #constrain parallel make or disable/enable build
@@ -44,6 +44,7 @@ openssl	make	1
 aom	url	file://~/src/aom
 ass	url	file://~/src/ass
 bzip2	url	file://~/src/bzip2
+dav1d	url	file://~/src/dav1d
 fdk-aac	url	file://~/src/fdk-aac
 ffmpeg	url	file://~/src/ffmpeg
 fontconfig	url	file://~/src/fontconfig
@@ -73,6 +74,7 @@ zlib	url	file://~/src/zlib
 aom	git	
 ass	git	
 bzip2	git	
+dav1d	git	
 fdk-aac	git	
 ffmpeg	git	
 fontconfig	git	

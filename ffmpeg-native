@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.5.5"
+SCRIPT_VERSION="1.6.0"
 THIS="ffmpeg-native"
 
 #build paths
@@ -37,7 +37,7 @@ NCC_SYSTEM_LIST=\
 
 NCC_SOURCE_LIST=\
 ( \
-"aom" "ass" "bzip2" "fdk-aac" "freetype" "ffmpeg" \
+"aom" "ass" "bzip2" "dav1d" "fdk-aac" "freetype" "ffmpeg" \
 "fribidi" "fontconfig" "harfbuzz" "lame" "lame" \
 "nv-codec-headers" "ogg" "openssl" "opus" "png" "sdl" \
 "sofa" "theora" "vorbis" "vpx" \
@@ -50,7 +50,7 @@ NCC_FFMPEG_EXTRA_LIBS="-lpthread -lm"
 #fix pkg-config paths for cross
 export PKG_CONFIG_DIR=
 export PKG_CONFIG_PATH=
-export PKG_CONFIG_SYSROOT_PATH="$ROOT_PATH"
+export PKG_CONFIG_SYSROOT_PATH="$ROOT_PATH/$OUT_PATH"
 export PKG_CONFIG_LIBDIR="$ROOT_PATH/$OUT_PATH/lib/pkgconfig:$ROOT_PATH/$OUT_PATH/share/pkgconfig"
 
 build_message() {
@@ -413,10 +413,9 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DBUILD_SHARED_LIBS=0 .
+		CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" LDFLAGS="-L$ROOT_PATH/$OUT_PATH/lib -l:libz.a" ./configure --prefix="$ROOT_PATH/$OUT_PATH" --static
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
-		cp $ROOT_PATH/$OUT_PATH/lib/libzlibstatic.a $ROOT_PATH/$OUT_PATH/lib/libz.a
 	fi
 fi
 
@@ -651,6 +650,25 @@ then
 	fi
 fi
 
+#dav1d
+set_source "dav1d" "git" "https://code.videolan.org/videolan/dav1d" "libdav1d"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		mkdir "$SRC_NAME"_build
+		cd "$SRC_NAME"_build
+		CPPFLAGS="$NCC_CPPFLAGS" meson --prefix="$ROOT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_tools=false -Denable_tests=false ../dav1d
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		ninja -C .
+		[ $? -eq 0 ] || build_die "$THIS: make stage failed -> $SRC_NAME"
+		ninja -C . install
+		[ $? -eq 0 ] || build_die "$THIS: install stage failed -> $SRC_NAME"
+		
+	fi
+fi
+
 #vpx
 set_source "vpx" "git" "https://chromium.googlesource.com/webm/libvpx.git" "libvpx"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -745,7 +763,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		./config no-ssl2 no-ssl3 no-weak-ssl-ciphers no-shared no-hw no-engine no-dso no-err no-tests zlib --prefix="$ROOT_PATH/$OUT_PATH" --openssldir="$ROOT_PATH/$OUT_PATH" "$NCC_OPTIM $NCC_CFLAGS" --with-zlib-include="$ROOT_PATH/$OUT_PATH/include" --with-zlib-lib=$ROOT_PATH/$OUT_PATH/lib
+		./config no-ssl2 no-ssl3 no-weak-ssl-ciphers no-shared no-hw no-engine no-dso no-err no-tests zlib --prefix="$ROOT_PATH/$OUT_PATH" --openssldir="$ROOT_PATH/$OUT_PATH" "$NCC_OPTIM $NCC_CFLAGS" --with-zlib-include="$ROOT_PATH/$OUT_PATH/include" --with-zlib-lib="$ROOT_PATH/$OUT_PATH/lib"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS install_sw
 	fi
@@ -767,9 +785,10 @@ then
 		  --prefix="$ROOT_PATH/$OUT_PATH" \
 		  --pkg-config="pkg-config" \
 		  --pkg-config-flags="--static" \
-		  --extra-cflags="$NCC_OPTIM $NCC_CFLAGS -no-pie" \
+		  --extra-cflags="$NCC_OPTIM $NCC_CFLAGS" \
 		  --extra-cflags="-I$ROOT_PATH/$OUT_PATH/include" \
-		  --extra-ldflags="-L$ROOT_PATH/$OUT_PATH/lib -no-pie" \
+		  --extra-ldflags="-no-pie" \
+		  --extra-ldflags="-L$ROOT_PATH/$OUT_PATH/lib" \
 		  --extra-libs="$NCC_FFMPEG_EXTRA_LIBS" \
 		  --bindir="$BIN_PATH"\
 		  $NCC_FFMPEG_LIB_OPTIONS
