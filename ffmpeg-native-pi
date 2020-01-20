@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.5.4"
+SCRIPT_VERSION="1.5.5"
 THIS="ffmpeg-native-pi"
 
 #build paths
@@ -18,6 +18,8 @@ NCC_PATH_LIST=\
 NCC_OPTIM="-O2"
 NCC_CFLAGS="-pipe"
 NCC_CPPFLAGS="-DNDEBUG -I$ROOT_PATH/$OUT_PATH/include"
+NCC_MACHINE="$(uname -m | tr '[:upper:]' '[:lower:]')"
+NCC_OS="$(uname -o | tr '[:upper:]' '[:lower:]')"
 #make settings
 NCC_JOBS=$(getconf _NPROCESSORS_ONLN)
 NCC_FETCH_ONLY="${NCC_FETCH_ONLY:-0}"
@@ -27,6 +29,12 @@ NCC_OPTION_LIST=\
 ( \
 "HOST" "OPTIM" "CFLAGS" "JOBS" "FETCH_ONLY" "SHOW_ONLY" "DISABLE_DEFAULT" \
 )
+
+NCC_SYSTEM_LIST=\
+( \
+"MACHINE" "OS" \
+)
+
 NCC_SOURCE_LIST=\
 ( \
 "fdk-aac" "ffmpeg" "lame" "ogg" "opus" "openssl" \
@@ -371,6 +379,23 @@ then
 	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_C_FLAGS   "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_CXX_FLAGS "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo 'SET(CMAKE_EXE_LINKER_FLAGS              "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/native.cmake
+fi
+
+#display the detected system type and hints file in use
+if [ "$BUILD" -ne 0 ]
+then
+	for i in "${NCC_SYSTEM_LIST[@]}"
+	do
+		var="NCC_$i"
+		echo "$var: ${!var}"
+	done
+	echo -n "HINTS_FILE: $HINTS_FILE"
+	if [ ! -e "$HINTS_FILE" ] || [ ! -r "$HINTS_FILE" ]
+	then
+		echo " (unreadable)"
+	else
+		echo " (readable)"
+	fi
 fi
 
 #build the sources

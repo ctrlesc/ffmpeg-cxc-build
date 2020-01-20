@@ -1,5 +1,5 @@
 #------------------------------------------------
-#ffmpeg-pi-build-hints - 2019-12-12 working build
+#ffmpeg-pi-build-hints - 2020-01-20 working build
 #------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH 
@@ -47,15 +47,16 @@ openssl	make	1
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
-fdk-aac	git	10fcf89a3ee22443ac47374c3fcbf0cf2eee7f07
-ffmpeg	git	13f2b6dc720bdcdeb404368e912694295cb23270
+fdk-aac	git	d47c2c625940d2bd62b0cd581605c5122c3d2cfd
+ffmpeg	git	38081acc01a0e62d05cdb474dd3834a2eae36aa7
 lame	svn	6448
 ogg	git	c8fca6b4a02d695b1ceea39b330d4406001c03ed
 openssl	git	894da2fb7ed5d314ee5c2fc9fd2d9b8b74111596
 opus	git	ad8fe90db79b7d2a135e3dfd2ed6631b0c5662ab
 theora	git	e5d205bfe849f1b41f45b91a0b71a3bdc6cd458f
-userland	git	7d3c6b9f4c3ddeecefdeb2b882bada74a235249b
+userland	git	06bc6daa02137ca72b7a2104afad81e82a44de17
 vorbis	git	9eadeccdc4247127d91ac70555074239f5ce3529
-vpx	git	fa370c32e710f2024d998c0bb3f2479d1fc3803f
-x264	git	7817004df0bf57e1eb83e8ef9c0c407477b59d71
+vpx	git	b78d3b21e336e9b08f0208f9a998aa804759a7f9
+x264	git	1771b556ee45207f8711744ccbd5d42a3949b14c
 zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f
+
