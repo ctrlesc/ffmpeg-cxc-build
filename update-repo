@@ -28,10 +28,10 @@ do
 			cd "$dir"
 			git fetch --all
 			#git reset --hard HEAD
-			git reset --hard origin/master
+			git reset --hard origin/HEAD
 			#git rev-parse HEAD
 			git show -s --format="%n%ci%n%cN (%ce)"
-			git log -n 1 --oneline --decorate origin/master
+			git log -n 1 --oneline --decorate origin/HEAD
 			cd ..
 		;;
 		hg)
