@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.5.5"
+SCRIPT_VERSION="1.5.6"
 THIS="ffmpeg-native-pi"
 
 #build paths
@@ -38,7 +38,7 @@ NCC_SYSTEM_LIST=\
 NCC_SOURCE_LIST=\
 ( \
 "fdk-aac" "ffmpeg" "lame" "ogg" "opus" "openssl" \
-"theora" "vorbis" "vpx" "x264" "userland" "zlib" \
+"theora" "vorbis" "vpx" "x264" "x265" "userland" "zlib" \
 )
 
 #lib options
@@ -408,7 +408,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DBUILD_SHARED_LIBS=0 .
+		CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" LDFLAGS="-L$ROOT_PATH/$OUT_PATH/lib -l:libz.a" ./configure --prefix="$ROOT_PATH/$OUT_PATH" --static
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 		cp $ROOT_PATH/$OUT_PATH/lib/libzlibstatic.a $ROOT_PATH/$OUT_PATH/lib/libz.a
@@ -548,19 +548,19 @@ then
 fi
 
 #x265
-#set_source "x265" "hg" "https://bitbucket.org/multicoreware/x265" "libx265"
-#if [ "${!SRC_ENABLE}" -ne 0 ]
-#then
-#	fetch_source
-#	if [ "$BUILD" -ne 0 ]
-#	then
-#		cd_source
-#		cd build/linux
-#		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DENABLE_SHARED=0 -DENABLE_CLI=0 ../../source
-#		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-#		build_make $NCC_JOBS
-#	fi
-#fi
+set_source "x265" "hg" "https://bitbucket.org/multicoreware/x265" "libx265"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		cd build/linux
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DENABLE_SHARED=0 -DENABLE_CLI=0 ../../source
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $NCC_JOBS
+	fi
+fi
 
 #rpi userland
 set_source "userland" "git" "https://github.com/raspberrypi/userland.git" "mmal" "omx" "omx-rpi"

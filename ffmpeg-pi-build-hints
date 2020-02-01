@@ -1,5 +1,5 @@
 #------------------------------------------------
-#ffmpeg-pi-build-hints - 2020-01-20 working build
+#ffmpeg-pi-build-hints - 2020-02-01 working build
 #------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH 
@@ -41,6 +41,7 @@ openssl	make	1
 #vorbis	url	file://~/src/vorbis
 #vpx	url	file://~/src/vpx
 #x264	url	file://~/src/x264
+#x265	url	file://~/src/x265
 #zlib	url	file://~/src/zlib
 
 #------------------------
@@ -48,7 +49,7 @@ openssl	make	1
 #------------------------
 #source	fetch_method	revision_id
 fdk-aac	git	d47c2c625940d2bd62b0cd581605c5122c3d2cfd
-ffmpeg	git	38081acc01a0e62d05cdb474dd3834a2eae36aa7
+ffmpeg	git	e3fb9af6f1353f30855eaa1cbd5befaf06e303b8
 lame	svn	6448
 ogg	git	c8fca6b4a02d695b1ceea39b330d4406001c03ed
 openssl	git	894da2fb7ed5d314ee5c2fc9fd2d9b8b74111596
@@ -56,7 +57,8 @@ opus	git	ad8fe90db79b7d2a135e3dfd2ed6631b0c5662ab
 theora	git	e5d205bfe849f1b41f45b91a0b71a3bdc6cd458f
 userland	git	06bc6daa02137ca72b7a2104afad81e82a44de17
 vorbis	git	9eadeccdc4247127d91ac70555074239f5ce3529
-vpx	git	b78d3b21e336e9b08f0208f9a998aa804759a7f9
+vpx	git	eeaf70361d443161d0a0bcdb57d5adcddb819ec6
 x264	git	1771b556ee45207f8711744ccbd5d42a3949b14c
+x265	hg	fdbd4e4a2aff
 zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f
 
