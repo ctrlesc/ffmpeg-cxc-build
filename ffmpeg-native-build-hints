@@ -1,5 +1,5 @@
 #----------------------------------------------------
-#ffmpeg-native-build-hints - 2020-01-09 working build
+#ffmpeg-native-build-hints - 2020-03-06 working build
 #----------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -71,30 +71,30 @@ openssl	make	1
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
-aom	git	7e48669d25a939833f548a66992f5af2a43bbec4
-ass	git	abf1144e61ffffc04f8ca9d7baa225e5fac65da8
+aom	git	c92d48a356114a3ce871c348865850d44f6477b0
+ass	git	6a670b485536e0398b3fc414fc4317a7b65b5622
 bzip2	git	475173c2d021b1bb1d0fe1845c66cf913260c03e
-dav1d	git	5462c2a80de6f7f6c0b1b0d20cbe571b09510a19
-fdk-aac	git	d47c2c625940d2bd62b0cd581605c5122c3d2cfd
-ffmpeg	git	3ea705767720033754e8d85566460390191ae27d
-fontconfig	git	452be8125f0e2a18a7dfef469e05d19374d36307
-freetype	git	50b013871c53f7624b5351dd4820a137303fe14b
-fribidi	git	f503e576c8345dd32d7438569346d6ca9aa50044
-harfbuzz	git	8ed46c3678cd4518efe5c9907bb9d22e6161bbd5
-lame	svn	6448
+dav1d	git	3a6a55d8d5883cf094bc3a140e568420014bbf47
+fdk-aac	git	e7d8591ff208803eee35dc289e89a0d69b707585
+ffmpeg	git	e27a35e0458224ef6f47753f248ba84ec8284818
+fontconfig	git	b546940435ebfb0df575bc7a2350d1e913919c34
+freetype	git	6a431038c9113d906d66836cd7d216a5c630be7c
+fribidi	git	f9e8e71a6fbf4a4619481284c9f484d10e559995
+harfbuzz	git	b7617f6b3cfa0abf10292ea79bcd53ef61a08e90
+lame	svn	6449
 nv-codec-headers	git	250292dd20af60edc6e0d07f1d6e489a2f8e1c44
 ogg	git	c8fca6b4a02d695b1ceea39b330d4406001c03ed
 openssl	git	894da2fb7ed5d314ee5c2fc9fd2d9b8b74111596
-opus	git	ad8fe90db79b7d2a135e3dfd2ed6631b0c5662ab
+opus	git	be68a9ae94a1f50c8c7a22f2bdd76ab12fd71a1b
 png	git	301f7a14295a3bdfaf406dbb5004d0784dc137ea
-sdl	hg	b7cea35fa5ea
-sofa	git	be7ac155734a435034a912c06d388ef17ccb234a
-theora	git	e5d205bfe849f1b41f45b91a0b71a3bdc6cd458f
+sdl	hg	ed4d8114b4e8
+sofa	git	5c238dc820f16a21b4dce7e91df98431852146e7
+theora	git	31e885eac7c23d2f312f49cd5138c0175008e2c9
 vorbis	git	9eadeccdc4247127d91ac70555074239f5ce3529
-vpx	git	ccb06a9fb15b9c10099cef28ff1240eb9ffa9390
+vpx	git	5532775efe808cb0942e7b99bf2f232c6ce99fee
 x264	git	1771b556ee45207f8711744ccbd5d42a3949b14c
-x265	hg	c5ff72937e9c
-xml2	git	3e7e75bed2cf2853b0d42d635d36676b3330d475
+x265	hg	30eb4de83092
+xml2	git	2a7b66846ef419a4da4ed60f863449f3498a1cc5
 zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f
 
 
