@@ -1,5 +1,5 @@
 #------------------------------------------------------
-#ffmpeg-cxc-build-hints-slim - 2020-03-06 working build
+#ffmpeg-cxc-build-hints-slim - 2020-04-06 working build
 #------------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -99,32 +99,30 @@ zlib	enable
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
-amf	git	009b948220757f874c52fd8494c22affe86395b5
-aom	git	c92d48a356114a3ce871c348865850d44f6477b0
+amf	git	eb931aa8a5b0320ce5466adf193e2781660c38f5
+aom	git	d3e939dbf713875c716bd88e6e6eb626691ac760
 ass	git	6a670b485536e0398b3fc414fc4317a7b65b5622
 bzip2	git	475173c2d021b1bb1d0fe1845c66cf913260c03e
-dav1d	git	3a6a55d8d5883cf094bc3a140e568420014bbf47
+dav1d	git	eb7077ed7773e1a1f06db58f77c7d52c05452d61
 fdk-aac	git	e7d8591ff208803eee35dc289e89a0d69b707585
-ffmpeg	git	e27a35e0458224ef6f47753f248ba84ec8284818
+ffmpeg	git	96840e47de5199c258285d7b51f09d04ec0d1b72
 fontconfig	git	b546940435ebfb0df575bc7a2350d1e913919c34
-freetype	git	6a431038c9113d906d66836cd7d216a5c630be7c
+freetype	git	8930cc96188c21a0ea5f7da7a6d00c4fefd86d3a
 fribidi	git	f9e8e71a6fbf4a4619481284c9f484d10e559995
-harfbuzz	git	b7617f6b3cfa0abf10292ea79bcd53ef61a08e90
+harfbuzz	git	9c6499d9f4556b9755487c1755e4d2386979d82b
 lame	svn	6449
 mfx	git	ff3d2ee3aed29c473190a6d35294e09fb624e933
 nv-codec-headers	git	250292dd20af60edc6e0d07f1d6e489a2f8e1c44
 ogg	git	c8fca6b4a02d695b1ceea39b330d4406001c03ed
-openssl	git	894da2fb7ed5d314ee5c2fc9fd2d9b8b74111596
-opus	git	be68a9ae94a1f50c8c7a22f2bdd76ab12fd71a1b
+openssl	git	36eadf1f84daa965041cce410b4ff32cbda4ef08
+opus	git	ad8fe90db79b7d2a135e3dfd2ed6631b0c5662ab
 png	git	301f7a14295a3bdfaf406dbb5004d0784dc137ea
 sdl	hg	ed4d8114b4e8
-sofa	git	5c238dc820f16a21b4dce7e91df98431852146e7
-theora	git	31e885eac7c23d2f312f49cd5138c0175008e2c9
+sofa	git	f09d25f5029512737b89f73c726fccce93bdc035
+theora	git	e5d205bfe849f1b41f45b91a0b71a3bdc6cd458f
 vorbis	git	9eadeccdc4247127d91ac70555074239f5ce3529
-vpx	git	5532775efe808cb0942e7b99bf2f232c6ce99fee
+vpx	git	0f3fe088fab5998c37910f3cc539a48fa1a72c14
 x264	git	1771b556ee45207f8711744ccbd5d42a3949b14c
-x265	hg	30eb4de83092
-xml2	git	2a7b66846ef419a4da4ed60f863449f3498a1cc5
+x265	hg	fdbd4e4a2aff
+xml2	git	c005c7a0f71fd14ea96e5906130f83dc718f52aa
 zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f
-
-
