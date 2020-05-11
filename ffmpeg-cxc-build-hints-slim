@@ -1,5 +1,5 @@
 #------------------------------------------------------
-#ffmpeg-cxc-build-hints-slim - 2020-04-06 working build
+#ffmpeg-cxc-build-hints-slim - 2020-05-11 working build
 #------------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -99,30 +99,31 @@ zlib	enable
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
-amf	git	eb931aa8a5b0320ce5466adf193e2781660c38f5
-aom	git	d3e939dbf713875c716bd88e6e6eb626691ac760
-ass	git	6a670b485536e0398b3fc414fc4317a7b65b5622
+amf	git	009b948220757f874c52fd8494c22affe86395b5
+aom	git	7b09fd0bcd0d1b936f1598676cc25951ccf5e2d9
+ass	git	e5140624ff739c3157929bc5e1a1007cdc9cdaa8
 bzip2	git	475173c2d021b1bb1d0fe1845c66cf913260c03e
-dav1d	git	eb7077ed7773e1a1f06db58f77c7d52c05452d61
+dav1d	git	eaedb95de65fb5612297b148a306398240e8ad6f
 fdk-aac	git	e7d8591ff208803eee35dc289e89a0d69b707585
-ffmpeg	git	96840e47de5199c258285d7b51f09d04ec0d1b72
+ffmpeg	git	b69f5a72cec0f604b8160c5d18a56036522635b8
 fontconfig	git	b546940435ebfb0df575bc7a2350d1e913919c34
-freetype	git	8930cc96188c21a0ea5f7da7a6d00c4fefd86d3a
+freetype	git	093f87bfe45160195ade7bd5174bbaaf50ebd6be
 fribidi	git	f9e8e71a6fbf4a4619481284c9f484d10e559995
-harfbuzz	git	9c6499d9f4556b9755487c1755e4d2386979d82b
-lame	svn	6449
+harfbuzz	git	44fe1c8ff19048d11785ff154993d6637b447fdd
+lame	svn	6461
 mfx	git	ff3d2ee3aed29c473190a6d35294e09fb624e933
 nv-codec-headers	git	250292dd20af60edc6e0d07f1d6e489a2f8e1c44
-ogg	git	c8fca6b4a02d695b1ceea39b330d4406001c03ed
+ogg	git	1e8d7cce266df61afc9d35db0283bbacc0237aba
 openssl	git	36eadf1f84daa965041cce410b4ff32cbda4ef08
-opus	git	ad8fe90db79b7d2a135e3dfd2ed6631b0c5662ab
-png	git	301f7a14295a3bdfaf406dbb5004d0784dc137ea
-sdl	hg	ed4d8114b4e8
-sofa	git	f09d25f5029512737b89f73c726fccce93bdc035
-theora	git	e5d205bfe849f1b41f45b91a0b71a3bdc6cd458f
-vorbis	git	9eadeccdc4247127d91ac70555074239f5ce3529
-vpx	git	0f3fe088fab5998c37910f3cc539a48fa1a72c14
-x264	git	1771b556ee45207f8711744ccbd5d42a3949b14c
-x265	hg	fdbd4e4a2aff
-xml2	git	c005c7a0f71fd14ea96e5906130f83dc718f52aa
-zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f
+opus	git	d1b5efe44739c094badf008e33f6fecae6751caa
+png	git	6dd99ca9c85a59cc8848553177b84abea228f82f
+sdl	hg	4298bf108b06
+sofa	git	5c238dc820f16a21b4dce7e91df98431852146e7
+theora	git	31e885eac7c23d2f312f49cd5138c0175008e2c9
+vorbis	git	0a4beb1d04f802c48016b11fb939690e24173168
+vpx	git	77960f37b3d328cf7552f6cd69a083f4005aed7b
+x264	git	33f9e1474613f59392be5ab6a7e7abf60fa63622
+x265	hg	1e3dbf09ee4f
+xml2	git	a230b728f1289dd24c1666856ac4fb55579c6dfb
+zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623
+
