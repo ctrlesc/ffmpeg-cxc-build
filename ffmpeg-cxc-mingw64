@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.6.2"
+SCRIPT_VERSION="1.6.3"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -49,7 +49,7 @@ CXC_SOURCE_LIST=\
 #lib options
 CXC_FFMPEG_EXTRA_LIBS="-lwinpthread"
 
-#fix pkg-config paths for cross
+#fix pkg-config paths
 export PKG_CONFIG_DIR=
 export PKG_CONFIG_PATH=
 export PKG_CONFIG_SYSROOT_PATH="$ROOT_PATH/$OUT_PATH"
@@ -87,6 +87,19 @@ build_make() {
 
 	grep -E '((^[ ]*)|([ ]*))[^ ]*install[^ ]*[ ]*$' <<< "$@" &> /dev/null
 	[ $? -eq 0 ] || make install
+	[ $? -eq 0 ] || build_die "$THIS: install stage failed -> $SRC_NAME"
+
+	build_message BM_GREEN "$SRC_NAME: built successfully (jobs = $jobs)"
+}
+
+build_meson() {
+
+	local jobs="${1:-1}"
+	shift
+
+	ninja -j $jobs -C .
+	[ $? -eq 0 ] || build_die "$THIS: make stage failed -> $SRC_NAME"
+	ninja -C . install
 	[ $? -eq 0 ] || build_die "$THIS: install stage failed -> $SRC_NAME"
 
 	build_message BM_GREEN "$SRC_NAME: built successfully (jobs = $jobs)"
@@ -313,6 +326,7 @@ cd_source() {
 
 #startup banner
 build_message BM_WHITE "$THIS: Version $SCRIPT_VERSION"
+build_message BM_WHITE "$THIS: $(${CXC_HOST}-gcc -v 2>&1 | grep '^gcc version')"
 
 #load CXC hints
 get_CXC_hints
@@ -504,11 +518,21 @@ then
 	fetch_source
 	if [ "$BUILD" -ne 0 ]
 	then
-		cd_source
-		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+		CXC_CPPFLAGS="$CXC_CPPFLAGS -DFRIBIDI_LIB_STATIC"
+
+		#autotools
+		#cd_source
+		#autoreconf -fiv
+		#./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+		#[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		#build_make $CXC_JOBS -C lib
+
+		#meson
+		mkdir "$SRC_NAME"_build
+		cd "$SRC_NAME"_build
+		CPPFLAGS="$CXC_CPPFLAGS" meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Ddocs=false --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-		build_make $CXC_JOBS -C lib
+		build_meson $CXC_JOBS
 	fi
 fi
 
@@ -679,7 +703,7 @@ fetch_source
 	then
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="../aom/build/cmake/toolchains/x86_64-mingw-gcc.cmake" -DCMAKE_C_FLAGS="$CXC_OPTIM $CXC_CFLAGS" -DCMAKE_CXX_FLAGS="$CXC_OPTIM $CXC_CFLAGS" -DCMAKE_CPP_FLAGS="$CXC_CPPFLAGS" -DAOM_TARGET_CPU="x86_64" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 -DENABLE_TOOLS=0 ../aom
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="../aom/build/cmake/toolchains/x86_64-mingw-gcc.cmake" -DCMAKE_C_FLAGS="$CXC_OPTIM $CXC_CFLAGS" -DCMAKE_CXX_FLAGS="$CXC_OPTIM $CXC_CFLAGS" -DCMAKE_CPP_FLAGS="$CXC_CPPFLAGS" -DAOM_TARGET_CPU="x86_64" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 -DENABLE_TOOLS=0 "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -694,13 +718,9 @@ fetch_source
 	then
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		CPPFLAGS="$CXC_CPPFLAGS" meson --prefix="$ROOT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_tools=false -Denable_tests=false --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" ../dav1d
+		CPPFLAGS="$CXC_CPPFLAGS" meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_tools=false -Denable_tests=false --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-		ninja -C .
-		[ $? -eq 0 ] || build_die "$THIS: make stage failed -> $SRC_NAME"
-		ninja -C . install
-		[ $? -eq 0 ] || build_die "$THIS: install stage failed -> $SRC_NAME"
-		
+		build_meson $CXC_JOBS
 	fi
 fi
 
@@ -757,7 +777,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DZLIB_LIBRARY="$ROOT_PATH/$OUT_PATH/lib/libz.a" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0 .
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DZLIB_LIBRARY="$ROOT_PATH/$OUT_PATH/lib/libz.a" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0 -DCODE_COVERAGE=0 .
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -841,7 +861,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		./configure \
+		CPPFLAGS="$CXC_CPPFLAGS" ./configure \
 		  --cross-prefix="$CXC_HOST"- \
 		  --arch="x86_64" \
 		  --target-os="mingw64" \
@@ -853,7 +873,6 @@ then
 		  --pkg-config="pkg-config" \
 		  --pkg-config-flags="--static" \
 		  --extra-cflags="$CXC_OPTIM $CXC_CFLAGS" \
-		  --extra-cflags="-I$ROOT_PATH/$OUT_PATH/include" \
 		  --extra-ldflags="-static-libgcc -static-libstdc++ -static -s" \
 		  --extra-ldflags="-L$ROOT_PATH/$OUT_PATH/lib" \
 		  --extra-libs="$CXC_FFMPEG_EXTRA_LIBS" \

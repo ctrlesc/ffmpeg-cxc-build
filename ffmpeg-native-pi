@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.5.6"
+SCRIPT_VERSION="1.5.7"
 THIS="ffmpeg-native-pi"
 
 #build paths
@@ -44,7 +44,7 @@ NCC_SOURCE_LIST=\
 #lib options
 NCC_FFMPEG_EXTRA_LIBS="-lpthread -lm"
 
-#fix pkg-config paths for cross
+#fix pkg-config paths
 export PKG_CONFIG_DIR=
 export PKG_CONFIG_PATH=
 export PKG_CONFIG_SYSROOT_PATH="$ROOT_PATH"
@@ -308,6 +308,7 @@ cd_source() {
 
 #startup banner
 build_message BM_WHITE "$THIS: Version $SCRIPT_VERSION"
+build_message BM_WHITE "$THIS: $(gcc -v 2>&1 | grep '^gcc version')"
 
 #load NCC hints
 get_NCC_hints
@@ -572,6 +573,7 @@ then
 		cd_source
 		./buildme "$ROOT_PATH/$OUT_PATH"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		NCC_CPPFLAGS="$NCC_CPPFLAGS -I$ROOT_PATH/$OUT_PATH/opt/vc/include/IL"
 	fi
 fi
 
@@ -597,18 +599,18 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		./configure \
+		CPPFLAGS="$NCC_CPPFLAGS" ./configure \
 		  --arch=armel \
 		  --target-os=linux \
-		  --disable-shared \
 		  --disable-debug \
+		  --disable-shared \
 		  --enable-static \
 		  --prefix="$ROOT_PATH/$OUT_PATH" \
 		  --pkg-config="pkg-config" \
 		  --pkg-config-flags="--static" \
-		  --extra-cflags="$NCC_OPTIM $NCC_CFLAGS -no-pie" \
-		  --extra-cflags="-I$ROOT_PATH/$OUT_PATH/include -I$ROOT_PATH/$OUT_PATH/opt/vc/include/IL" \
-		  --extra-ldflags="-L$ROOT_PATH/$OUT_PATH/lib -L$ROOT_PATH/$OUT_PATH/opt/vc/lib -no-pie" \
+		  --extra-cflags="$NCC_OPTIM $NCC_CFLAGS" \
+		  --extra-ldflags="-no-pie" \
+		  --extra-ldflags="-L$ROOT_PATH/$OUT_PATH/lib -L$ROOT_PATH/$OUT_PATH/opt/vc/lib" \
 		  --extra-libs="$NCC_FFMPEG_EXTRA_LIBS" \
 		  --bindir="$BIN_PATH"\
 		  $NCC_FFMPEG_LIB_OPTIONS
