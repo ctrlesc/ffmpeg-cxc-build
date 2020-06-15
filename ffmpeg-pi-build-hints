@@ -1,5 +1,5 @@
 #------------------------------------------------
-#ffmpeg-pi-build-hints - 2020-02-01 working build
+#ffmpeg-pi-build-hints - 2020-06-14 working build
 #------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH 
@@ -30,35 +30,35 @@ openssl	make	1
 #source	url	url_string
 #ffmpeg	url	https://git.videolan.org/git/ffmpeg.git
 
-#ffmpeg	url	file://~/src/ffmpeg
-#userland	url	file://~/src/userland
-#fdk-aac	url	file://~/src/fdk-aac
-#lame	url	file://~/src/lame
-#ogg	url	file://~/src/ogg
-#openssl	url	file://~/src/openssl
-#opus	url	file://~/src/opus
-#theora	url	file://~/src/theora
-#vorbis	url	file://~/src/vorbis
-#vpx	url	file://~/src/vpx
-#x264	url	file://~/src/x264
-#x265	url	file://~/src/x265
-#zlib	url	file://~/src/zlib
+ffmpeg	url	file://~/src/ffmpeg
+userland	url	file://~/src/userland
+fdk-aac	url	file://~/src/fdk-aac
+lame	url	file://~/src/lame
+ogg	url	file://~/src/ogg
+openssl	url	file://~/src/openssl
+opus	url	file://~/src/opus
+theora	url	file://~/src/theora
+vorbis	url	file://~/src/vorbis
+vpx	url	file://~/src/vpx
+x264	url	file://~/src/x264
+x265	url	file://~/src/x265
+zlib	url	file://~/src/zlib
 
 #------------------------
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
-fdk-aac	git	d47c2c625940d2bd62b0cd581605c5122c3d2cfd
-ffmpeg	git	e3fb9af6f1353f30855eaa1cbd5befaf06e303b8
-lame	svn	6448
-ogg	git	c8fca6b4a02d695b1ceea39b330d4406001c03ed
+fdk-aac	git	845febbb4aa8b81914a8d759536ec48f496d46a3
+ffmpeg	git	318a1a383dc0312ad5b4afec0ddf0d8d231f5c79
+lame	svn	6461
+ogg	git	0bbcba4e7cf32324170470569c4527ffd0002870
 openssl	git	894da2fb7ed5d314ee5c2fc9fd2d9b8b74111596
-opus	git	ad8fe90db79b7d2a135e3dfd2ed6631b0c5662ab
-theora	git	e5d205bfe849f1b41f45b91a0b71a3bdc6cd458f
-userland	git	06bc6daa02137ca72b7a2104afad81e82a44de17
-vorbis	git	9eadeccdc4247127d91ac70555074239f5ce3529
-vpx	git	eeaf70361d443161d0a0bcdb57d5adcddb819ec6
-x264	git	1771b556ee45207f8711744ccbd5d42a3949b14c
-x265	hg	fdbd4e4a2aff
+opus	git	b69bfb2a30df65e7f267dd6998276fa3986bd14b
+theora	git	31e885eac7c23d2f312f49cd5138c0175008e2c9
+userland	git	f97b1af1b3e653f9da2c1a3643479bfd469e3b74
+vorbis	git	f1c1e4451c650008cc5549b08c10fe9ad8ddb1fa
+vpx	git	e753d4930f3b2859968068ffb77f6a6159b2f3c6
+x264	git	235ce6130168f4deee55c88ecda5ab84d81d125b
+x265	hg	73ca1d7be377
 zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f
 
