@@ -3,7 +3,7 @@ Fast cross-compile ffmpeg for Windows with MinGW on Linux and Cygwin to produce 
 
 **Enabled Features**
 
-amf aom ass/ssa bzip2 dav1d fdk-aac fontconfig freetype fribidi harfbuzz lame nvenc/nvdec ogg openssl opus png qsv sdl sofalizer theora vorbis vpx x264 x265 xml2 zlib
+amf aom ass/ssa bzip2 dav1d fdk-aac fontconfig freetype fribidi harfbuzz lame nvenc/nvdec ogg openssl opus png qsv sdl sofalizer soxr theora vorbis vpx x264 x265 xml2 zlib
 
 **Package Requirements**
 
@@ -13,7 +13,7 @@ sudo apt-get -y install autoconf automake build-essential cmake git-core gperf g
   
 Fedora:
 
-sudo yum install make autogen automake cmake gcc gcc-c++ git gettext-devel gperf kernel-devel libtool mercurial meson mingw64-gcc mingw64-gcc-c++ mingw64-winpthreads-static nasm python2-lxml ragel subversion uuid-devel yasm
+sudo yum install make autogen automake cmake gcc gcc-c++ git gettext-devel gperf kernel-devel libtool mercurial meson mingw64-gcc mingw64-gcc-c++ mingw64-libgomp mingw64-winpthreads-static nasm python2-lxml ragel subversion uuid-devel yasm
 
 Arch/Manjaro:
 
