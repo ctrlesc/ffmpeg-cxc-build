@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.6.3"
+SCRIPT_VERSION="1.6.4"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -42,7 +42,7 @@ CXC_SOURCE_LIST=\
 "amf" "aom" "ass" "bzip2" "dav1d" "fdk-aac" "freetype" "ffmpeg" \
 "fribidi" "fontconfig" "harfbuzz" "lame" "lame" "mfx" \
 "nv-codec-headers" "ogg" "openssl" "opus" "png" "sdl" \
-"sofa" "theora" "vorbis" "vpx" \
+"sofa" "soxr" "theora" "vorbis" "vpx" \
 "xml2" "x264" "x265" "zlib" \
 )
 
@@ -780,6 +780,21 @@ then
 		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DZLIB_LIBRARY="$ROOT_PATH/$OUT_PATH/lib/libz.a" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0 -DCODE_COVERAGE=0 .
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
+	fi
+fi
+
+#soxr
+set_source "soxr" "git" "https://git.code.sf.net/p/soxr/code" "libsoxr"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0 .
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+		CXC_FFMPEG_EXTRA_LIBS="$CXC_FFMPEG_EXTRA_LIBS -lgomp -lpthread"
 	fi
 fi
 

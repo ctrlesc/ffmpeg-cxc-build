@@ -61,6 +61,7 @@ opus	url	file://~/src/opus
 png	url	file://~/src/png
 sdl	url	file://~/src/sdl
 sofa	url	file://~/src/sofa
+soxr	url	file://~/src/soxr
 theora	url	file://~/src/theora
 vorbis	url	file://~/src/vorbis
 vpx	url	file://~/src/vpx
@@ -90,13 +91,14 @@ lame	svn
 mfx	git	
 nv-codec-headers	git	
 ogg	git	
-#commit below is for openssl 1.1.1.d, head may not build/work as expected
-openssl	git	894da2fb7ed5d314ee5c2fc9fd2d9b8b74111596
+#commit below is for openssl 1.1.1.g, head may not build/work as expected
+openssl	git	e2e09d9fba1187f8d6aafaa34d4172f56f1ffb72
 #openssl	git	
 opus	git	
 png	git	
 sdl	hg	
 sofa	git	
+soxr	git	
 theora	git	
 vorbis	git	
 vpx	git	
