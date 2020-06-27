@@ -50,3 +50,13 @@ Using this technique, the script *update-repo* can be used to maintain up to dat
 	update-repo
 	HINTS_FILE=~/ffmpeg-cxc-build-hints-file-head ffmpeg-cxc-mingw64
 
+**Using frei0r**
+
+Frei0r is a collection of video effect plugins which can be enabled in ffmpeg as a configure option.  The effects are self-contained in individual DLLs/shared libraries and are not compiled into ffmepg.  After a successful build, the compiled modules will be at "$ROOT_PATH/$OUT_PATH/lib/frei0r".  After moving them to the desired path and setting the location of the plugins in an environment variable, they are easily enabled as an ffmpeg video filter (-vf).  Assuming *.frei0r* has been created in the user's home directory and the modules have been copied there, the FREI0R_PATH can be defined as below:
+
+	
+	#Unixish: export FREI0R_PATH="$HOME/.frei0r-1
+	#Windows: set FREI0R_PATH="%USERPROFILE%\.frei0r-1"
+	#Test the plugin
+	ffmpeg -i in.mp4 -vf frei0r=glow out.mp4
+
