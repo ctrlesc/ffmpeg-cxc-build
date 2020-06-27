@@ -49,6 +49,7 @@ fdk-aac	url	file://~/src/fdk-aac
 ffmpeg	url	file://~/src/ffmpeg
 fontconfig	url	file://~/src/fontconfig
 freetype	url	file://~/src/freetype
+frei0r	url	file://~/src/frei0r
 fribidi	url	file://~/src/fribidi
 harfbuzz	url	file://~/src/harfbuzz
 lame	url	file://~/src/lame
@@ -80,6 +81,7 @@ fdk-aac	git
 ffmpeg	git	
 fontconfig	git	
 freetype	git	
+frei0r	git	
 fribidi	git	
 harfbuzz	git	
 lame	svn	

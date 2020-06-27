@@ -46,10 +46,12 @@ aom	url	file://~/src/aom
 ass	url	file://~/src/ass
 bzip2	url	file://~/src/bzip2
 dav1d	url	file://~/src/dav1d
+dlfcn	url	file://~/src/dlfcn
 fdk-aac	url	file://~/src/fdk-aac
 ffmpeg	url	file://~/src/ffmpeg
 fontconfig	url	file://~/src/fontconfig
 freetype	url	file://~/src/freetype
+frei0r	url	file://~/src/frei0r
 fribidi	url	file://~/src/fribidi
 harfbuzz	url	file://~/src/harfbuzz
 lame	url	file://~/src/lame
@@ -79,12 +81,14 @@ aom	git
 ass	git	
 bzip2	git	
 dav1d	git	
+dlfcn	git	
 fdk-aac	git	
 ffmpeg	git	
 #commit below is for fontconfig 2.12.6, head may not build/work as expected
 fontconfig	git	b546940435ebfb0df575bc7a2350d1e913919c34
 #fontconfig	git	
 freetype	git	
+frei0r	git	
 fribidi	git	
 harfbuzz	git	
 lame	svn	

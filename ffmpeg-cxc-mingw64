@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.6.4"
+SCRIPT_VERSION="1.6.6"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -39,9 +39,9 @@ CXC_SYSTEM_LIST=\
 
 CXC_SOURCE_LIST=\
 ( \
-"amf" "aom" "ass" "bzip2" "dav1d" "fdk-aac" "freetype" "ffmpeg" \
-"fribidi" "fontconfig" "harfbuzz" "lame" "lame" "mfx" \
-"nv-codec-headers" "ogg" "openssl" "opus" "png" "sdl" \
+"amf" "aom" "ass" "bzip2" "dav1d" "dlfcn" "fdk-aac" "freetype" \
+"ffmpeg" "fribidi" "frei0r" "fontconfig" "harfbuzz" "lame" \
+"mfx" "nv-codec-headers" "ogg" "openssl" "opus" "png" "sdl" \
 "sofa" "soxr" "theora" "vorbis" "vpx" \
 "xml2" "x264" "x265" "zlib" \
 )
@@ -386,21 +386,28 @@ if [ "$BUILD" -ne 0 ]
 then
 	#cmake toolchain settings
 	touch $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_SYSTEM_NAME                      Windows)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_BUILD_TYPE                       Release)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_SYSTEM_PROCESSOR                  x86_64)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_C_COMPILER        x86_64-w64-mingw32-gcc)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_CXX_COMPILER      x86_64-w64-mingw32-g++)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_RC_COMPILER   x86_64-w64-mingw32-windres)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_C_FLAGS       \"$CXC_OPTIM $CXC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_CXX_FLAGS     \"$CXC_OPTIM $CXC_CFLAGS\")" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_CPP_FLAGS     \"$CXC_CPPFLAGS\")"          >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_ASM_YASM_COMPILER                   yasm)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_ASM_NASM_COMPILER                   nasm)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_FIND_LIBRARY_SUFFIXES                 .a)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_C_FLAGS   "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_CXX_FLAGS "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo 'SET(CMAKE_EXE_LINKER_FLAGS              "-static-libgcc -static-libstdc++ -static -s")' >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	FORCE_CMAKE_VALUE='CACHE STRING "" FORCE'
+	#echo "SET(CMAKE_VERBOSE_MAKEFILE             1                                                $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_SYSTEM_NAME                  Windows                                          $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_BUILD_TYPE                   Release                                          $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_SYSTEM_PROCESSOR             x86_64                                           $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_C_COMPILER                   x86_64-w64-mingw32-gcc                           $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_CXX_COMPILER                 x86_64-w64-mingw32-g++                           $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_RC_COMPILER                  x86_64-w64-mingw32-windres                       $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_C_FLAGS                     \"$CXC_CFLAGS\"                                   $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_C_FLAGS_RELEASE             \"$CXC_OPTIM -DNDEBUG\"                           $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_CXX_FLAGS                   \"$CXC_CFLAGS\"                                   $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_CXX_FLAGS_RELEASE           \"$CXC_OPTIM -DNDEBUG\"                           $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_CPP_FLAGS                   \"$CXC_CPPFLAGS\"                                 $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_ASM_YASM_COMPILER             yasm                                            $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_ASM_NASM_COMPILER             nasm                                            $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_FIND_LIBRARY_SUFFIXES         .a                                              $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_C_FLAGS   "-static-libgcc -static-libstdc++ -static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_CXX_FLAGS "-static-libgcc -static-libstdc++ -static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	#echo 'SET(CMAKE_STATIC_LINKER_FLAGS           "-static-libgcc -static-libstdc++ -static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo 'SET(CMAKE_MODULE_LINKER_FLAGS           "-static-libgcc -static-libstdc++ -static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo 'SET(CMAKE_SHARED_LINKER_FLAGS           "-static-libgcc -static-libstdc++ -static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo 'SET(CMAKE_EXE_LINKER_FLAGS              "-static-libgcc -static-libstdc++ -static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 
 	#meson toolchain settings
 	touch $ROOT_PATH/$SRC_PATH/cross.meson
@@ -410,8 +417,10 @@ then
 	echo "windres = 'x86_64-w64-mingw32-windres'"              >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "strip = 'x86_64-w64-mingw32-strip'"                  >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "[properties]"                                        >> $ROOT_PATH/$SRC_PATH/cross.meson
-	echo "c_args = ['$(echo "$CXC_CFLAGS" | sed -r "s/\s+/','/g")']"    >> $ROOT_PATH/$SRC_PATH/cross.meson
-	echo "c_link_args = ['-static-libgcc','-static','-s']"     >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "c_args = ['$(echo "$CXC_OPTIM $CXC_CFLAGS" | sed -r "s/\s+/','/g")']"        >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "cpp_args = ['$(echo "$CXC_OPTIM $CXC_CFLAGS" | sed -r "s/\s+/','/g")']"      >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "c_link_args = ['-static-libgcc','-static','-s']"                             >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "cpp_link_args = ['-static-libgcc','-static-libstdc++','-static','-s']"       >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "[host_machine]"                                      >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "system = 'windows'"                                  >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "cpu_family = 'x86_64'"                               >> $ROOT_PATH/$SRC_PATH/cross.meson
@@ -475,7 +484,8 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		sed -ir 's/<sys\\stat.h>/<sys\/stat.h>/' bzip2.c
+		sed -i -r 's/<sys\\stat.h>/<sys\/stat.h>/' bzip2.c
+		sed -i -r "s/^(CFLAGS=.+)-O2 -g(.+)/\1${CXC_OPTIM} ${CXC_CFLAGS}\2/" Makefile
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS PREFIX="$ROOT_PATH/$OUT_PATH" CC="x86_64-w64-mingw32-gcc" AR="x86_64-w64-mingw32-ar" RANLIB="x86_64-w64-mingw32-ranlib" -i libbz2.a install
 	fi
@@ -530,7 +540,7 @@ then
 		#meson
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		CPPFLAGS="$CXC_CPPFLAGS" meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Ddocs=false --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
+		CPPFLAGS="$CXC_CPPFLAGS" meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Ddocs=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
 	fi
@@ -698,12 +708,12 @@ fi
 set_source "aom" "git" "https://aomedia.googlesource.com/aom" "libaom"
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
-fetch_source
+	fetch_source
 	if [ "$BUILD" -ne 0 ]
 	then
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="../aom/build/cmake/toolchains/x86_64-mingw-gcc.cmake" -DCMAKE_C_FLAGS="$CXC_OPTIM $CXC_CFLAGS" -DCMAKE_CXX_FLAGS="$CXC_OPTIM $CXC_CFLAGS" -DCMAKE_CPP_FLAGS="$CXC_CPPFLAGS" -DAOM_TARGET_CPU="x86_64" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 -DENABLE_TOOLS=0 "../$SRC_NAME"
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_BUILD_TYPE="Release"  -DCMAKE_C_FLAGS_RELEASE="$CXC_OPTIM -DNDEBUG" -DCMAKE_C_FLAGS="$CXC_CFLAGS" -DCMAKE_CXX_FLAGS_RELEASE="$CXC_OPTIM -DNDEBUG" -DCMAKE_CXX_FLAGS="$CXC_CFLAGS" -DCMAKE_CPP_FLAGS="$CXC_CPPFLAGS" -DCMAKE_TOOLCHAIN_FILE="../aom/build/cmake/toolchains/x86_64-mingw-gcc.cmake" -DAOM_TARGET_CPU="x86_64" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 -DENABLE_TOOLS=0 -DENABLE_TESTS=0 "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -718,7 +728,7 @@ fetch_source
 	then
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		CPPFLAGS="$CXC_CPPFLAGS" meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_tools=false -Denable_tests=false --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
+		CPPFLAGS="$CXC_CPPFLAGS" meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_tools=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
 	fi
@@ -748,7 +758,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$CXC_CFLAGS" --host="$CXC_HOST" --bindir="$BIN_PATH" --enable-static --cross-prefix="$CXC_HOST"- --disable-cli
+		CFLAGS="$CXC_OPTIM" ./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$CXC_OPTIM $CXC_CFLAGS" --host="$CXC_HOST" --bindir="$BIN_PATH" --enable-static --cross-prefix="$CXC_HOST"- --disable-cli
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -763,9 +773,38 @@ then
 	then
 		cd_source
 		cd build/linux
-		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DENABLE_SHARED=0 -DENABLE_CLI=0 ../../source
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DENABLE_SHARED=0 -DENABLE_CLI=0 -DENABLE_TESTS=0 ../../source
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
+	fi
+fi
+
+#dlfcn
+set_source "dlfcn" "git" "https://github.com/dlfcn-win32/dlfcn-win32.git"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 .
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+	fi
+fi
+
+#frei0r
+set_source "frei0r" "git" "https://github.com/dyne/frei0r.git" "frei0r"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DWITHOUT_OPENCV=1 -DBUILD_SHARED_LIBS=0 .
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+		find "$ROOT_PATH/$OUT_PATH/lib/frei0r" -type f -name "*.dll" -print0 | xargs -0 xargs strip
 	fi
 fi
 
@@ -791,7 +830,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0 .
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DBUILD_EXAMPLES=0 -DBUILD_TESTS=0 -DBUILD_LSR_TESTS=0 .
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 		CXC_FFMPEG_EXTRA_LIBS="$CXC_FFMPEG_EXTRA_LIBS -lgomp -lpthread"
