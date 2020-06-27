@@ -448,7 +448,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		sed -i -r "s/^(CFLAGS=.+)-O2 -g(.+)/\1${CXC_OPTIM} ${CXC_CFLAGS}\2/" Makefile
+		sed -i -r "s/^(CFLAGS=.+)-O2 -g(.+)/\1${NCC_OPTIM} ${NCC_CFLAGS}\2/" Makefile
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS PREFIX="$ROOT_PATH/$OUT_PATH" libbz2.a install
 	fi
