@@ -3,7 +3,7 @@ Fast cross-compile ffmpeg for Windows with MinGW on Linux and Cygwin to produce 
 
 **Enabled Features**
 
-amf aom ass/ssa bzip2 dav1d fdk-aac fontconfig freetype fribidi harfbuzz lame nvenc/nvdec ogg openssl opus png qsv sdl sofalizer soxr theora vorbis vpx x264 x265 xml2 zlib
+amf aom ass/ssa bzip2 dav1d fdk-aac fontconfig freetype frei0r fribidi harfbuzz lame mfx/qsv nvenc/nvdec ogg openssl opus png sdl sofalizer soxr theora vmaf vorbis vpx x264 x265 xml2 zlib
 
 **Package Requirements**
 
@@ -52,7 +52,7 @@ Using this technique, the script *update-repo* can be used to maintain up to dat
 
 **Using frei0r**
 
-Frei0r is a collection of video effect plugins which can be enabled in ffmpeg as a configure option.  The effects are self-contained in individual DLLs/shared libraries and are not compiled into ffmepg.  After a successful build, the compiled modules will be at "$ROOT_PATH/$OUT_PATH/lib/frei0r".  After moving them to the desired path and setting the location of the plugins in an environment variable, they are easily enabled as an ffmpeg video filter (-vf).  Assuming *.frei0r* has been created in the user's home directory and the modules have been copied there, the FREI0R_PATH can be defined as below:
+Frei0r is a collection of video effect plugins which can be used as filters ffmpeg.  The effects are self-contained in individual DLLs/shared libraries and are not compiled into ffmepg.  After a successful build, the compiled modules will be at "$ROOT_PATH/$OUT_PATH/lib/frei0r".  After moving them to the desired path and setting the location of the plugins in an environment variable, they are easily enabled as an ffmpeg video filter (-vf).  Assuming *.frei0r* has been created in the user's home directory and the modules have been copied there, the FREI0R_PATH can be defined as below:
 
 	
 	#Unixish: export FREI0R_PATH="$HOME/.frei0r-1
