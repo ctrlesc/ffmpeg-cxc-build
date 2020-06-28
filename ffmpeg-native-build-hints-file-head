@@ -62,6 +62,7 @@ sdl	url	file://~/src/sdl
 sofa	url	file://~/src/sofa
 soxr	url	file://~/src/soxr
 theora	url	file://~/src/theora
+vmaf	url	file://~/src/vmaf
 vorbis	url	file://~/src/vorbis
 vpx	url	file://~/src/vpx
 x264	url	file://~/src/x264
@@ -96,6 +97,7 @@ sdl	hg
 sofa	git	
 soxr	git	
 theora	git	
+vmaf    git 
 vorbis	git	
 vpx	git	
 x264	git	

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.6.6"
+SCRIPT_VERSION="1.6.8"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -42,7 +42,7 @@ CXC_SOURCE_LIST=\
 "amf" "aom" "ass" "bzip2" "dav1d" "dlfcn" "fdk-aac" "freetype" \
 "ffmpeg" "fribidi" "frei0r" "fontconfig" "harfbuzz" "lame" \
 "mfx" "nv-codec-headers" "ogg" "openssl" "opus" "png" "sdl" \
-"sofa" "soxr" "theora" "vorbis" "vpx" \
+"sofa" "soxr" "theora" "vmaf" "vorbis" "vpx" \
 "xml2" "x264" "x265" "zlib" \
 )
 
@@ -394,9 +394,9 @@ then
 	echo "SET(CMAKE_C_COMPILER                   x86_64-w64-mingw32-gcc                           $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_CXX_COMPILER                 x86_64-w64-mingw32-g++                           $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_RC_COMPILER                  x86_64-w64-mingw32-windres                       $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_C_FLAGS                     \"$CXC_CFLAGS\"                                   $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_C_FLAGS                     \"$CXC_CFLAGS -I $ROOT_PATH/$OUT_PATH/include\"   $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_C_FLAGS_RELEASE             \"$CXC_OPTIM -DNDEBUG\"                           $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
-	echo "SET(CMAKE_CXX_FLAGS                   \"$CXC_CFLAGS\"                                   $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
+	echo "SET(CMAKE_CXX_FLAGS                   \"$CXC_CFLAGS -I $ROOT_PATH/$OUT_PATH/include\"   $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_CXX_FLAGS_RELEASE           \"$CXC_OPTIM -DNDEBUG\"                           $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_CPP_FLAGS                   \"$CXC_CPPFLAGS\"                                 $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
 	echo "SET(CMAKE_ASM_YASM_COMPILER             yasm                                            $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/cross.cmake
@@ -417,8 +417,8 @@ then
 	echo "windres = 'x86_64-w64-mingw32-windres'"              >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "strip = 'x86_64-w64-mingw32-strip'"                  >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "[properties]"                                        >> $ROOT_PATH/$SRC_PATH/cross.meson
-	echo "c_args = ['$(echo "$CXC_OPTIM $CXC_CFLAGS" | sed -r "s/\s+/','/g")']"        >> $ROOT_PATH/$SRC_PATH/cross.meson
-	echo "cpp_args = ['$(echo "$CXC_OPTIM $CXC_CFLAGS" | sed -r "s/\s+/','/g")']"      >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "c_args = ['$(echo "$CXC_OPTIM $CXC_CFLAGS $CXC_CPPFLAGS" | sed -r "s/\s+/','/g")']"        >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "cpp_args = ['$(echo "$CXC_OPTIM $CXC_CFLAGS $CXC_CPPFLAGS" | sed -r "s/\s+/','/g")']"      >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "c_link_args = ['-static-libgcc','-static','-s']"                             >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "cpp_link_args = ['-static-libgcc','-static-libstdc++','-static','-s']"       >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "[host_machine]"                                      >> $ROOT_PATH/$SRC_PATH/cross.meson
@@ -540,7 +540,7 @@ then
 		#meson
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		CPPFLAGS="$CXC_CPPFLAGS" meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Ddocs=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
+		meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --bindir="$ROOT_PATH/$OUT_PATH/bin" --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Ddocs=false -Dtests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
 	fi
@@ -728,7 +728,7 @@ fetch_source
 	then
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		CPPFLAGS="$CXC_CPPFLAGS" meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_tools=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
+		meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_tools=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
 	fi
@@ -904,6 +904,23 @@ then
 		./Configure no-ssl2 no-ssl3 no-weak-ssl-ciphers no-shared no-hw no-engine no-dso no-err no-tests zlib --prefix="$ROOT_PATH/$OUT_PATH" --openssldir="$ROOT_PATH/$OUT_PATH" "$CXC_OPTIM $CXC_CFLAGS" --with-zlib-include="$ROOT_PATH/$OUT_PATH/include" --with-zlib-lib=$ROOT_PATH/$OUT_PATH/lib --cross-compile-prefix="$CXC_HOST-" mingw64
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS -i install_sw
+	fi
+fi
+
+#vmaf
+set_source "vmaf" "git" "https://github.com/Netflix/vmaf.git" "libvmaf"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		mkdir "$SRC_NAME"_build
+		cd "$SRC_NAME"_build
+		meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --bindir="$ROOT_PATH/$OUT_PATH/bin" --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_docs=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../lib$SRC_NAME"
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_meson $CXC_JOBS
+		CXC_FFMPEG_EXTRA_LIBS="$CXC_FFMPEG_EXTRA_LIBS -lstdc++"
 	fi
 fi
 

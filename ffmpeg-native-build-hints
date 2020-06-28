@@ -62,6 +62,7 @@ openssl	make	1
 #sofa	url	file://~/src/sofa
 #soxr	url	file://~/src/soxr
 #theora	url	file://~/src/theora
+#vmaf	url	file://~/src/vmaf
 #vorbis	url	file://~/src/vorbis
 #vpx	url	file://~/src/vpx
 #x264	url	file://~/src/x264
@@ -94,6 +95,7 @@ sdl	hg	a8a693919f9e
 sofa	git	4dd112c203147c3a19f7062fb0f9fa8ee823db6f
 soxr	git	945b592b70470e29f917f4de89b4281fbbd540c0
 theora	git	f98989ad7c3745d6cc4d24666e64046ff4a3f745
+vmaf    git 17f410e00bd63f3a71cd7a532c0c1edd8d21f8b4
 vorbis	git	5fd186e2a5bc45dfd3ff2248e5d6247f7567c3dd
 vpx	git	d9a69a1e2967920afbeee2a76ce978d3e210298c
 x264	git	4c9b076be684832b9141f5b6c03aaf302adca0e4

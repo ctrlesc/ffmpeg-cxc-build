@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.6.6"
+SCRIPT_VERSION="1.6.8"
 THIS="ffmpeg-native"
 
 #build paths
@@ -40,7 +40,7 @@ NCC_SOURCE_LIST=\
 "aom" "ass" "bzip2" "dav1d" "dlfcn" "fdk-aac" "freetype" \
 "ffmpeg" "fribidi" "frei0r" "fontconfig" "harfbuzz" "lame" \
 "nv-codec-headers" "ogg" "openssl" "opus" "png" "sdl" \
-"sofa" "soxr" "theora" "vorbis" "vpx" \
+"sofa" "soxr" "theora" "vmaf" "vorbis" "vpx" \
 "xml2" "x264" "x265" "zlib" \
 )
 
@@ -391,9 +391,9 @@ then
 	echo "SET(CMAKE_SYSTEM_PROCESSOR             x86_64                                           $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_C_COMPILER                   gcc                                              $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_CXX_COMPILER                 g++                                              $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
-	echo "SET(CMAKE_C_FLAGS                     \"$NCC_CFLAGS\"                                   $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo "SET(CMAKE_C_FLAGS                     \"$NCC_CFLAGS -I $ROOT_PATH/$OUT_PATH/include\"   $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_C_FLAGS_RELEASE             \"$NCC_OPTIM -DNDEBUG\"                           $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
-	echo "SET(CMAKE_CXX_FLAGS                   \"$NCC_CFLAGS\"                                   $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo "SET(CMAKE_CXX_FLAGS                   \"$NCC_CFLAGS -I $ROOT_PATH/$OUT_PATH/include\"   $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_CXX_FLAGS_RELEASE           \"$NCC_OPTIM -DNDEBUG\"                           $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_CPP_FLAGS                   \"$NCC_CPPFLAGS\"                                 $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_ASM_YASM_COMPILER             yasm                                            $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
@@ -503,7 +503,7 @@ then
 		#meson
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		CPPFLAGS="$NCC_CPPFLAGS" CFLAGS="$NCC_CFLAGS" meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Ddocs=false "../$SRC_NAME"
+		CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS $NCC_CPPFLAGS" CFLAGS="$NCC_OPTIM $NCC_CFLAGS $NCC_CPPFLAGS" meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Ddocs=false -Dtests=false "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $NCC_JOBS
 	fi
@@ -686,12 +686,12 @@ fi
 set_source "dav1d" "git" "https://code.videolan.org/videolan/dav1d" "libdav1d"
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
-fetch_source
+	fetch_source
 	if [ "$BUILD" -ne 0 ]
 	then
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		CPPFLAGS="$NCC_CPPFLAGS" CFLAGS="$NCC_CFLAGS" meson --prefix="$ROOT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_tools=false -Denable_tests=false ../dav1d
+		CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS $NCC_CPPFLAGS" CFLAGS="$NCC_OPTIM $NCC_CFLAGS $NCC_CPPFLAGS" meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --bindir="$ROOT_PATH/$OUT_PATH/bin" --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_tools=false -Denable_tests=false --strip ../"$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $NCC_JOBS
 	fi
@@ -824,6 +824,22 @@ then
 		./config no-ssl2 no-ssl3 no-weak-ssl-ciphers no-shared no-hw no-engine no-dso no-err no-tests zlib --prefix="$ROOT_PATH/$OUT_PATH" --openssldir="$ROOT_PATH/$OUT_PATH" "$NCC_OPTIM $NCC_CFLAGS" --with-zlib-include="$ROOT_PATH/$OUT_PATH/include" --with-zlib-lib="$ROOT_PATH/$OUT_PATH/lib"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS install_sw
+	fi
+fi
+
+#vmaf
+set_source "vmaf" "git" "https://github.com/Netflix/vmaf.git" "libvmaf"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		mkdir "$SRC_NAME"_build
+		cd "$SRC_NAME"_build
+		CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS $NCC_CPPFLAGS" CFLAGS="$NCC_OPTIM $NCC_CFLAGS $NCC_CPPFLAGS" meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --bindir="$ROOT_PATH/$OUT_PATH/bin" --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_docs=false -Denable_tests=false --strip "../lib$SRC_NAME"
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_meson $NCC_JOBS
 	fi
 fi
 
