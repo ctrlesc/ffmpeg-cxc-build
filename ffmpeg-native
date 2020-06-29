@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.6.8"
+SCRIPT_VERSION="1.6.9"
 THIS="ffmpeg-native"
 
 #build paths
@@ -370,7 +370,7 @@ fi
 
 if [ "$BUILD" -ne 0 ]
 then
-	mkdir "$ROOT_PATH/$OUT_PATH"
+	mkdir --parents "$ROOT_PATH/$OUT_PATH/misc"
 	[ ! -d "$ROOT_PATH/$OUT_PATH" ] && build_die "$THIS: unable to create build directory -> $ROOT_PATH/$OUT_PATH"
 fi
 
@@ -840,8 +840,13 @@ then
 		CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS $NCC_CPPFLAGS" CFLAGS="$NCC_OPTIM $NCC_CFLAGS $NCC_CPPFLAGS" meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --bindir="$ROOT_PATH/$OUT_PATH/bin" --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_docs=false -Denable_tests=false --strip "../lib$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $NCC_JOBS
+		NCC_FFMPEG_EXTRA_LIBS="$NCC_FFMPEG_EXTRA_LIBS -lstdc++"
 	fi
 fi
+
+#move and shared libs to 'misc' to hide from linker
+find "$ROOT_PATH/$OUT_PATH/lib" -type f -a -\( -name "*.so" -o -name "*.so.*" -\) -exec mv -t "$ROOT_PATH/$OUT_PATH/misc" '{}' \;
+find "$ROOT_PATH/$OUT_PATH/lib" -type l -a -\( -name "*.so" -o -name "*.so.*" -\) -exec rm '{}' \;
 
 #ffmpeg
 set_source "ffmpeg" "git" "https://git.ffmpeg.org/ffmpeg.git" "gpl" "version3" "nonfree"
