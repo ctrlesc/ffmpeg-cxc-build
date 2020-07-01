@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.6.8"
+SCRIPT_VERSION="1.6.10"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -372,7 +372,7 @@ fi
 
 if [ "$BUILD" -ne 0 ]
 then
-	mkdir "$ROOT_PATH/$OUT_PATH"
+	mkdir --parents "$ROOT_PATH/$OUT_PATH/misc"
 	[ ! -d "$ROOT_PATH/$OUT_PATH" ] && build_die "$THIS: unable to create build directory -> $ROOT_PATH/$OUT_PATH"
 fi
 
@@ -728,7 +728,7 @@ fetch_source
 	then
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_tools=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
+		meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --bindir="$ROOT_PATH/$OUT_PATH/bin" --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_tools=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
 	fi

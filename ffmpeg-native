@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.6.9"
+SCRIPT_VERSION="1.6.10"
 THIS="ffmpeg-native"
 
 #build paths
@@ -503,7 +503,7 @@ then
 		#meson
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS $NCC_CPPFLAGS" CFLAGS="$NCC_OPTIM $NCC_CFLAGS $NCC_CPPFLAGS" meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Ddocs=false -Dtests=false "../$SRC_NAME"
+		CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS $NCC_CPPFLAGS" CFLAGS="$NCC_OPTIM $NCC_CFLAGS $NCC_CPPFLAGS" meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --bindir="$ROOT_PATH/$OUT_PATH/bin" --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Ddocs=false -Dtests=false "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $NCC_JOBS
 	fi
@@ -661,7 +661,7 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared -disable-docs --disable-examples
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared -disable-docs --disable-examples
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -676,7 +676,7 @@ then
 	then
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_C_FLAGS_RELEASE="$NCC_OPTIM -DNDEBUG" -DCMAKE_C_FLAGS="$NCC_CFLAGS" -DCMAKE_CXX_FLAGS_RELEASE="$NCC_OPTIM -DNDEBUG" -DCMAKE_CXX_FLAGS="$NCC_CFLAGS" -DCMAKE_CPP_FLAGS="$NCC_CPPFLAGS" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DAOM_TARGET_CPU="x86_64" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 -DENABLE_TOOLS=0 -DENABLE_TESTS=0 ../aom
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_C_FLAGS_RELEASE="$NCC_OPTIM -DNDEBUG" -DCMAKE_C_FLAGS="$NCC_CFLAGS" -DCMAKE_CXX_FLAGS_RELEASE="$NCC_OPTIM -DNDEBUG" -DCMAKE_CXX_FLAGS="$NCC_CFLAGS" -DCMAKE_CPP_FLAGS="$NCC_CPPFLAGS" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DAOM_TARGET_CPU="x86_64" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 -DENABLE_TOOLS=0 -DENABLE_TESTS=0 "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -719,7 +719,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		CFLAGS="$NCC_OPTIM" ./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$NCC_CFLAGS" --bindir="$BIN_PATH" --enable-static --disable-cli
+		CFLAGS="$NCC_OPTIM" ./configure --prefix="$ROOT_PATH/$OUT_PATH" --extra-cflags="$NCC_OPTIM $NCC_CFLAGS" --bindir="$BIN_PATH" --enable-static --disable-cli
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
