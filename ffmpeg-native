@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.6.10"
+SCRIPT_VERSION="1.7.0"
 THIS="ffmpeg-native"
 
 #build paths
@@ -37,11 +37,11 @@ NCC_SYSTEM_LIST=\
 
 NCC_SOURCE_LIST=\
 ( \
-"aom" "ass" "bzip2" "dav1d" "dlfcn" "fdk-aac" "freetype" \
-"ffmpeg" "fribidi" "frei0r" "fontconfig" "harfbuzz" "lame" \
-"nv-codec-headers" "ogg" "openssl" "opus" "png" "sdl" \
-"sofa" "soxr" "theora" "vmaf" "vorbis" "vpx" \
-"xml2" "x264" "x265" "zlib" \
+"aom" "ass" "bzip2" "dav1d" "fdk-aac" "ffmpeg" "fftw3" \
+"fontconfig" "freetype" "frei0r" "fribidi" "harfbuzz" "ladspa" \
+"lame" "nv-codec-headers" "ogg" "openssl" "opus" "png" "rubberband" \
+"sdl" "samplerate" "sofa" "soxr" "srt" "theora" "vmaf" "vorbis" \
+"vpx" "xml2" "x264" "x265" "zlib" \
 )
 
 #lib options
@@ -183,9 +183,28 @@ fetch_source() {
 				cd ..
 			fi
 		;;
-		#wget)
-			#wget -O "$SRC_NAME.$1" "$url"
-		#;;
+		wget)
+			if [ "$scheme" != "file://" ]
+			then
+				local wOrigin="${url%/*}"
+				local wFile="${url##*/}"
+				if [ ! -z "$revision" ]
+				then
+					wFile="$revision"
+				fi
+				#echo "SRC_NAME="$SRC_NAME "SRC_URL="$SRC_URL "url="$url "revision="$revision "origin/file="$wOrigin/$wFile
+				status=0
+				if [ ! -d "$SRC_NAME" ]
+				then
+					mkdir "$SRC_NAME"
+					status=$?
+				fi
+				[ $status -eq 0 ] && \
+				wget -O "$wFile" "$wOrigin/$wFile" && \
+				bsdtar -xvf "$wFile" -C "$SRC_NAME"
+				status=$?
+			fi
+		;;
 		*)
 			build_die "$THIS: invalid fetch method -> $SRC_NAME: $SRC_METHOD"
 		;;
@@ -320,6 +339,12 @@ set_source() {
 cd_source() {
 
 	cd $SRC_NAME
+	[ $? -eq 0 ] || build_die "$THIS: unable to change to directory -> $SRC_NAME"
+	if [ ! -z "$1" ]
+	then
+		cd $(ls -d1 $1*/ | head -n 1)
+		[ $? -eq 0 ] || build_die "$THIS: unable to change to directory -> $SRC_NAME"
+	fi
 }
 
 #startup banner
@@ -330,15 +355,20 @@ build_message BM_WHITE "$THIS: $(gcc -v 2>&1 | grep '^gcc version')"
 get_NCC_hints
 if [ "$NCC_SHOW_ONLY" -ne 0 ]
 then
+	{
 	for i in "${NCC_PATH_LIST[@]}"
 	do
 		echo "$i: ${!i}"
 	done
+	} | sort
+	{
 	for i in "${NCC_OPTION_LIST[@]}"
 	do
 		var="NCC_$i"
 		echo "$var: ${!var}"
 	done
+	} | sort
+	{
 	for i in "${NCC_SOURCE_LIST[@]}"
 	do
 		var="NCC_ENABLE_$i"
@@ -346,6 +376,7 @@ then
 		var="${var^^}"
 		echo "$var: ${!var} ($i)"
 	done
+	} | sort
 fi
 
 if [ "$NCC_FETCH_ONLY" -eq 0 ] && [ "$NCC_SHOW_ONLY" -eq 0 ]
@@ -578,6 +609,71 @@ then
 	fi
 fi
 
+#libsamplerate
+set_source "samplerate" "git" "https://github.com/erikd/libsamplerate.git"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DLIBSAMPLERATE_TESTS=0 -DLIBSAMPLERATE_EXAMPLES=0 .
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $NCC_JOBS
+	fi
+fi
+
+#fftw3
+set_source "fftw3" "wget" "http://fftw.org/fftw-3.3.8.tar.gz"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source "fftw-"
+		#./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared --disable-fortran --disable-doc
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0 -DDISABLE_FORTRAN=1 .
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $NCC_JOBS
+		ln -s "$ROOT_PATH/$OUT_PATH"/lib/pkgconfig/fftw*.pc "$ROOT_PATH/$OUT_PATH"/lib/pkgconfig/fftw3.pc
+	fi
+fi
+
+#ladspa
+set_source "ladspa" "git" "https://github.com/swh/ladspa.git"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		cp ladspa.h "$ROOT_PATH/$OUT_PATH/include"
+		[ $? -eq 0 ] || build_die "$THIS: install stage failed -> $SRC_NAME"
+		build_message BM_GREEN "$SRC_NAME: installed"
+	fi
+fi
+
+#librubberband
+set_source "rubberband" "hg" "https://hg.sr.ht/~breakfastquay/rubberband" "librubberband"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		autoreconf -fiv
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --disable-vamp --disable-programs
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		#build_make $NCC_JOBS static
+		make lib static && \
+		cp "lib/librubberband.a" "$ROOT_PATH/$OUT_PATH/lib" && \
+		cp -r "rubberband/" "$ROOT_PATH/$OUT_PATH/include" && \
+		sed -r "s#%PREFIX%#$ROOT_PATH/$OUT_PATH##" rubberband.pc.in > "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/rubberband.pc" && \
+		[ $? -eq 0 ] || build_die "$THIS: make stage failed -> $SRC_NAME"
+		build_message BM_GREEN "$SRC_NAME: installed"
+		NCC_FFMPEG_EXTRA_LIBS="$NCC_FFMPEG_EXTRA_LIBS -lsamplerate -lfftw3"
+	fi
+fi
 #fdk-aac
 set_source "fdk-aac" "git" "https://github.com/mstorsjo/fdk-aac.git" "libfdk-aac"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -683,7 +779,7 @@ then
 fi
 
 #dav1d
-set_source "dav1d" "git" "https://code.videolan.org/videolan/dav1d" "libdav1d"
+set_source "dav1d" "git" "https://code.videolan.org/videolan/dav1d.git" "libdav1d"
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
 	fetch_source
@@ -827,6 +923,20 @@ then
 	fi
 fi
 
+#libsrt
+set_source "srt" "git" "https://github.com/Haivision/srt.git" "libsrt"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DENABLE_SHARED=0 -DENABLE_APPS=0 -DENABLE_PROFILE=0 .
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $NCC_JOBS
+	fi
+fi
+
 #vmaf
 set_source "vmaf" "git" "https://github.com/Netflix/vmaf.git" "libvmaf"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -844,7 +954,7 @@ then
 	fi
 fi
 
-#move and shared libs to 'misc' to hide from linker
+#move shared libs to 'misc' to hide from linker
 find "$ROOT_PATH/$OUT_PATH/lib" -type f -a -\( -name "*.so" -o -name "*.so.*" -\) -exec mv -t "$ROOT_PATH/$OUT_PATH/misc" '{}' \;
 find "$ROOT_PATH/$OUT_PATH/lib" -type l -a -\( -name "*.so" -o -name "*.so.*" -\) -exec rm '{}' \;
 

@@ -49,11 +49,13 @@ dav1d	url	file://~/src/dav1d
 dlfcn	url	file://~/src/dlfcn
 fdk-aac	url	file://~/src/fdk-aac
 ffmpeg	url	file://~/src/ffmpeg
+fftw3	url	file://~/src/fftw3
 fontconfig	url	file://~/src/fontconfig
 freetype	url	file://~/src/freetype
 frei0r	url	file://~/src/frei0r
 fribidi	url	file://~/src/fribidi
 harfbuzz	url	file://~/src/harfbuzz
+ladspa	url	file://~/src/ladspa
 lame	url	file://~/src/lame
 mfx	url	file://~/src/mfx
 nv-codec-headers	url	file://~/src/nv-codec-headers
@@ -61,9 +63,12 @@ ogg	url	file://~/src/ogg
 openssl	url	file://~/src/openssl
 opus	url	file://~/src/opus
 png	url	file://~/src/png
+rubberband	url	file://~/src/rubberband
 sdl	url	file://~/src/sdl
+samplerate	url	file://~/src/samplerate
 sofa	url	file://~/src/sofa
 soxr	url	file://~/src/soxr
+srt	url	file://~/src/srt
 theora	url	file://~/src/theora
 vmaf	url	file://~/src/vmaf
 vorbis	url	file://~/src/vorbis
@@ -85,31 +90,34 @@ dav1d	git
 dlfcn	git	
 fdk-aac	git	
 ffmpeg	git	
+fftw3	wget	
 #commit below is for fontconfig 2.12.6, head may not build/work as expected
 fontconfig	git	b546940435ebfb0df575bc7a2350d1e913919c34
-#fontconfig	git	
 freetype	git	
 frei0r	git	
 fribidi	git	
 harfbuzz	git	
+ladspa	git	
 lame	svn	
 mfx	git	
 nv-codec-headers	git	
 ogg	git	
 #commit below is for openssl 1.1.1.g, head may not build/work as expected
 openssl	git	e2e09d9fba1187f8d6aafaa34d4172f56f1ffb72
-#openssl	git	
 opus	git	
 png	git	
+rubberband	hg	
+samplerate	git	
 sdl	hg	
 sofa	git	
 soxr	git	
+#commit below is for srt v1.4.1, head may not build/work as expected
+srt	git	9e52606fae3b32818b5b734d45d3358f4a95cf3f
 theora	git	
-vmaf    git 
+vmaf	git	
 vorbis	git	
 vpx	git	
 x264	git	
 x265	hg	
 xml2	git	
 zlib	git	
-
