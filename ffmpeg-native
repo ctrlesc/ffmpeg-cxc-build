@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.0"
+SCRIPT_VERSION="1.7.1"
 THIS="ffmpeg-native"
 
 #build paths
@@ -647,7 +647,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		cp ladspa.h "$ROOT_PATH/$OUT_PATH/include"
+		cp --verbose ladspa.h "$ROOT_PATH/$OUT_PATH/include"
 		[ $? -eq 0 ] || build_die "$THIS: install stage failed -> $SRC_NAME"
 		build_message BM_GREEN "$SRC_NAME: installed"
 	fi
@@ -666,8 +666,8 @@ then
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		#build_make $NCC_JOBS static
 		make lib static && \
-		cp "lib/librubberband.a" "$ROOT_PATH/$OUT_PATH/lib" && \
-		cp -r "rubberband/" "$ROOT_PATH/$OUT_PATH/include" && \
+		cp --verbose "lib/librubberband.a" "$ROOT_PATH/$OUT_PATH/lib" && \
+		cp --verbose -r "rubberband/" "$ROOT_PATH/$OUT_PATH/include" && \
 		sed -r "s#%PREFIX%#$ROOT_PATH/$OUT_PATH##" rubberband.pc.in > "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/rubberband.pc" && \
 		[ $? -eq 0 ] || build_die "$THIS: make stage failed -> $SRC_NAME"
 		build_message BM_GREEN "$SRC_NAME: installed"
