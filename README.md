@@ -54,9 +54,29 @@ Using this technique, the script *update-repo* can be used to maintain up to dat
 
 Frei0r is a collection of video effect plugins which can be used as ffmpeg filters.  The effects are self-contained in individual DLLs/shared libraries and are not compiled into ffmepg.  After a successful build, the compiled modules will be at "$ROOT_PATH/$OUT_PATH/lib/frei0r".  After moving them to the desired path and setting the location of the plugins in an environment variable, they are easily enabled as an ffmpeg video filter (-vf).  Assuming *.frei0r* has been created in the user's home directory and the modules have been copied there, the FREI0R_PATH can be defined as below:
 
-	
-	#Unixish: export FREI0R_PATH="$HOME/.frei0r-1
-	#Windows: set FREI0R_PATH="%USERPROFILE%\.frei0r-1"
+	#Unixish: export FREI0R_PATH=$HOME/.frei0r-1
+	#Windows: set FREI0R_PATH=%USERPROFILE%\.frei0r-1
 	#Test the plugin
-	ffmpeg -i in.mp4 -vf frei0r=glow out.mp4
+	ffmpeg -i in.mp4 -vf frei0r=vignette out.mp4
 
+**Using fontconfig**
+
+Fontconfig allows the user to specify fonts by name instead of file path making drawtext filters easier to construct.  To access user and system fonts on Windows, a minimal fonts.conf file should be specified in the environment. A sample fonts.conf and drawtext filter to test font access appear below.
+
+fonts.conf:
+
+	<?xml version="1.0"?>
+	<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+	<!-- minimal fonts.conf file for ffmpeg on Windows -->
+	<fontconfig>
+		<dir>WINDOWSFONTDIR</dir>
+		<dir>~/AppData/Local/Microsoft/Windows/Fonts</dir>
+		<cachedir>LOCAL_APPDATA_FONTCONFIG_CACHE</cachedir>
+	</fontconfig>
+
+	#Windows
+	set FONTCONFIG_FILE=%USERPROFILE%\.fonts\fonts.conf
+	#Test font access
+	ffmpeg -y -t 10 -i in.mp4 -filter_complex "drawtext='font=Segoe UI:\
+	fontsize=64:x=20:y=50:fontcolor=white:bordercolor=black:borderw=1:\
+	shadowcolor=black:shadowx=2:shadowy=2:alpha=0.5:text=Testing 1, 2, 3'" -an out.mp4
