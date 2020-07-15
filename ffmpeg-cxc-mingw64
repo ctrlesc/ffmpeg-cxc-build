@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.1"
+SCRIPT_VERSION="1.7.3"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -462,8 +462,6 @@ fi
 #test and fix cross for cygwin build environment
 if [[ "$CXC_OS" == *cygwin* ]]
 then
-	find /usr -ipath "*x86_64*mingw*sys-root*mingw/bin/iconv.dll" 2> /dev/null | grep -Ev "^$" &> /dev/null
-	[ $? -eq 0 ] || build_die "$THIS: mingw win-iconv package is required and not found in PATH"
 	if [[ "$PATH" == *x86_64*mingw*sys-root*mingw/bin* ]]
 	then
 		CXC_BUILD='--build=x86_64-pc-cygwin'
@@ -471,6 +469,9 @@ then
 		build_die "$THIS: mingw 'sys-root/bin' must be in PATH"
 	fi
 	build_message BM_YELLOW "$THIS: Cygwin build detected - ensure sys-root contains a symlink to construct a valid path for '$OUT_PATH/include'"
+elif [[ "$CXC_OS" == *linux* ]]
+then
+	CXC_BUILD='--build=x86_64-pc-linux-gnu'
 fi
 
 #display the detected system type and hints file in use
@@ -560,15 +561,6 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		CXC_CPPFLAGS="$CXC_CPPFLAGS -DFRIBIDI_LIB_STATIC"
-
-		#autotools
-		#cd_source
-		#autoreconf -fiv
-		#./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
-		#[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-		#build_make $CXC_JOBS -C lib
-
-		#meson
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
 		meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --bindir="$ROOT_PATH/$OUT_PATH/bin" --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Ddocs=false -Dtests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
@@ -601,7 +593,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --disable-docs --enable-libxml2
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared --disable-docs --enable-libxml2 --disable-nls
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -668,7 +660,6 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source "fftw-"
-		#./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --enable-static --disable-shared --disable-fortran --disable-doc
 		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0 -DDISABLE_FORTRAN=1 .
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS

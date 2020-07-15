@@ -46,4 +46,4 @@ do
 		;;
 	esac
 
-done < <(find "$fpath" -mindepth 2 -maxdepth 2 -type d -name ".git" -o -name ".svn" -o -name ".hg")
+done < <(find "$fpath" -mindepth 2 -maxdepth 2 -type d -name ".git" -o -name ".svn" -o -name ".hg" | sort)
