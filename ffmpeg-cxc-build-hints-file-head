@@ -44,6 +44,7 @@ openssl	make	1
 amf	url	file://~/src/amf
 aom	url	file://~/src/aom
 ass	url	file://~/src/ass
+avisynth	url	file://~/src/avisynth
 bzip2	url	file://~/src/bzip2
 dav1d	url	file://~/src/dav1d
 dlfcn	url	file://~/src/dlfcn
@@ -73,6 +74,7 @@ theora	url	file://~/src/theora
 vmaf	url	file://~/src/vmaf
 vorbis	url	file://~/src/vorbis
 vpx	url	file://~/src/vpx
+webp	url	file://~/src/webp
 x264	url	file://~/src/x264
 x265	url	file://~/src/x265
 xml2	url	file://~/src/xml2
@@ -85,14 +87,14 @@ zlib	url	file://~/src/zlib
 amf	git	
 aom	git	
 ass	git	
+avisynth	git	
 bzip2	git	
 dav1d	git	
 dlfcn	git	
 fdk-aac	git	
 ffmpeg	git	
 fftw3	wget	
-#commit below is for fontconfig 2.12.6, head may not build/work as expected
-fontconfig	git	b546940435ebfb0df575bc7a2350d1e913919c34
+fontconfig	git	
 freetype	git	
 frei0r	git	
 fribidi	git	
@@ -117,6 +119,7 @@ theora	git
 vmaf	git	
 vorbis	git	
 vpx	git	
+webp	git	
 x264	git	
 x265	hg	
 xml2	git	

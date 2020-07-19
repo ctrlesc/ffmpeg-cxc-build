@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.3"
+SCRIPT_VERSION="1.7.4"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -39,11 +39,11 @@ CXC_SYSTEM_LIST=\
 
 CXC_SOURCE_LIST=\
 ( \
-"amf" "aom" "ass" "bzip2" "dav1d" "dlfcn" "fdk-aac" "ffmpeg" \
+"amf" "aom" "ass" "avisynth" "bzip2" "dav1d" "dlfcn" "fdk-aac" "ffmpeg" \
 "fftw3" "fontconfig" "freetype" "frei0r" "fribidi" "harfbuzz" "ladspa" \
 "lame" "mfx" "nv-codec-headers" "ogg" "openssl" "opus" "png" "rubberband" \
 "sdl" "samplerate" "sofa" "soxr" "srt" "theora" "vmaf" "vorbis" \
-"vpx" "xml2" "x264" "x265" "zlib" \
+"vpx" "webp" "xml2" "x264" "x265" "zlib" \
 )
 
 #lib options
@@ -538,6 +538,22 @@ then
 	fi
 fi
 
+#webp
+set_source "webp" "git" "https://chromium.googlesource.com/webm/libwebp" "libwebp"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		mkdir "$SRC_NAME"_build
+		cd "$SRC_NAME"_build
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DWEBP_BUILD_EXTRAS=0 -DWEBP_BUILD_WEBP_JS=0 ..
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+	fi
+fi
+
 #freetype
 set_source "freetype" "git" "https://git.savannah.gnu.org/git/freetype/freetype2.git" "libfreetype"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -553,7 +569,7 @@ then
 	fi
 fi
 
-#fribidi 
+#fribidi
 set_source "fribidi" "git" "https://github.com/fribidi/fribidi.git" "libfribidi"
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
@@ -966,6 +982,22 @@ then
 		cd_source
 		autoreconf -fiv
 		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --bindir="$BIN_PATH" --enable-static --disable-shared
+		build_make $CXC_JOBS
+	fi
+fi
+
+#avisynth
+set_source "avisynth" "git" "https://github.com/AviSynth/AviSynthPlus.git" "avisynth"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		mkdir "$SRC_NAME"_build
+		cd "$SRC_NAME"_build
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DHEADERS_ONLY=1 ..
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
 fi

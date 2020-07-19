@@ -70,6 +70,7 @@ theora	url	file://~/src/theora
 vmaf	url	file://~/src/vmaf
 vorbis	url	file://~/src/vorbis
 vpx	url	file://~/src/vpx
+webp	url	file://~/src/webp
 x264	url	file://~/src/x264
 x265	url	file://~/src/x265
 xml2	url	file://~/src/xml2
@@ -110,6 +111,7 @@ theora	git
 vmaf	git	
 vorbis	git	
 vpx	git	
+webp	git	
 x264	git	
 x265	hg	
 xml2	git	
