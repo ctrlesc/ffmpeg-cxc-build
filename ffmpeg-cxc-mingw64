@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.5"
+SCRIPT_VERSION="1.7.6"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -39,7 +39,7 @@ CXC_SYSTEM_LIST=\
 
 CXC_SOURCE_LIST=\
 ( \
-"amf" "aom" "ass" "avisynth" "bzip2" "dav1d" "dlfcn" "fdk-aac" "ffmpeg" \
+"amf" "aom" "ass" "avisynth" "bzip2" "dav1d" "decklink" "dlfcn" "fdk-aac" "ffmpeg" \
 "fftw3" "fontconfig" "freetype" "frei0r" "fribidi" "harfbuzz" "ladspa" \
 "lame" "mfx" "nv-codec-headers" "ogg" "openssl" "opus" "png" "rubberband" \
 "sdl" "samplerate" "sofa" "soxr" "srt" "theora" "vmaf" "vorbis" \
@@ -532,7 +532,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" LDFLAGS="-L$ROOT_PATH/$OUT_PATH/lib" --host="$CXC_HOST" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" LDFLAGS="-L$ROOT_PATH/$OUT_PATH/lib" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -594,7 +594,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --with-python=no
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared --with-python=no
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -624,7 +624,7 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" LIBS="-lwinpthread" --host="$CXC_HOST" --enable-static --disable-shared --with-cairo=no --with-glib=no --with-icu=no --with-freetype=yes
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" LIBS="-lwinpthread" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared --with-cairo=no --with-glib=no --with-icu=no --with-freetype=yes
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 		#now rebuild freetype to be harfbuzz aware
@@ -648,7 +648,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -706,7 +706,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --disable-vamp --disable-programs
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" "$CXC_BUILD" --disable-vamp --disable-programs
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		#build_make $CXC_JOBS static
 		make lib static && \
@@ -718,6 +718,35 @@ then
 		CXC_FFMPEG_EXTRA_LIBS="$CXC_FFMPEG_EXTRA_LIBS -lsamplerate -lfftw3"
 	fi
 fi
+
+#sofa
+set_source "sofa" "git" "https://github.com/hoene/libmysofa.git" "libmysofa"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DZLIB_LIBRARY="$ROOT_PATH/$OUT_PATH/lib/libz.a" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0 -DCODE_COVERAGE=0 .
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+	fi
+fi
+
+#soxr
+set_source "soxr" "git" "https://git.code.sf.net/p/soxr/code" "libsoxr"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DBUILD_EXAMPLES=0 -DBUILD_TESTS=0 -DBUILD_LSR_TESTS=0 .
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+		CXC_FFMPEG_EXTRA_LIBS="$CXC_FFMPEG_EXTRA_LIBS -lgomp -lpthread"
+	fi
+fi
 #fdk-aac
 set_source "fdk-aac" "git" "https://github.com/mstorsjo/fdk-aac.git" "libfdk-aac"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -727,7 +756,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -741,7 +770,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --enable-nasm --host="$CXC_HOST" --disable-shared --disable-frontend
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" "$CXC_BUILD" --enable-nasm --disable-shared --disable-frontend
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -756,7 +785,7 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -771,22 +800,7 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS  -D_FORTIFY_SOURCE=0" --host="$CXC_HOST" --enable-static --disable-shared --disable-doc
-		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-		build_make $CXC_JOBS
-	fi
-fi
-
-#theora
-set_source "theora" "git" "https://github.com/xiph/theora.git" "libtheora"
-if [ "${!SRC_ENABLE}" -ne 0 ]
-then
-	fetch_source
-	if [ "$BUILD" -ne 0 ]
-	then
-		cd_source
-		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared --disable-doc --disable-oggtest --disable-vorbistest --disable-examples
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS  -D_FORTIFY_SOURCE=0" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared --disable-doc
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -801,7 +815,22 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --enable-static --disable-shared -disable-docs --disable-examples
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared -disable-docs --disable-examples
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+	fi
+fi
+
+#theora
+set_source "theora" "git" "https://github.com/xiph/theora.git" "libtheora"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		./autogen.sh
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared --disable-doc --disable-oggtest --disable-vorbistest --disable-examples
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -938,35 +967,6 @@ then
 	fi
 fi
 
-#sofa
-set_source "sofa" "git" "https://github.com/hoene/libmysofa.git" "libmysofa"
-if [ "${!SRC_ENABLE}" -ne 0 ]
-then
-	fetch_source
-	if [ "$BUILD" -ne 0 ]
-	then
-		cd_source
-		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DZLIB_LIBRARY="$ROOT_PATH/$OUT_PATH/lib/libz.a" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0 -DCODE_COVERAGE=0 .
-		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-		build_make $CXC_JOBS
-	fi
-fi
-
-#soxr
-set_source "soxr" "git" "https://git.code.sf.net/p/soxr/code" "libsoxr"
-if [ "${!SRC_ENABLE}" -ne 0 ]
-then
-	fetch_source
-	if [ "$BUILD" -ne 0 ]
-	then
-		cd_source
-		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DBUILD_EXAMPLES=0 -DBUILD_TESTS=0 -DBUILD_LSR_TESTS=0 .
-		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-		build_make $CXC_JOBS
-		CXC_FFMPEG_EXTRA_LIBS="$CXC_FFMPEG_EXTRA_LIBS -lgomp -lpthread"
-	fi
-fi
-
 #sdl
 set_source "sdl" "hg" "http://hg.libsdl.org/SDL"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -976,7 +976,8 @@ then
 	then
 		cd_source
 		mv .hg .temp_hg
-		CFLAGS=-DDECLSPEC= ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --bindir="$BIN_PATH" --enable-static --disable-shared
+		autoreconv -fiv
+		CFLAGS=-DDECLSPEC= ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" "$CXC_BUILD" --bindir="$BIN_PATH" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 		rm -f "$BIN_PATH"/sdl*
@@ -1008,8 +1009,20 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" --bindir="$BIN_PATH" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" "$CXC_BUILD" --bindir="$BIN_PATH" --enable-static --disable-shared
 		build_make $CXC_JOBS
+	fi
+fi
+
+#nvenc
+set_source "nv-codec-headers" "git" "https://github.com/FFmpeg/nv-codec-headers.git" "nvenc" "nvdec"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		build_make $CXC_JOBS PREFIX="$ROOT_PATH/$OUT_PATH" install
 	fi
 fi
 
@@ -1029,8 +1042,8 @@ then
 	fi
 fi
 
-#nvenc
-set_source "nv-codec-headers" "git" "https://github.com/FFmpeg/nv-codec-headers.git" "nvenc" "nvdec"
+#decklink
+set_source "decklink" "git" "https://notabug.org/RiCON/decklink-headers.git" "decklink"
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
 	fetch_source

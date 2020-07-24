@@ -680,6 +680,36 @@ then
 		NCC_FFMPEG_EXTRA_LIBS="$NCC_FFMPEG_EXTRA_LIBS -lsamplerate -lfftw3"
 	fi
 fi
+
+#sofa
+set_source "sofa" "git" "https://github.com/hoene/libmysofa.git" "libmysofa"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DZLIB_LIBRARY="$ROOT_PATH/$OUT_PATH/lib/libz.a" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0 -DCODE_COVERAGE=0 .
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $NCC_JOBS
+	fi
+fi
+
+#soxr
+set_source "soxr" "git" "https://git.code.sf.net/p/soxr/code" "libsoxr"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DBUILD_SHARED_LIBS=0 -DBUILD_EXAMPLES=0 -DBUILD_TESTS=0 -DBUILD_LSR_TESTS=0 .
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $NCC_JOBS
+		NCC_FFMPEG_EXTRA_LIBS="$NCC_FFMPEG_EXTRA_LIBS -lgomp"
+	fi
+fi
+
 #fdk-aac
 set_source "fdk-aac" "git" "https://github.com/mstorsjo/fdk-aac.git" "libfdk-aac"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -739,21 +769,6 @@ then
 	fi
 fi
 
-#theora
-set_source "theora" "git" "https://github.com/xiph/theora.git" "libtheora"
-if [ "${!SRC_ENABLE}" -ne 0 ]
-then
-	fetch_source
-	if [ "$BUILD" -ne 0 ]
-	then
-		cd_source
-		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared --disable-doc --disable-oggtest --disable-vorbistest --disable-examples
-		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-		build_make $NCC_JOBS
-	fi
-fi
-
 #vorbis
 set_source "vorbis" "git" "https://github.com/xiph/vorbis.git" "libvorbis"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -764,6 +779,21 @@ then
 		cd_source
 		./autogen.sh
 		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared -disable-docs --disable-examples
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $NCC_JOBS
+	fi
+fi
+
+#theora
+set_source "theora" "git" "https://github.com/xiph/theora.git" "libtheora"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		./autogen.sh
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --enable-static --disable-shared --disable-doc --disable-oggtest --disable-vorbistest --disable-examples
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -881,35 +911,6 @@ then
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 		find "$ROOT_PATH/$OUT_PATH/lib/frei0r" -type f -name "*.so" -print0 | xargs -0 xargs strip
-	fi
-fi
-
-#sofa
-set_source "sofa" "git" "https://github.com/hoene/libmysofa.git" "libmysofa"
-if [ "${!SRC_ENABLE}" -ne 0 ]
-then
-	fetch_source
-	if [ "$BUILD" -ne 0 ]
-	then
-		cd_source
-		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DZLIB_LIBRARY="$ROOT_PATH/$OUT_PATH/lib/libz.a" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0 -DCODE_COVERAGE=0 .
-		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-		build_make $NCC_JOBS
-	fi
-fi
-
-#soxr
-set_source "soxr" "git" "https://git.code.sf.net/p/soxr/code" "libsoxr"
-if [ "${!SRC_ENABLE}" -ne 0 ]
-then
-	fetch_source
-	if [ "$BUILD" -ne 0 ]
-	then
-		cd_source
-		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DBUILD_SHARED_LIBS=0 -DBUILD_EXAMPLES=0 -DBUILD_TESTS=0 -DBUILD_LSR_TESTS=0 .
-		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-		build_make $NCC_JOBS
-		NCC_FFMPEG_EXTRA_LIBS="$NCC_FFMPEG_EXTRA_LIBS -lgomp"
 	fi
 fi
 

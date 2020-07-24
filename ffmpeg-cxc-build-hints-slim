@@ -1,5 +1,5 @@
 #------------------------------------------------------
-#ffmpeg-cxc-build-hints-slim - 2020-07-19 working build
+#ffmpeg-cxc-build-hints-slim - 2020-07-23 working build
 #------------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -35,6 +35,7 @@ aom	disable
 ass	disable	
 avisynth	disable	
 bzip2	disable	
+decklink	disable	
 dlfcn	disable	
 fftw3	disable	
 fontconfig	disable	
@@ -82,6 +83,7 @@ zlib	enable
 #ass	url	file://~/src/ass
 #avisynth	url	file://~/src/avisynth
 #bzip2	url	file://~/src/bzip2
+#decklink	url	file://~/src/decklink
 #dlfcn	url	file://~/src/dlfcn
 #fftw3	url	file://~/src/fftw3
 #fontconfig	url	file://~/src/fontconfig
@@ -127,6 +129,7 @@ ass	git	66dba8dd21bbf81b25b26e2556c404006f80a43c
 avisynth	git	954db7b7861f7b6a7740d65f15f5ab1c4dda8ed9
 bzip2	git	8ca1faa31f396d94ab927b257f3a05236c84e330
 dav1d	git	1317e61939b89aac7fa0a7037bca0545cf1991e8
+decklink	git	efb287366bd96065b8ab2c1e64978fde807ead08
 dlfcn	git	0a494c01b0586faa5f89465c0728f0fb209c08df
 fdk-aac	git	8439b745f65bce3fd55ffc9f9edcc04f5f447c55
 ffmpeg	git	1998d1d6af98f31e9ddeead4893efad8144357be

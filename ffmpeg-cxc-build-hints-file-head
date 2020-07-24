@@ -47,6 +47,7 @@ ass	url	file://~/src/ass
 avisynth	url	file://~/src/avisynth
 bzip2	url	file://~/src/bzip2
 dav1d	url	file://~/src/dav1d
+decklink	url	file://~/src/decklink
 dlfcn	url	file://~/src/dlfcn
 fdk-aac	url	file://~/src/fdk-aac
 ffmpeg	url	file://~/src/ffmpeg
@@ -90,6 +91,7 @@ ass	git
 avisynth	git	
 bzip2	git	
 dav1d	git	
+decklink	git	
 dlfcn	git	
 fdk-aac	git	
 ffmpeg	git	
