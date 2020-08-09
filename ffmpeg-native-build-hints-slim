@@ -1,5 +1,5 @@
 #---------------------------------------------------------
-#ffmpeg-native-build-hints-slim - 2020-07-19 working build
+#ffmpeg-native-build-hints-slim - 2020-08-09 working build
 #---------------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -113,39 +113,43 @@ zlib	enable
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
-aom	git	4b422e688f4dc3cdf0d74ac63087f521d682a4bb
+aom	git	1478d8607fed2964e1d1c7bb465c0071313c99be
 ass	git	66dba8dd21bbf81b25b26e2556c404006f80a43c
+avisynth	git	b41c55b34cab0c3a3aa91562f225de90f2352b32
 bzip2	git	8ca1faa31f396d94ab927b257f3a05236c84e330
-dav1d	git	1317e61939b89aac7fa0a7037bca0545cf1991e8
+dav1d	git	5bbd96322035c37a9d20b8624ee83b98a9550ff0
 fdk-aac	git	8439b745f65bce3fd55ffc9f9edcc04f5f447c55
-ffmpeg	git	1998d1d6af98f31e9ddeead4893efad8144357be
+ffmpeg	git	14b84a2e997945467e445b1d246ee03a0c3ba806
 fftw3	wget	fftw-3.3.8.tar.gz
-fontconfig	git	437f03299bd1adc9673cd576072f1657be8fd4e0
-freetype	git	b7c467b6efa5a91945854de81632be45d6f360ff
+fontconfig	git	a53f79b4a283569d45c34e29b24815836be42464
+freetype	git	f9f6adb625c48ef15b5d61a3ac1709a068ea95a3
 frei0r	git	9d3a813d191552329a4fd1b4dcfab9e03cc98a92
 fribidi	git	5464c284034da9c058269377b7f5013bb089f553
-harfbuzz	git	ab1079b04621311b9e5b776adf77ab6038fefa66
-ladspa	git	63f2be34d3851c5257629c2c057c90a343d8d0a5
+harfbuzz	git	fce64a407d381372c92fcb5f0e551c17185ea735
+ladspa	git	0c94d096a2202c83dcb89b5b66bd6047cb0e98c7
 lame	svn	6465
 nv-codec-headers	git	de0b1bfabb01768302de66a2d88d03a48c266150
 ogg	git	0bbcba4e7cf32324170470569c4527ffd0002870
 #commit below is for openssl 1.1.1.g, head may not build/work as expected
 openssl	git	e2e09d9fba1187f8d6aafaa34d4172f56f1ffb72
-opus	git	484af2580b82dffd695fcd0841fc34a9dc5f7293
+opus	git	b83dd52868326a401c8578041e3dbea439d53f11
 png	git	dbe3e0c43e549a1602286144d94b0666549b18e6
 rubberband	hg	e553918012b8
 samplerate	git	10a317060d4dbaa66fdf1710b0e6fa2c943022eb
-sdl	hg	ac567246864a
+sdl	hg	c77235726409
 sofa	git	6f4f25e28f52d8d100d7c1df1d75142d5aeb7786
 soxr	git	945b592b70470e29f917f4de89b4281fbbd540c0
 #commit below is for srt v1.4.1, head may not build/work as expected
 srt	git	9e52606fae3b32818b5b734d45d3358f4a95cf3f
 theora	git	f98989ad7c3745d6cc4d24666e64046ff4a3f745
-vmaf	git	a9e4d5a48b66e2ed90c7a34d088d75ba97017e80
-vorbis	git	0657aee69dec8508a0011f47f3b69d7538e9d262
-vpx	git	16935397ee6712c407f0554e80160054d5eb7188
+vmaf	git	081604103e91c501afeb11491aad004240908f8b
+vorbis	git	4a767c9ead99d36f7dee4d45cabb6636dd9e8a75
+vpx	git	bb7a2ccc38475ce0e70be134b5bf862000a3fc82
 webp	git	cf2f88b38f0131644bb02df6a75ca36a342b4f7d
 x264	git	db0d417728460c647ed4a847222a535b00d3dbcb
+x265	hg	73ca1d7be377
+xml2	git	3f18e7486d5feb8ae41911ce3c122e05641a4c3d
+zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623fa535b00d3dbcb
 x265	hg	73ca1d7be377
 xml2	git	3f18e7486d5feb8ae41911ce3c122e05641a4c3d
 zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f

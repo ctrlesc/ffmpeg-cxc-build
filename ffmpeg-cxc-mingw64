@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.6"
+SCRIPT_VERSION="1.7.7"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -49,10 +49,9 @@ CXC_SOURCE_LIST=\
 #lib options
 CXC_FFMPEG_EXTRA_LIBS="-lwinpthread"
 
-#fix pkg-config paths
+#fix pkg-config env
 export PKG_CONFIG_DIR=
 export PKG_CONFIG_PATH=
-export PKG_CONFIG_SYSROOT_PATH="$ROOT_PATH/$OUT_PATH"
 export PKG_CONFIG_LIBDIR="$ROOT_PATH/$OUT_PATH/lib/pkgconfig:$ROOT_PATH/$OUT_PATH/share/pkgconfig"
 
 build_message() {
@@ -447,6 +446,7 @@ then
 	echo "cpp = 'x86_64-w64-mingw32-g++'"                      >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "windres = 'x86_64-w64-mingw32-windres'"              >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "strip = 'x86_64-w64-mingw32-strip'"                  >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "pkgconfig = 'pkg-config'"                            >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "[properties]"                                        >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "c_args = ['$(echo "$CXC_OPTIM $CXC_CFLAGS $CXC_CPPFLAGS" | sed -r "s/\s+/','/g")']"        >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "cpp_args = ['$(echo "$CXC_OPTIM $CXC_CFLAGS $CXC_CPPFLAGS" | sed -r "s/\s+/','/g")']"      >> $ROOT_PATH/$SRC_PATH/cross.meson
@@ -579,7 +579,7 @@ then
 		CXC_CPPFLAGS="$CXC_CPPFLAGS -DFRIBIDI_LIB_STATIC"
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --bindir="$ROOT_PATH/$OUT_PATH/bin" --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Ddocs=false -Dtests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
+		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Ddocs=false -Dtests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
 	fi
@@ -623,10 +623,11 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" LIBS="-lwinpthread" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared --with-cairo=no --with-glib=no --with-icu=no --with-freetype=yes
+		mkdir "$SRC_NAME"_build
+		cd "$SRC_NAME"_build
+		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Dfreetype=enabled -Dcairo=disabled -Dglib=disabled -Dicu=disabled -Dintrospection=disabled -Dbenchmark=disabled -Ddocs=disabled -Dtests=disabled --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" ".."
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-		build_make $CXC_JOBS
+		build_meson $NCC_JOBS
 		#now rebuild freetype to be harfbuzz aware
 		set_source "freetype"
 		cd_source
@@ -747,6 +748,7 @@ then
 		CXC_FFMPEG_EXTRA_LIBS="$CXC_FFMPEG_EXTRA_LIBS -lgomp -lpthread"
 	fi
 fi
+
 #fdk-aac
 set_source "fdk-aac" "git" "https://github.com/mstorsjo/fdk-aac.git" "libfdk-aac"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -860,7 +862,7 @@ fetch_source
 	then
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --bindir="$ROOT_PATH/$OUT_PATH/bin" --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_tools=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
+		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Denable_tools=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
 	fi
@@ -1092,7 +1094,7 @@ then
 		cd_source
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		meson --prefix="$ROOT_PATH/$OUT_PATH" -Ddefault_library=static --bindir="$ROOT_PATH/$OUT_PATH/bin" --libdir="$ROOT_PATH/$OUT_PATH/lib" --buildtype=release -Denable_docs=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../lib$SRC_NAME"
+		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Denable_docs=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../lib$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
 		CXC_FFMPEG_EXTRA_LIBS="$CXC_FFMPEG_EXTRA_LIBS -lstdc++"
