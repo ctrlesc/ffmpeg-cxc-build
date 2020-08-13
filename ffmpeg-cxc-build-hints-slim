@@ -60,9 +60,9 @@ dav1d	enable
 fdk-aac	enable	
 ffmpeg	enable	
 lame	enable	
-lame	make	1
+#lame	make	1
 ogg	enable	
-openssl	enable	1
+openssl	enable	
 openssl	make	1
 opus	enable	
 sdl	enable	

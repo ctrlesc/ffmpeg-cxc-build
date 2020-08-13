@@ -33,6 +33,7 @@ NCC	OPTIM	-O3
 aom	disable	
 ass	disable	
 bzip2	disable	
+decklink-linux	disable	
 fftw3	disable	
 fontconfig	disable	
 freetype	disable	
@@ -55,9 +56,9 @@ dav1d	enable
 fdk-aac	enable	
 ffmpeg	enable	
 lame	enable	
-lame	make	1
+#lame	make	1
 ogg	enable	
-openssl	enable	1
+openssl	enable	
 openssl	make	1
 opus	enable	
 sdl	enable	
@@ -76,6 +77,7 @@ zlib	enable
 #aom	url	file://~/src/aom
 #ass	url	file://~/src/ass
 #bzip2	url	file://~/src/bzip2
+#decklink-linux  url	file://~/src/decklink-linux
 #fftw3	url	file://~/src/fftw3
 #fontconfig	url	file://~/src/fontconfig
 #freetype	url	file://~/src/freetype
@@ -115,9 +117,9 @@ zlib	enable
 #source	fetch_method	revision_id
 aom	git	1478d8607fed2964e1d1c7bb465c0071313c99be
 ass	git	66dba8dd21bbf81b25b26e2556c404006f80a43c
-avisynth	git	b41c55b34cab0c3a3aa91562f225de90f2352b32
 bzip2	git	8ca1faa31f396d94ab927b257f3a05236c84e330
 dav1d	git	5bbd96322035c37a9d20b8624ee83b98a9550ff0
+decklink-linux	git	6e9b591d9a3ad7946d2f401cae9832fef722889e
 fdk-aac	git	8439b745f65bce3fd55ffc9f9edcc04f5f447c55
 ffmpeg	git	14b84a2e997945467e445b1d246ee03a0c3ba806
 fftw3	wget	fftw-3.3.8.tar.gz
@@ -147,9 +149,6 @@ vorbis	git	4a767c9ead99d36f7dee4d45cabb6636dd9e8a75
 vpx	git	bb7a2ccc38475ce0e70be134b5bf862000a3fc82
 webp	git	cf2f88b38f0131644bb02df6a75ca36a342b4f7d
 x264	git	db0d417728460c647ed4a847222a535b00d3dbcb
-x265	hg	73ca1d7be377
-xml2	git	3f18e7486d5feb8ae41911ce3c122e05641a4c3d
-zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623fa535b00d3dbcb
 x265	hg	73ca1d7be377
 xml2	git	3f18e7486d5feb8ae41911ce3c122e05641a4c3d
 zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f

@@ -28,11 +28,11 @@ CXC	OPTIM	-O3
 #source	make	job_count
 #source	disable	
 #source	enable	
-lame	make	1
-fribidi	make	1
-fontconfig	make	1
-freetype	make	1
-harfbuzz	make	1
+#lame	make	1
+#fribidi	make	1
+#fontconfig	make	1
+#freetype	make	1
+#harfbuzz	make	1
 openssl	make	1
 
 #---------------------------

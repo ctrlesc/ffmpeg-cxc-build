@@ -28,11 +28,11 @@ NCC	OPTIM	-O3
 #source	make	job_count
 #source	disable	
 #source	enable	
-lame	make	1
-fribidi	make	1
-fontconfig	make	1
-freetype	make	1
-harfbuzz	make	1
+#lame	make	1
+#fribidi	make	1
+#fontconfig	make	1
+#freetype	make	1
+#harfbuzz	make	1
 openssl	make	1
 
 #---------------------------
@@ -45,6 +45,7 @@ aom	url	file://~/src/aom
 ass	url	file://~/src/ass
 bzip2	url	file://~/src/bzip2
 dav1d	url	file://~/src/dav1d
+decklink-linux  url	file://~/src/decklink-linux
 fdk-aac	url	file://~/src/fdk-aac
 ffmpeg	url	file://~/src/ffmpeg
 fftw3	url	file://~/src/fftw3
@@ -84,6 +85,7 @@ aom	git
 ass	git	
 bzip2	git	
 dav1d	git	
+decklink-linux  git
 fdk-aac	git	
 ffmpeg	git	
 fftw3	wget	

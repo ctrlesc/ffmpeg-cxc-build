@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.7"
+SCRIPT_VERSION="1.7.8"
 THIS="ffmpeg-native"
 
 #build paths
@@ -37,7 +37,7 @@ NCC_SYSTEM_LIST=\
 
 NCC_SOURCE_LIST=\
 ( \
-"aom" "ass" "bzip2" "dav1d" "fdk-aac" "ffmpeg" "fftw3" \
+"aom" "ass" "bzip2" "dav1d" "decklink-linux" "fdk-aac" "ffmpeg" "fftw3" \
 "fontconfig" "freetype" "frei0r" "fribidi" "harfbuzz" "ladspa" \
 "lame" "nv-codec-headers" "ogg" "openssl" "opus" "png" "rubberband" \
 "sdl" "samplerate" "sofa" "soxr" "srt" "theora" "vmaf" "vorbis" \
@@ -940,6 +940,20 @@ then
 	then
 		cd_source
 		build_make $NCC_JOBS PREFIX="$ROOT_PATH/$OUT_PATH" install
+	fi
+fi
+
+#decklink
+set_source "decklink-linux" "git" "https://github.com/nachochip/Blackmagic-SDK.git" "decklink"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		cp --verbose Linux/include/* "$ROOT_PATH/$OUT_PATH/include"
+		[ $? -eq 0 ] || build_die "$THIS: install stage failed -> $SRC_NAME"
+		build_message BM_GREEN "$SRC_NAME: installed"
 	fi
 fi
 

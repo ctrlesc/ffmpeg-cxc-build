@@ -28,11 +28,11 @@ NCC	OPTIM	-O3
 #source	make	job_count
 #source	disable	
 #source	enable	
-lame	make	1
-fribidi	make	1
-fontconfig	make	1
-freetype	make	1
-harfbuzz	make	1
+#lame	make	1
+#fribidi	make	1
+#fontconfig	make	1
+#freetype	make	1
+#harfbuzz	make	1
 openssl	make	1
 
 #---------------------------
@@ -45,6 +45,7 @@ openssl	make	1
 #ass	url	file://~/src/ass
 #bzip2	url	file://~/src/bzip2
 #dav1d	url	file://~/src/dav1d
+#decklink-linux  url	file://~/src/decklink-linux
 #fdk-aac	url	file://~/src/fdk-aac
 #ffmpeg	url	file://~/src/ffmpeg
 #fftw3	url	file://~/src/fftw3
@@ -82,9 +83,9 @@ openssl	make	1
 #source	fetch_method	revision_id
 aom	git	1478d8607fed2964e1d1c7bb465c0071313c99be
 ass	git	66dba8dd21bbf81b25b26e2556c404006f80a43c
-avisynth	git	b41c55b34cab0c3a3aa91562f225de90f2352b32
 bzip2	git	8ca1faa31f396d94ab927b257f3a05236c84e330
 dav1d	git	5bbd96322035c37a9d20b8624ee83b98a9550ff0
+decklink-linux	git	6e9b591d9a3ad7946d2f401cae9832fef722889e
 fdk-aac	git	8439b745f65bce3fd55ffc9f9edcc04f5f447c55
 ffmpeg	git	14b84a2e997945467e445b1d246ee03a0c3ba806
 fftw3	wget	fftw-3.3.8.tar.gz
