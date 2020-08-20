@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.7"
+SCRIPT_VERSION="1.7.8"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -627,7 +627,7 @@ then
 		cd "$SRC_NAME"_build
 		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Dfreetype=enabled -Dcairo=disabled -Dglib=disabled -Dicu=disabled -Dintrospection=disabled -Dbenchmark=disabled -Ddocs=disabled -Dtests=disabled --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" ".."
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-		build_meson $NCC_JOBS
+		build_meson $CXC_JOBS
 		#now rebuild freetype to be harfbuzz aware
 		set_source "freetype"
 		cd_source
