@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.8"
+SCRIPT_VERSION="1.7.9"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -899,7 +899,7 @@ then
 fi
 
 #x265
-set_source "x265" "hg" "https://bitbucket.org/multicoreware/x265" "libx265"
+set_source "x265" "hg" "http://hg.videolan.org/x265" "libx265"
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
 	fetch_source
