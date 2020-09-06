@@ -115,8 +115,7 @@ samplerate	git
 sdl	hg	
 sofa	git	
 soxr	git	
-#commit below is for srt v1.4.1, head may not build/work as expected
-srt	git	9e52606fae3b32818b5b734d45d3358f4a95cf3f
+srt	git	
 theora	git	
 vmaf	git	
 vorbis	git	
