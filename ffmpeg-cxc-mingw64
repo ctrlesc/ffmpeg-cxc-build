@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.9"
+SCRIPT_VERSION="1.7.10"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -47,7 +47,7 @@ CXC_SOURCE_LIST=\
 )
 
 #lib options
-CXC_FFMPEG_EXTRA_LIBS="-lwinpthread"
+CXC_FFMPEG_EXTRA_LIBS="-lwinpthread -lssp"
 
 #fix pkg-config env
 export PKG_CONFIG_DIR=
@@ -594,7 +594,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared --with-python=no
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS -D_FORTIFY_SOURCE=0" LDFLAGS="-lssp" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared --with-python=no
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
