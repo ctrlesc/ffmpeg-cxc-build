@@ -9,11 +9,11 @@ amf aom ass/ssa avisynth bzip2 dav1d decklink fdk-aac fontconfig freetype frei0r
 
 Debian/Ubuntu/Mint:
 
-sudo apt-get -y install autoconf automake build-essential bsdtar cmake git-core gperf g++-mingw-w64 libtool mercurial meson nasm pkg-config python-lxml ragel subversion texinfo yasm wget
+sudo apt-get -y install autoconf automake build-essential libarchive-tools cmake git-core gperf g++-mingw-w64 libtool mercurial meson nasm pkg-config python-lxml ragel subversion texinfo yasm wget
   
 Fedora:
 
-sudo yum install make autogen automake bsdtar cmake gcc gcc-c++ git gettext-devel gperf kernel-devel libtool mercurial meson mingw64-gcc mingw64-gcc-c++ mingw64-libgomp mingw64-winpthreads-static nasm python2-lxml ragel subversion uuid-devel yasm
+sudo yum install make autogen automake bsdtar cmake gcc gcc-c++ git gettext-devel gperf kernel-devel libtool mercurial meson mingw64-gcc mingw64-gcc-c++ mingw64-libgomp mingw64-winpthreads-static nasm perl-FindBin python-lxml ragel subversion uuid-devel yasm
 
 Arch/Manjaro:
 
