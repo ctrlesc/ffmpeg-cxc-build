@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.11"
+SCRIPT_VERSION="1.7.12"
 THIS="ffmpeg-native"
 
 #build paths
@@ -631,7 +631,7 @@ then
 fi
 
 #fftw3
-set_source "fftw3" "wget" "http://fftw.org/fftw-3.3.8.tar.gz"
+set_source "fftw3" "wget" "http://fftw.org/fftw-3.3.9.tar.gz"
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
 	fetch_source

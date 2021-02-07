@@ -1,5 +1,5 @@
 #------------------------------------------------------
-#ffmpeg-cxc-build-hints-slim - 2020-12-01 working build
+#ffmpeg-cxc-build-hints-slim - 2021-02-06 working build
 #------------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -123,43 +123,50 @@ zlib	enable
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
-amf	git	7a83513f8a0c9f2b2b6270dbb294cd942d27a499
-aom	git	c2875e9326363fec675f2235f7eaf4eb81ce3df6
-ass	git	7a853255bb5083c9c6ab31a29f215875dc8d8251
-avisynth	git	69755f54d26377760f4096048d451f98aeade486
+amf	git	e4a58cffa5c5b74c868808cd5300385c4ba6977e
+aom	git	7926ca6cd1e52b3ed5ff199bf0f532848f89caa6
+ass	git	d1903f5a404ec9f2e5cb4f4fb139333361a4811d
+avisynth	git	41a129336b422dee7d0fb3864ac7a965b68f8f38
 bzip2	git	8ca1faa31f396d94ab927b257f3a05236c84e330
-dav1d	git	d6beb0a055d46d238c7c4ad73afda8bb2f7a2c26
+dav1d	git	ffc4e01c25b5412ce1aad077f5f132b43dcf98d8
 decklink	git	23194d695a3ae4aca7bc6c2f16dd6e7325a41c27
-dlfcn	git	008df693cf5a71b8f1db87731a7b5af87400e5dd
-fdk-aac	git	a0411159e8d9b2357fa9c9cc49638e4f37890e03
-ffmpeg	git	bebea787554fe4481847afabf7107171d6523323
-fftw3	wget	fftw-3.3.8.tar.gz
-fontconfig	git	d06103e3e764bd43758e213414a1716858ab384c
-freetype	git	56c610b145212b7acfb24a17e86fc0ba15aa3052
-frei0r	git	a312322d8350c3670bf56516696ba48599c58bbb
+dlfcn	git	3ec513f9d9fec0cf52aa7e2f2050112499cac581
+fdk-aac	git	6a2eb8b30f4a65d3b9b0422bf14eaf7007149ffd
+ffmpeg	git	4b2968d3055de3d7f1622e93b9aed867b14cdc54
+fftw3	wget	fftw-3.3.9.tar.gz
+fontconfig	git	b58f2798e2bb0c7866455d469dc30f80c2cbd674
+freetype	git	03ceda9701cd8c08ea5b4ee0c2d558a98fc4ed7d
+frei0r	git	86475d3e11e1061bf161e6ed3830fe2cf3d172ac
 fribidi	git	3585a81e625e5b35962bed11fdc99d54485048e0
-harfbuzz	git	53806e5b83cee0e275eac038d0780f95ac56588c
+harfbuzz	git	99184fbe2b22b2662fdf1b29edd9aabc1abc040b
 ladspa	git	0c94d096a2202c83dcb89b5b66bd6047cb0e98c7
 lame	svn	6474
 mfx	git	2cd279f1e8a277c843025c8713c6ed3b4c42b032
-nv-codec-headers	git	315ad740ac77282c7cea67ba31f2e4b373132919
+#v9
+#nv-codec-headers	git	dc0ee86ad5b994ff84f94701bbf5880e022a4869
+#v10
+nv-codec-headers	git	a99740a84b49fd609e04b03279e66c5a8b767440
+#v11
+#nv-codec-headers	git	7a81595786463d1c7efcb03aa85def69fc2cad41
 ogg	git	31bd3f2707fb7dbae539a7093ba1fc4b2b37d84e
-#commit below is for openssl 1.1.1.g, head may not build/work as expected
-openssl	git	e2e09d9fba1187f8d6aafaa34d4172f56f1ffb72
-opus	git	d2f6805c3f36718a742c33c56eb945c2e10646ef
+#commit below is for openssl 1.1.1.i, head may not build/work as expected
+openssl	git	90cebd1b216e0a160fcfd8e0eddca47dad47c183
+opus	git	d633f523e36e3b6d01cc6d57386458d770d618be
 png	git	dbe3e0c43e549a1602286144d94b0666549b18e6
-rubberband	hg	9df2a19b93a3
-samplerate	git	b3f0e9349724510c047a735b2f70fe76afeed47c
-sdl	hg	0ba75e4da3e1
-sofa	git	bc596860a1b70d5785d9b5b1550ceae8059cbb24
+rubberband	hg	60c13e3a6a40
+samplerate	git	7a42f1823814b5ec04fbc62206eaa83671458f36
+sdl	hg	342d5a45885f
+sofa	git	8dda834bf9851357fdaae7a6ebd76b157bb91c7a
 soxr	git	945b592b70470e29f917f4de89b4281fbbd540c0
-srt	git	5bc58cddb92e56532c272034bb4dbfdd7ff529d0
+#commit below is for srt v1.4.2, head may not build/work as expected
+srt	git	50b7af06f3a0a456c172b4cb3aceafa8a5cc0036
 theora	git	7180717276af1ebc7da15c83162d6c5d6203aabf
-vmaf	git	b82432d86b61833108dfa9afe0d863894749d911
+#commit below is for vmaf v2.1.1, head may not build/work as expected
+vmaf	git	8ba4a4b84beb40f97fa01d902e45dde69b18b517
 vorbis	git	83a82dd9296400d811b78c06e9ca429e24dd1e5c
-vpx	git	ebac57ce9250aac85701f5258ec54f9cf9bf14a8
-webp	git	7656f0b3355b94cba0e0b3e096414331a49246c9
-x264	git	4121277b40a667665d4eea1726aefdc55d12d110
-x265	hg	65b6d13ab22a
-xml2	git	3f18e7486d5feb8ae41911ce3c122e05641a4c3d
+vpx	git	0d8354669ac525a27c78bc8c761e98e0f8c3905c
+webp	git	9c367bc6025a4dd35a1d7d6c91e0bd6e4f14f2e3
+x264	git	59c06095de90db362b959a4975d8cc6f1566dbdb
+x265	git	b2445965714d4b94ac41da3a15b7a4bf63d1fe3a
+xml2	git	acb3566739b019ef020c575b891c39121a2420fe
 zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f
