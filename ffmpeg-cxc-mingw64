@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.13"
+SCRIPT_VERSION="1.7.14"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -42,7 +42,7 @@ CXC_SOURCE_LIST=\
 "amf" "aom" "ass" "avisynth" "bzip2" "dav1d" "decklink" "dlfcn" "fdk-aac" "ffmpeg" \
 "fftw3" "fontconfig" "freetype" "frei0r" "fribidi" "harfbuzz" "ladspa" \
 "lame" "mfx" "nv-codec-headers" "ogg" "openssl" "opus" "png" "rubberband" \
-"sdl" "samplerate" "sofa" "soxr" "srt" "theora" "vmaf" "vorbis" \
+"samplerate" "sdl" "sofa" "soxr" "srt" "svt-av1" "theora" "vmaf" "vorbis" \
 "vpx" "webp" "xml2" "x264" "x265" "zlib" \
 )
 
@@ -801,7 +801,7 @@ then
 	then
 		cd_source
 		./autogen.sh
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS  -D_FORTIFY_SOURCE=0" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared --disable-doc
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS -D_FORTIFY_SOURCE=0" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared --disable-doc
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -846,7 +846,22 @@ then
 	then
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_BUILD_TYPE="Release"  -DCMAKE_C_FLAGS_RELEASE="$CXC_OPTIM -DNDEBUG" -DCMAKE_C_FLAGS="$CXC_CFLAGS" -DCMAKE_CXX_FLAGS_RELEASE="$CXC_OPTIM -DNDEBUG" -DCMAKE_CXX_FLAGS="$CXC_CFLAGS" -DCMAKE_CPP_FLAGS="$CXC_CPPFLAGS" -DCMAKE_TOOLCHAIN_FILE="../aom/build/cmake/toolchains/x86_64-mingw-gcc.cmake" -DAOM_TARGET_CPU="x86_64" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 -DENABLE_TOOLS=0 -DENABLE_TESTS=0 "../$SRC_NAME"
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_C_FLAGS_RELEASE="$CXC_OPTIM -DNDEBUG" -DCMAKE_C_FLAGS="$CXC_CFLAGS" -DCMAKE_CXX_FLAGS_RELEASE="$CXC_OPTIM -DNDEBUG" -DCMAKE_CXX_FLAGS="$CXC_CFLAGS" -DCMAKE_CPP_FLAGS="$CXC_CPPFLAGS" -DCMAKE_TOOLCHAIN_FILE="../aom/build/cmake/toolchains/x86_64-mingw-gcc.cmake" -DAOM_TARGET_CPU="x86_64" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 -DENABLE_TOOLS=0 -DENABLE_TESTS=0 "../$SRC_NAME"
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+	fi
+fi
+
+#svtav1
+set_source "svt-av1" "git" "https://gitlab.com/AOMediaCodec/SVT-AV1.git" "libsvtav1"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		mkdir "$SRC_NAME"_build
+		cd "$SRC_NAME"_build
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_C_FLAGS_RELEASE="$CXC_OPTIM -DNDEBUG" -DCMAKE_C_FLAGS="$CXC_CFLAGS" -DCMAKE_CXX_FLAGS_RELEASE="$CXC_OPTIM -DNDEBUG" -DCMAKE_CXX_FLAGS="$CXC_CFLAGS" -DCMAKE_CPP_FLAGS="$CXC_CPPFLAGS" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -856,7 +871,7 @@ fi
 set_source "dav1d" "git" "https://code.videolan.org/videolan/dav1d.git" "libdav1d"
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
-fetch_source
+	fetch_source
 	if [ "$BUILD" -ne 0 ]
 	then
 		mkdir "$SRC_NAME"_build

@@ -1,5 +1,5 @@
 #----------------------------------------------------
-#ffmpeg-native-build-hints - 2021-04-24 working build
+#ffmpeg-native-build-hints - 2021-05-03 working build
 #----------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -67,6 +67,7 @@ openssl	make	1
 #sofa	url	file://~/src/sofa
 #soxr	url	file://~/src/soxr
 #srt	url	file://~/src/srt
+#svt-av1	url	file://~/src/svt-av1
 #theora	url	file://~/src/theora
 #vmaf	url	file://~/src/vmaf
 #vorbis	url	file://~/src/vorbis
@@ -81,19 +82,19 @@ openssl	make	1
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
-aom	git	5d8a6c3fd57f2bb0695b09557817255a9eb20846
-ass	git	49f116ab1fa4386f6a5191f322ac29872279516e
+aom	git	7247e6413ff9742d58d8f601da6e262940695cca
+ass	git	5447214643eacef71776350e779adf4b6c07bb3b
 bzip2	git	8ca1faa31f396d94ab927b257f3a05236c84e330
-dav1d	git	a98f5e6056568de9125c1fbb4f63f525b95e30b1
+dav1d	git	136585101bd5fa8a07a5c7bf66390439a1c7d387
 decklink-linux	git	6e9b591d9a3ad7946d2f401cae9832fef722889e
-fdk-aac	git	5329a829a0349bdf76a743efbb2d3f416b285e94
-ffmpeg	git	718e03e5f297564b828730dfc012fa3f6fbf576b
+fdk-aac	git	801f67f671929311e0c9952c5f92d6e147c7b003
+ffmpeg	git	e27e80edcd3a20efb8520943448aa9353a191ecd
 fftw3	wget	fftw-3.3.9.tar.gz
 fontconfig	git	fd3eebad741c0fdfce2a7e44f9b3ac8895b70a58
-freetype	git	8a459e5172dbb54b42d7b8247c98627d5cefb98d
+freetype	git	ec95f9c9212e9bf9371471f845903bb0e895807d
 frei0r	git	86475d3e11e1061bf161e6ed3830fe2cf3d172ac
 fribidi	git	3585a81e625e5b35962bed11fdc99d54485048e0
-harfbuzz	git	425ba1f4ab4fd1ee0245bc822336d26bd1755c52
+harfbuzz	git	b37f03f16b39d397a626f097858e9ae550234ca0
 ladspa	git	0c94d096a2202c83dcb89b5b66bd6047cb0e98c7
 lame	svn	6505
 #v9
@@ -114,13 +115,14 @@ sofa	git	d70a2a7aa0b20764ca60390a932ee3b23eb1acb6
 soxr	git	945b592b70470e29f917f4de89b4281fbbd540c0
 #commit below is for srt v1.4.2, head may not build/work as expected
 srt	git	50b7af06f3a0a456c172b4cb3aceafa8a5cc0036
+svt-av1	git	7cb05bf7ea102875e24936afc0e5eb08e17c6756
 theora	git	7180717276af1ebc7da15c83162d6c5d6203aabf
 #commit below is for vmaf v2.1.1, head may not build/work as expected
 vmaf	git	8ba4a4b84beb40f97fa01d902e45dde69b18b517
 vorbis	git	4e1155cc77a2c672f3dd18f9a32dbf1404693289
-vpx	git	665cccfd6ccbc1be2db7d550b68388679b573410
-webp	git	8933bac21290a64c15a1a4f492e8152fb7fba48f
+vpx	git	2eb934d9c1fb4a460e3f03c8578b7b4f4f195784
+webp	git	05b72d4205491a9f54ff5449d54f407a91689e8e
 x264	git	c347e7a0b476d77674e2c9a6f137f57da026e8fc
 x265	git	bf91444e034831141e0ce02b1200e51996f8b6c6
-xml2	git	1358d157d0bd83be1dfe356a69213df9fac0b539
+xml2	git	33468d7e7080e384ad703a2369003cf18b2ad91d
 zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f

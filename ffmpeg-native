@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.13"
+SCRIPT_VERSION="1.7.14"
 THIS="ffmpeg-native"
 
 #build paths
@@ -40,7 +40,7 @@ NCC_SOURCE_LIST=\
 "aom" "ass" "bzip2" "dav1d" "decklink-linux" "fdk-aac" "ffmpeg" "fftw3" \
 "fontconfig" "freetype" "frei0r" "fribidi" "harfbuzz" "ladspa" \
 "lame" "nv-codec-headers" "ogg" "openssl" "opus" "png" "rubberband" \
-"sdl" "samplerate" "sofa" "soxr" "srt" "theora" "vmaf" "vorbis" \
+"samplerate" "sdl" "sofa" "soxr" "srt" "svt-av1" "theora" "vmaf" "vorbis" \
 "vpx" "webp" "xml2" "x264" "x265" "zlib" \
 )
 
@@ -807,6 +807,21 @@ then
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
 		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_C_FLAGS_RELEASE="$NCC_OPTIM -DNDEBUG" -DCMAKE_C_FLAGS="$NCC_CFLAGS" -DCMAKE_CXX_FLAGS_RELEASE="$NCC_OPTIM -DNDEBUG" -DCMAKE_CXX_FLAGS="$NCC_CFLAGS" -DCMAKE_CPP_FLAGS="$NCC_CPPFLAGS" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DAOM_TARGET_CPU="x86_64" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 -DENABLE_TOOLS=0 -DENABLE_TESTS=0 "../$SRC_NAME"
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $NCC_JOBS
+	fi
+fi
+
+#svtav1
+set_source "svt-av1" "git" "https://gitlab.com/AOMediaCodec/SVT-AV1.git" "libsvtav1"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		mkdir "$SRC_NAME"_build
+		cd "$SRC_NAME"_build
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_C_FLAGS_RELEASE="$NCC_OPTIM -DNDEBUG" -DCMAKE_C_FLAGS="$NCC_CFLAGS" -DCMAKE_CXX_FLAGS_RELEASE="$NCC_OPTIM -DNDEBUG" -DCMAKE_CXX_FLAGS="$NCC_CFLAGS" -DCMAKE_CPP_FLAGS="$NCC_CPPFLAGS" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi

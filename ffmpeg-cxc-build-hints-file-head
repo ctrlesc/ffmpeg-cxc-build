@@ -71,6 +71,7 @@ samplerate	url	file://~/src/samplerate
 sofa	url	file://~/src/sofa
 soxr	url	file://~/src/soxr
 srt	url	file://~/src/srt
+svt-av1	url	file://~/src/svt-av1
 theora	url	file://~/src/theora
 vmaf	url	file://~/src/vmaf
 vorbis	url	file://~/src/vorbis
@@ -116,6 +117,7 @@ sdl	hg
 sofa	git	
 soxr	git	
 srt	git	
+svt-av1	git	
 theora	git	
 vmaf	git	
 vorbis	git	
