@@ -107,8 +107,8 @@ lame	svn
 mfx	git	
 nv-codec-headers	git	
 ogg	git	
-#commit below is for openssl 1.1.1.g, head may not build/work as expected
-openssl	git	e2e09d9fba1187f8d6aafaa34d4172f56f1ffb72
+#commit below is for openssl 1.1.1.k, head may not build/work as expected
+openssl	git	fd78df59b0f656aefe96e39533130454aa957c00
 opus	git	
 png	git	
 rubberband	hg	
@@ -124,6 +124,6 @@ vorbis	git
 vpx	git	
 webp	git	
 x264	git	
-x265	hg	
+x265	git	
 xml2	git	
 zlib	git	

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.14"
+SCRIPT_VERSION="1.7.15"
 THIS="ffmpeg-native"
 
 #build paths
@@ -624,7 +624,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DLIBSAMPLERATE_TESTS=0 -DLIBSAMPLERATE_EXAMPLES=0 .
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTING=0 -DLIBSAMPLERATE_EXAMPLES=0 .
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -923,7 +923,7 @@ then
 		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DWITHOUT_OPENCV=1 -DBUILD_SHARED_LIBS=0 .
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
-		find "$ROOT_PATH/$OUT_PATH/lib/frei0r" -type f -name "*.so" -print0 | xargs -0 xargs strip
+		find "$ROOT_PATH/$OUT_PATH/lib/frei0r-1" -type f -name "*.so" -print0 | xargs -0 xargs strip
 	fi
 fi
 
