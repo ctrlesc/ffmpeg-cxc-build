@@ -107,13 +107,12 @@ lame	svn
 mfx	git	
 nv-codec-headers	git	
 ogg	git	
-#commit below is for openssl 1.1.1.k, head may not build/work as expected
-openssl	git	fd78df59b0f656aefe96e39533130454aa957c00
+openssl	git	
 opus	git	
 png	git	
 rubberband	hg	
 samplerate	git	
-sdl	hg	
+sdl	git	
 sofa	git	
 soxr	git	
 srt	git	
