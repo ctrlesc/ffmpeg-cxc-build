@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.16"
+SCRIPT_VERSION="1.7.17"
 THIS="ffmpeg-native"
 
 #build paths
@@ -979,7 +979,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		./config no-ssl2 no-ssl3 no-weak-ssl-ciphers no-shared no-hw no-engine no-dso no-err no-tests zlib --prefix="$ROOT_PATH/$OUT_PATH" --openssldir="$ROOT_PATH/$OUT_PATH" "$NCC_OPTIM $NCC_CFLAGS" --with-zlib-include="$ROOT_PATH/$OUT_PATH/include" --with-zlib-lib="$ROOT_PATH/$OUT_PATH/lib"
+		./config no-ssl2 no-ssl3 no-weak-ssl-ciphers no-shared no-hw no-engine no-dso no-err no-tests zlib --prefix="$ROOT_PATH/$OUT_PATH" --libdir="$ROOT_PATH/$OUT_PATH/lib" --openssldir="$ROOT_PATH/$OUT_PATH" "$NCC_OPTIM $NCC_CFLAGS" --with-zlib-include="$ROOT_PATH/$OUT_PATH/include" --with-zlib-lib="$ROOT_PATH/$OUT_PATH/lib"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS install_sw
 	fi
