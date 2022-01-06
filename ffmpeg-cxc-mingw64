@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.18"
+SCRIPT_VERSION="1.7.19"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -709,7 +709,7 @@ then
 		mkdir "$SRC_NAME"_build
 		sed -r -i 's/^system = build_machine\.system\(\)/system = host_machine.system()/' meson.build
 		cd "$SRC_NAME"_build
-		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Dno_shared=true -Dfft=fftw --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" ".."
+		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Dfft=fftw --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" ".."
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS && \
 		cp --verbose -r "../rubberband/" "$ROOT_PATH/$OUT_PATH/include" && \

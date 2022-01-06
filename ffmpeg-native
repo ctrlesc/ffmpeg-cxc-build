@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.18"
+SCRIPT_VERSION="1.7.19"
 THIS="ffmpeg-native"
 
 #build paths
@@ -669,7 +669,7 @@ then
 		cd_source
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Dno_shared=true -Dfft=fftw --strip ".."
+		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Dfft=fftw --strip ".."
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $NCC_JOBS && \
 		cp --verbose -r "../rubberband/" "$ROOT_PATH/$OUT_PATH/include" && \
