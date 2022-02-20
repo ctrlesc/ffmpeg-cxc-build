@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.19"
+SCRIPT_VERSION="1.7.20"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -979,7 +979,7 @@ then
 		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DWITHOUT_OPENCV=1 -DBUILD_SHARED_LIBS=0 .
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
-		find "$ROOT_PATH/$OUT_PATH/lib/frei0r-1" -type f -name "*.dll" -print0 | xargs -0 xargs strip
+		find "$ROOT_PATH/$OUT_PATH/lib/frei0r-1" -type f -name "*.dll" -print0 | xargs -0 strip
 	fi
 fi
 
@@ -1054,7 +1054,7 @@ then
 		cd "$SRC_NAME"_build
 		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DHEADERS_ONLY=1 ..
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
-		build_make $CXC_JOBS
+		build_make $CXC_JOBS VersionGen install
 	fi
 fi
 
