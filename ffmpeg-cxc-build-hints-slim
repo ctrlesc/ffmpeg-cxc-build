@@ -1,5 +1,5 @@
 #------------------------------------------------------
-#ffmpeg-cxc-build-hints-slim - 2022-03-27 working build
+#ffmpeg-cxc-build-hints-slim - 2022-04-24 working build
 #------------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -124,23 +124,22 @@ zlib	enable
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
-
-amf	git	fbf12cd39fe1812ed902525a1c001307b94871b9
-aom	git	4becfef8dc7a17a54307d64eeee26bc48943016f
-ass	git	5f0e8450f834894b2745238e3d32ff4878710ec8
-avisynth	git	bc1224b9b801a9a6283ec0b0efa2e90e4a7371ba
-bzip2	git	8ca1faa31f396d94ab927b257f3a05236c84e330
-dav1d	git	87f9a81cd770e49394a45deca7a3df41243de00b
+amf	git	053040d662b4d88d9994dc706b948ee409292537
+aom	git	93e83ff473b20e983c6b9bf6ba8d208c70a31188
+ass	git	0e0f9da2edc8eead93f9bf0ac4ef0336ad646ea7
+avisynth	git	23f945532f22c75fa1c8e7b99c129b25b88f1cc8
+bzip2	git	64d6fa68c1af46f6408f832443ce23709a2f0a66
+dav1d	git	bfc1178f911543739fe50697998d9df69ad2f201
 decklink	git	23194d695a3ae4aca7bc6c2f16dd6e7325a41c27
-dlfcn	git	123c746159233847b91648b39a4a5f6940a1ff2b
+dlfcn	git	9d0ef119d9fcb9139f831adc224857b791c81140
 fdk-aac	git	072f2cdafdd2bb7ed2d630d09c2a5697a4aec53d
-ffmpeg	git	c2d1597a8a6470045a8da241d4f65c81f26c3107
+ffmpeg	git	16463520d9de05481320303dd49ea5158c715c9f
 fftw3	wget	fftw-3.3.10.tar.gz
-fontconfig	git	d485760bbefba003c974699d0277f61697bf6282
-freetype	git	a8e4563c3418ed74d39019a6c5e2122d12c8f56f
-frei0r	git	febd73874dab6be330398a3b55112451b36ee939
-fribidi	git	f22593b82b5d1668d1997dbccd10a9c31ffea3b3
-harfbuzz	git	0dcbdbde9cff68384bb3a5b9847283ca0676e54a
+fontconfig	git	d863f6778915f7dd224c98c814247ec292904e30
+freetype	git	079a22da037835daf5be2bd9eccf7bc1eaa2e783
+frei0r	git	114a72f438fa04c5d12593e38dac148dbb9ce10c
+fribidi	git	6428d8469e536bcbb6e12c7b79ba6659371c435a
+harfbuzz	git	6695bf056065f2e2e56c0e00b9740e6685a8af28
 ladspa	git	d99a0db521d13a87bdaa418c674ca8858e484452
 lame	svn	6507
 mfx	git	7e4d221c36c630c1250b23a5dfa15657bc04c10c
@@ -153,23 +152,23 @@ nv-codec-headers	git	b641a195edbe3ac9788e681e22c2e2fad8aacddb
 ogg	git	3069cc2bb44160982cdb21b2b8f0660c76b17572
 #commit below is for openssl 1.1.1.n, head may not build/work as expected
 openssl	git	d82e959e621a3d597f1e0d50ff8c2d8b96915fd7
-opus	git	c6f98577716d39907264d5388b74b5be5dea3d6c
+opus	git	ccaaffa9a3ee427e9401c4dcf6462e378d9a4694
 png	git	a37d4836519517bdce6cb9d956092321eca3e73b
-rubberband	hg	dd230c9836d9
+rubberband	hg	49636f065ade
 samplerate	git	4909e679b3e268a1403608cbd860f3895549b0d5
-sdl	git	6d1c3cd6918aa84fe2a0ba7d895169a4f69233bc
-sofa	git	52590e103faf3efd456035ca820a1ae71ee15c6e
+sdl	git	fa073ed01aff3b0fe32edfccd4806a311c8ea214
+sofa	git	29deb800f6e363a3a6de67c47bdff8a2192242c1
 soxr	git	945b592b70470e29f917f4de89b4281fbbd540c0
 #commit below is for srt v1.4.4, head may not build/work as expected
 srt	git	8b32f3734ff6af7cc7b0fef272591cb80a2d1aae
-svt-av1	git	df313c624130847cbd1a47b3b0b4c90b608a2d7a
+svt-av1	git	da60d7c6e27c08806da0b493d5d3fc0a08629102
 theora	git	7180717276af1ebc7da15c83162d6c5d6203aabf
 #commit below is for vmaf v2.3.0, head may not build/work as expected
 vmaf	git	5c1c9bfaad599796921b59873e9c3ed74a29c6ff
 vorbis	git	84c023699cdf023a32fa4ded32019f194afcdad0
-vpx	git	b0087f6cd2c3a2076847d52efd824007dd7693f7
-webp	git	7a68afaac56306b4d118a6a969d5acd252a3dbc1
+vpx	git	618739f59f5d3505ff76a1a82eb198bed4ec989d
+webp	git	dc3841e077c522be3a011a50d78c717d2656eab9
 x264	git	bfc87b7a330f75f5c9a21e56081e4b20344f139e
 x265	git	9b59d45549f460e41a852cfd276f9b89eed2112a
-xml2	git	968495442964f3ea72499dfbdba9e2fa9d77f9b7
-zlib	git	cacf7f1d4e3d44d871b605da3b647f07d718623f
+xml2	git	65b01647bf90019bea271eb0a217cf4365c20af6
+zlib	git	21767c654d31d2dccdde4330529775c6c5fd5389
