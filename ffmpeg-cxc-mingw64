@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.20"
+SCRIPT_VERSION="1.7.21"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -504,7 +504,7 @@ then
 		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DBUILD_SHARED_LIBS=0 .
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
-		cp "$ROOT_PATH/$OUT_PATH/lib/libzlibstatic.a" "$ROOT_PATH/$OUT_PATH/lib/libz.a"
+		cp -pv "$ROOT_PATH/$OUT_PATH/lib/libzlibstatic.a" "$ROOT_PATH/$OUT_PATH/lib/libz.a"
 	fi
 fi
 
@@ -692,7 +692,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		cp --verbose ladspa.h "$ROOT_PATH/$OUT_PATH/include"
+		cp -pv ladspa.h "$ROOT_PATH/$OUT_PATH/include"
 		[ $? -eq 0 ] || build_die "$THIS: install stage failed -> $SRC_NAME"
 		build_message BM_GREEN "$SRC_NAME: installed"
 	fi
@@ -712,7 +712,7 @@ then
 		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Dfft=fftw --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" ".."
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS && \
-		cp --verbose -r "../rubberband/" "$ROOT_PATH/$OUT_PATH/include" && \
+		cp -pv -r "../rubberband/" "$ROOT_PATH/$OUT_PATH/include" && \
 		[ $? -eq 0 ] || build_die "$THIS: make stage failed -> $SRC_NAME"
 		build_message BM_GREEN "$SRC_NAME: installed"
 		CXC_FFMPEG_EXTRA_LIBS="$CXC_FFMPEG_EXTRA_LIBS -lsamplerate -lfftw3"
@@ -1010,7 +1010,7 @@ then
 	then
 		cd_source
 		mkdir --parents "$ROOT_PATH/$OUT_PATH"/include/AMF && \
-		cp --verbose -r amf/public/include/* "$ROOT_PATH/$OUT_PATH"/include/AMF && \
+		cp -pv -r amf/public/include/* "$ROOT_PATH/$OUT_PATH"/include/AMF && \
 		[ $? -eq 0 ] || build_die "$THIS: make stage failed -> $SRC_NAME"
 		build_message BM_GREEN "$SRC_NAME: installed"
 	fi
@@ -1027,6 +1027,7 @@ then
 		autoreconf -fiv
 		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" "$CXC_BUILD" --bindir="$BIN_PATH" --enable-static --disable-shared
 		build_make $CXC_JOBS
+		cp -pv "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/libmfx.pc" "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/mfx.pc"
 	fi
 fi
 
