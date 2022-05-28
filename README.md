@@ -3,17 +3,17 @@ Fast cross-compile ffmpeg for Windows with MinGW on Linux and Cygwin to produce 
 
 **Enabled Features**
 
-amf aom ass/ssa avisynth bzip2 dav1d decklink fdk-aac fontconfig freetype frei0r fribidi harfbuzz lame mfx/qsv nvenc/nvdec ogg openssl opus png rubberband sdl sofalizer soxr srt theora vmaf vorbis vpx webp x264 x265(8/10/12-bit) xml2 zlib
+amf aom ass/ssa avisynth bzip2 dav1d decklink fdk-aac fontconfig freetype frei0r fribidi harfbuzz lame mfx/qsv nvenc/nvdec ogg openssl opus png rubberband sdl sofalizer soxr srt svt-av1 theora vmaf vorbis vpx webp x264 x265(8/10/12-bit) xml2 zlib
 
 **Package Requirements**
 
 Debian/Ubuntu/Mint:
 
-sudo apt-get -y install autoconf automake build-essential libarchive-tools cmake git-core gperf g++-mingw-w64 libtool mercurial meson nasm pkg-config python-lxml ragel subversion texinfo yasm wget
+sudo apt-get -y install autoconf automake autopoint build-essential libarchive-tools cmake git-core gperf g++-mingw-w64 libtool mercurial meson nasm pkg-config python3-lxml ragel subversion texinfo yasm wget
   
 Fedora:
 
-sudo yum install make autogen automake bsdtar cmake gcc gcc-c++ git gettext-devel gperf kernel-devel libtool mercurial meson mingw64-gcc mingw64-gcc-c++ mingw64-libgomp mingw64-winpthreads-static nasm perl-FindBin python-lxml ragel subversion uuid-devel yasm
+sudo yum install make autogen automake bsdtar cmake gcc gcc-c++ git gettext-devel gperf kernel-devel libtool mercurial meson mingw64-gcc mingw64-gcc-c++ mingw64-libgomp mingw64-winpthreads-static nasm perl-FindBin python3-lxml ragel subversion uuid-devel yasm
 
 Arch/Manjaro:
 
