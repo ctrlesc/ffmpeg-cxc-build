@@ -31,6 +31,14 @@ The mingw toolchain files must be in the path, and a link from the mingw sys-roo
 	export PATH=$PATH:/usr/x86_64-w64-mingw32/sys-root/mingw/bin
 	HINTS_FILE=~/ffmpeg-cxc-build-hints ffmpeg-cxc-mingw64
 
+**rav1e/cargo Installation**
+
+If you want to enable the rav1e AV1 encoder, you will need to install the rust toolchain. A minimal working toolchain with support for the x86_64-pc-windows-gnu target can be installed as below.
+
+	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+	source "$HOME/.cargo/env"
+	cargo install cargo-c
+	rustup target add x86_64-pc-windows-gnu
 **Example Build Procedure**
 
 Assumptions: ROOT_PATH is left to the default ($HOME) and *ffmpeg-cxc-mingw64* is executable in the environment's path.
