@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.21"
+SCRIPT_VERSION="1.8.0"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -19,6 +19,7 @@ CXC_HOST="x86_64-w64-mingw32"
 CXC_OPTIM="-O2"
 CXC_CFLAGS="-mtune=generic -march=x86-64 -pipe"
 CXC_CPPFLAGS="-DNDEBUG -I$ROOT_PATH/$OUT_PATH/include"
+CXC_RUSTFLAGS=""
 CXC_BUILD=""
 CXC_MACHINE="$(uname -m | tr '[:upper:]' '[:lower:]')"
 CXC_OS="$(uname -o | tr '[:upper:]' '[:lower:]')"
@@ -29,7 +30,7 @@ CXC_SHOW_ONLY="${CXC_SHOW_ONLY:-0}"
 CXC_DISABLE_DEFAULT="${CXC_DISABLE_DEFAULT:-0}"
 CXC_OPTION_LIST=\
 ( \
-"HOST" "OPTIM" "CFLAGS" "JOBS" "FETCH_ONLY" "SHOW_ONLY" "DISABLE_DEFAULT" \
+"HOST" "OPTIM" "CFLAGS" "JOBS" "FETCH_ONLY" "SHOW_ONLY" "DISABLE_DEFAULT" "RUSTFLAGS" \
 )
 
 CXC_SYSTEM_LIST=\
@@ -41,9 +42,9 @@ CXC_SOURCE_LIST=\
 ( \
 "amf" "aom" "ass" "avisynth" "bzip2" "dav1d" "decklink" "dlfcn" "fdk-aac" "ffmpeg" \
 "fftw3" "fontconfig" "freetype" "frei0r" "fribidi" "harfbuzz" "ladspa" \
-"lame" "mfx" "nv-codec-headers" "ogg" "openssl" "opus" "png" "rubberband" \
-"samplerate" "sdl" "sofa" "soxr" "srt" "svt-av1" "theora" "vmaf" "vorbis" \
-"vpx" "webp" "xml2" "x264" "x265" "zlib" \
+"lame" "mfx" "nv-codec-headers" "ogg" "openssl" "opus" "png" "rav1e" \
+"rubberband" "samplerate" "sdl" "sofa" "soxr" "srt" "svt-av1" "theora" "vmaf" \
+"vorbis" "vpx" "webp" "xml2" "x264" "x265" "zlib" \
 )
 
 #lib options
@@ -879,6 +880,19 @@ then
 		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Denable_tools=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
+	fi
+fi
+
+#rav1e
+set_source "rav1e" "git" "https://github.com/xiph/rav1e.git" "librav1e"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		RUSTFLAGS="${CXC_RUSTFLAGS}" cargo cinstall --prefix="$ROOT_PATH/$OUT_PATH" --lib --release --target x86_64-pc-windows-gnu --dlltool=/usr/bin/x86_64-w64-mingw32-dlltool
+		[ $? -eq 0 ] || build_die "$THIS: build stage failed -> $SRC_NAME"
 	fi
 fi
 

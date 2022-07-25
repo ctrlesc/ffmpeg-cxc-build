@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.7.20"
+SCRIPT_VERSION="1.8.0"
 THIS="ffmpeg-native"
 
 #build paths
@@ -18,6 +18,7 @@ NCC_PATH_LIST=\
 NCC_OPTIM="-O2"
 NCC_CFLAGS="-mtune=generic -march=x86-64 -pipe"
 NCC_CPPFLAGS="-DNDEBUG -I$ROOT_PATH/$OUT_PATH/include"
+NCC_RUSTFLAGS=""
 NCC_MACHINE="$(uname -m | tr '[:upper:]' '[:lower:]')"
 NCC_OS="$(uname -o | tr '[:upper:]' '[:lower:]')"
 #make settings
@@ -27,7 +28,7 @@ NCC_SHOW_ONLY="${NCC_SHOW_ONLY:-0}"
 NCC_DISABLE_DEFAULT="${NCC_DISABLE_DEFAULT:-0}"
 NCC_OPTION_LIST=\
 ( \
-"HOST" "OPTIM" "CFLAGS" "JOBS" "FETCH_ONLY" "SHOW_ONLY" "DISABLE_DEFAULT" \
+"HOST" "OPTIM" "CFLAGS" "JOBS" "FETCH_ONLY" "SHOW_ONLY" "DISABLE_DEFAULT" "RUSTFLAGS" \
 )
 
 NCC_SYSTEM_LIST=\
@@ -39,7 +40,7 @@ NCC_SOURCE_LIST=\
 ( \
 "aom" "ass" "bzip2" "dav1d" "decklink-linux" "fdk-aac" "ffmpeg" "fftw3" \
 "fontconfig" "freetype" "frei0r" "fribidi" "harfbuzz" "ladspa" \
-"lame" "nv-codec-headers" "ogg" "openssl" "opus" "png" "rubberband" \
+"lame" "nv-codec-headers" "ogg" "openssl" "opus" "png" "rav1e" "rubberband" \
 "samplerate" "sdl" "sofa" "soxr" "srt" "svt-av1" "theora" "vmaf" "vorbis" \
 "vpx" "webp" "xml2" "x264" "x265" "zlib" \
 )
@@ -842,6 +843,18 @@ then
 	fi
 fi
 
+#rav1e
+set_source "rav1e" "git" "https://github.com/xiph/rav1e.git" "librav1e"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		RUSTFLAGS="${NCC_RUSTFLAGS}" cargo cinstall --prefix="$ROOT_PATH/$OUT_PATH" --lib --release
+		[ $? -eq 0 ] || build_die "$THIS: build stage failed -> $SRC_NAME"
+	fi
+fi
 #vpx
 set_source "vpx" "git" "https://chromium.googlesource.com/webm/libvpx.git" "libvpx"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -1016,9 +1029,12 @@ then
 	fi
 fi
 
-#move shared libs to 'misc' to hide from linker
-find "$ROOT_PATH/$OUT_PATH/lib" -type f -a -! -path "*/frei0r-1/*" -a -\( -name "*.so" -o -name "*.so.*" -\) -exec mv -t "$ROOT_PATH/$OUT_PATH/misc" '{}' \;
-find "$ROOT_PATH/$OUT_PATH/lib" -type l -a -\( -name "*.so" -o -name "*.so.*" -\) -exec rm '{}' \;
+if [ "$BUILD" -ne 0 ]
+then
+	#move shared libs to 'misc' to hide from linker
+	find "$ROOT_PATH/$OUT_PATH/lib" -type f -a -! -path "*/frei0r-1/*" -a -\( -name "*.so" -o -name "*.so.*" -\) -exec mv -t "$ROOT_PATH/$OUT_PATH/misc" '{}' \;
+	find "$ROOT_PATH/$OUT_PATH/lib" -type l -a -\( -name "*.so" -o -name "*.so.*" -\) -exec rm '{}' \;
+fi
 
 #ffmpeg
 set_source "ffmpeg" "git" "https://git.ffmpeg.org/ffmpeg.git" "gpl" "version3" "nonfree"

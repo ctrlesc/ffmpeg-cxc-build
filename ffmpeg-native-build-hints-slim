@@ -1,5 +1,5 @@
 #---------------------------------------------------------
-#ffmpeg-native-build-hints-slim - 2022-07-03 working build
+#ffmpeg-native-build-hints-slim - 2022-07-25 working build
 #---------------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -15,6 +15,7 @@
 NCC	CFLAGS	-mtune=generic -march=x86-64 -pipe
 #x86-64 generic skylake broadwell haswell ivybridge sandybridge corei7-avx westmere nehalem
 NCC	OPTIM	-O3
+NCC	RUSTFLAGS	-C target-feature=+avx2,+fma
 #override getconf _NPROCESSORS_ONLN
 #NCC	JOBS	6
 #use FETCH_ONLY to clone all the repositories without a build
@@ -87,6 +88,7 @@ zlib	enable
 #ladspa	url	file://~/src/ladspa
 #nv-codec-headers	url	file://~/src/nv-codec-headers
 #png	url	file://~/src/png
+#rav1e	url	file://~/src/rav1e
 #rubberband	url	file://~/src/rubberband
 #samplerate	url	file://~/src/samplerate
 #sofa	url	file://~/src/sofa
@@ -116,47 +118,48 @@ zlib	enable
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
-aom	git	402e264b94fd74bdf66837da216b6251805b4ae4
-ass	git	a2b39cde4ecb74d5e6fccab4a5f7d8ad52b2b1a4
+aom	git	9473c4783bed901d9f34931ac810ab3089c6efdd
+ass	git	7bc0c45dd58de6afa1800f8e8a94285e7535d68d
 bzip2	git	9de658d248f9fd304afa3321dd7a9de1280356ec
-dav1d	git	233737c9b18e84372701e89bf57098257a30c8e4
+dav1d	git	a029d6892c5c39f4cda629d4a3b676ef2e8288f6
 decklink-linux	git	6e9b591d9a3ad7946d2f401cae9832fef722889e
 fdk-aac	git	3f864cce9736cc8e9312835465fae18428d76295
-ffmpeg	git	33fe3b73c2d4dec674509de5dc48698895f0806b
+ffmpeg	git	cddb25c84859d04c9d4c4d8e86ece8a07632d99d
 fftw3	wget	fftw-3.3.10.tar.gz
-fontconfig	git	fe2fa4d1f4a0aaf4092c8f5e3e5b40e567c8f2b7
-freetype	git	1a242558be670626ed2ec62efb1909c000b2cae7
+fontconfig	git	fd0753af88f746fd3d729bf6e1df08eefeeaa3ac
+freetype	git	9a00282efce6350e438cd2b9ef779cbc4a5c4d8b
 frei0r	git	a9d15ff07e130baf3408da6e1f1b22f82e7c62b6
 fribidi	git	6428d8469e536bcbb6e12c7b79ba6659371c435a
-harfbuzz	git	cb5a6b5a27cfe616113bafe7f23ad33f1b0d0a1e
-ladspa	git	d99a0db521d13a87bdaa418c674ca8858e484452
+harfbuzz	git	1945b400da4bb9fbc50e51b3e61f5d0c171c11c0
+ladspa	git	7559ebea07eb289ca90a40f72ec2b9d3844b33c3
 lame	svn	6507
 #v9
 #nv-codec-headers	git	7c533c80e68e6a857807a180c771adc764203ef9
 #v10
-#nv-codec-headers	git	43adb856807855d7742da53181b181e4ef25344a
+nv-codec-headers	git	43adb856807855d7742da53181b181e4ef25344a
 #v11
-nv-codec-headers	git	84483da70d903239d4536763fde8c7e6c4e80784
+#nv-codec-headers	git	84483da70d903239d4536763fde8c7e6c4e80784
 ogg	git	3069cc2bb44160982cdb21b2b8f0660c76b17572
-#commit below is for openssl 1.1.1.p, head may not build/work as expected
-openssl	git	8aaca20cf9996257d1ce2e6f4d3059b3698dde3d
-opus	git	3acaa70965c5570ef1711fee9b3a15eac3e74ffe
+#commit below is for openssl 1.1.1.q, head may not build/work as expected
+openssl	git	29708a562a1887a91de0fa6ca668c71871accde9
+opus	git	ab04fbb1b7d0b727636d28fc2cadb5df9febe515
 png	git	a37d4836519517bdce6cb9d956092321eca3e73b
-rubberband	hg	dbec65481a5e
+rav1e	git	00def0fc623f58a38f010c03ce5a107e15ace062
+rubberband	hg	fed4b9778f7f
 samplerate	git	aee38d0bc797d0d1a3774ef574af1d5d248d2398
-sdl	git	2a25b69ba580ff63ede93f2b19fa1bca09dab484
+sdl	git	1e492b2f6d6ee76f414047d5729d083dbc547d4f
 sofa	git	9c419b6adf3737ffc33ba894e1017335aa6b9998
 soxr	git	945b592b70470e29f917f4de89b4281fbbd540c0
 #commit below is for srt v1.5.0, head may not build/work as expected
 srt	git	060c0d1a2af8082c053018fa6a6fe2dba67d71a8
-svt-av1	git	80114c8c8271c2707e8f817674444d674fbd05bf
+svt-av1	git	d72a9e11561cec0245227efbcef98c4d477bf086
 theora	git	7180717276af1ebc7da15c83162d6c5d6203aabf
 #commit below is for vmaf v2.3.1, head may not build/work as expected
 vmaf	git	f2661673a078718ddfc1ddb6042048c1b1284946
 vorbis	git	84c023699cdf023a32fa4ded32019f194afcdad0
-vpx	git	888bafc78d8bddb5cfc4262c93f456c812763571
-webp	git	8ea81561d2fdd382da60f57958741a7c23a18eb6
+vpx	git	78c9a61f794b122e131d15e715564127ae974046
+webp	git	7366f7f394af26de814296152c50e673ed0a832f
 x264	git	baee400fa9ced6f5481a728138fed6e867b0ff7f
-x265	git	9b59d45549f460e41a852cfd276f9b89eed2112a
-xml2	git	ca2c91f139426f63646292da58a15a1511dccc0f
+x265	git	20255e6f0ead5b2ef65a520f202cedd5965f8541
+xml2	git	5930fe01963136ab92125feec0c6204d9c9225dc
 zlib	git	21767c654d31d2dccdde4330529775c6c5fd5389
