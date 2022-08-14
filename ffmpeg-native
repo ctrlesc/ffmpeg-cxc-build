@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.8.0"
+SCRIPT_VERSION="1.8.1"
 THIS="ffmpeg-native"
 
 #build paths
@@ -436,6 +436,7 @@ then
 	echo 'SET(CMAKE_MODULE_LINKER_FLAGS           "-static-libgcc -static-libstdc++ -s"'"         $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo 'SET(CMAKE_SHARED_LINKER_FLAGS           "-static-libgcc -static-libstdc++ -static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo 'SET(CMAKE_EXE_LINKER_FLAGS              "-static-libgcc -static-libstdc++ -static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+
 fi
 
 #display the detected system type and hints file in use
@@ -855,6 +856,7 @@ then
 		[ $? -eq 0 ] || build_die "$THIS: build stage failed -> $SRC_NAME"
 	fi
 fi
+
 #vpx
 set_source "vpx" "git" "https://chromium.googlesource.com/webm/libvpx.git" "libvpx"
 if [ "${!SRC_ENABLE}" -ne 0 ]
@@ -922,6 +924,10 @@ then
 		[ $? -eq 0 ] || build_die "$THIS: (ar) multilib merge failed -> $SRC_NAME"
 
 		build_make $NCC_JOBS
+		if [[ "$NCC_FFMPEG_EXTRA_LIBS" != *"lstdc++"* ]]
+		then
+			NCC_FFMPEG_EXTRA_LIBS="$NCC_FFMPEG_EXTRA_LIBS -lstdc++"
+		fi
 	fi
 fi
 
@@ -1025,7 +1031,10 @@ then
 		CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS $NCC_CPPFLAGS" CFLAGS="$NCC_OPTIM $NCC_CFLAGS $NCC_CPPFLAGS" meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Denable_docs=false -Denable_tests=false --strip "../lib$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $NCC_JOBS
-		NCC_FFMPEG_EXTRA_LIBS="$NCC_FFMPEG_EXTRA_LIBS -lstdc++"
+		if [[ "$NCC_FFMPEG_EXTRA_LIBS" != *"lstdc++"* ]]
+		then
+			NCC_FFMPEG_EXTRA_LIBS="$NCC_FFMPEG_EXTRA_LIBS -lstdc++"
+		fi
 	fi
 fi
 

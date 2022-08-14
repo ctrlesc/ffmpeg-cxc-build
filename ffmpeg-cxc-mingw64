@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.8.0"
+SCRIPT_VERSION="1.8.1"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -458,6 +458,7 @@ then
 	echo "cpu_family = 'x86_64'"                               >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "cpu = 'x86_64'"                                      >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "endian = 'little'"                                   >> $ROOT_PATH/$SRC_PATH/cross.meson
+
 fi
 
 #test and fix cross for cygwin build environment
@@ -891,7 +892,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		RUSTFLAGS="${CXC_RUSTFLAGS}" cargo cinstall --prefix="$ROOT_PATH/$OUT_PATH" --lib --release --target x86_64-pc-windows-gnu --dlltool=/usr/bin/x86_64-w64-mingw32-dlltool
+		PKG_CONFIG_LIBDIR="" RUSTFLAGS="${CXC_RUSTFLAGS}" cargo cinstall --prefix="$ROOT_PATH/$OUT_PATH" --lib --release --target x86_64-pc-windows-gnu --dlltool=/usr/bin/x86_64-w64-mingw32-dlltool
 		[ $? -eq 0 ] || build_die "$THIS: build stage failed -> $SRC_NAME"
 	fi
 fi
@@ -965,6 +966,10 @@ then
 		[ $? -eq 0 ] || build_die "$THIS: (ar) multilib merge failed -> $SRC_NAME"
 
 		build_make $CXC_JOBS
+		if [[ "$CXC_FFMPEG_EXTRA_LIBS" != *"lstdc++"* ]]
+		then
+			CXC_FFMPEG_EXTRA_LIBS="$CXC_FFMPEG_EXTRA_LIBS -lstdc++"
+		fi
 	fi
 fi
 
@@ -1126,7 +1131,10 @@ then
 		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Denable_docs=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../lib$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
-		CXC_FFMPEG_EXTRA_LIBS="$CXC_FFMPEG_EXTRA_LIBS -lstdc++"
+		if [[ "$CXC_FFMPEG_EXTRA_LIBS" != *"lstdc++"* ]]
+		then
+			CXC_FFMPEG_EXTRA_LIBS="$CXC_FFMPEG_EXTRA_LIBS -lstdc++"
+		fi
 	fi
 fi
 
