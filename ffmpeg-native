@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.8.1"
+SCRIPT_VERSION="1.8.2"
 THIS="ffmpeg-native"
 
 #build paths
@@ -897,7 +897,7 @@ then
 		build_message BM_WHITE "$SRC_NAME: configuring 12-bit"
 		mkdir "$SRC_NAME"_build_12
 		cd "$SRC_NAME"_build_12
-		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DENABLE_SHARED=0 -DENABLE_CLI=0 -DENABLE_TESTS=0 -DHIGH_BIT_DEPTH=1 -DMAIN12=1 -DEXPORT_C_API=0 ../source
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy -DENABLE_SHARED=0 -DENABLE_CLI=0 -DENABLE_TESTS=0 -DHIGH_BIT_DEPTH=1 -DMAIN12=1 -DEXPORT_C_API=0 ../source
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		make -j$NCC_JOBS
 		[ $? -eq 0 ] || build_die "$THIS: make stage failed -> $SRC_NAME"
@@ -905,7 +905,7 @@ then
 		build_message BM_WHITE "$SRC_NAME: configuring 10-bit"
 		mkdir ../"$SRC_NAME"_build_10
 		cd ../"$SRC_NAME"_build_10
-		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DENABLE_SHARED=0 -DENABLE_CLI=0 -DENABLE_TESTS=0 -DHIGH_BIT_DEPTH=1 -DEXPORT_C_API=0 ../source
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy -DENABLE_SHARED=0 -DENABLE_CLI=0 -DENABLE_TESTS=0 -DHIGH_BIT_DEPTH=1 -DEXPORT_C_API=0 ../source
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		make -j$NCC_JOBS
 		[ $? -eq 0 ] || build_die "$THIS: make stage failed -> $SRC_NAME"
@@ -915,7 +915,7 @@ then
 		cd ../"$SRC_NAME"_build
 		ln -sf ../"$SRC_NAME"_build_12/libx265.a libx265_main12.a
 		ln -sf ../"$SRC_NAME"_build_10/libx265.a libx265_main10.a
-		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DENABLE_SHARED=0 -DENABLE_CLI=0 -DENABLE_TESTS=0 -DLINKED_10BIT=ON -DLINKED_12BIT=ON -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS="-L." ../source
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy -DENABLE_SHARED=0 -DENABLE_CLI=0 -DENABLE_TESTS=0 -DLINKED_10BIT=ON -DLINKED_12BIT=ON -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS="-L." ../source
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		make -j$NCC_JOBS
 		[ $? -eq 0 ] || build_die "$THIS: make stage failed -> $SRC_NAME"
