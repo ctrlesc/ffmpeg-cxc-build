@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.8.2"
+SCRIPT_VERSION="1.8.4"
 THIS="ffmpeg-native"
 
 #build paths
@@ -424,18 +424,18 @@ then
 	echo "SET(CMAKE_CXX_COMPILER                 g++                                              $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_C_FLAGS                     \"$NCC_CFLAGS -I $ROOT_PATH/$OUT_PATH/include\"   $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_C_FLAGS_RELEASE             \"$NCC_OPTIM -DNDEBUG\"                           $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
-	echo "SET(CMAKE_CXX_FLAGS                   \"$NCC_CFLAGS -I $ROOT_PATH/$OUT_PATH/include\"   $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo "SET(CMAKE_CXX_FLAGS                   \"$NCC_CFLAGS -fpermissive -I $ROOT_PATH/$OUT_PATH/include\"   $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_CXX_FLAGS_RELEASE           \"$NCC_OPTIM -DNDEBUG\"                           $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_CPP_FLAGS                   \"$NCC_CPPFLAGS\"                                 $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_ASM_YASM_COMPILER             yasm                                            $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_ASM_NASM_COMPILER             nasm                                            $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	echo "SET(CMAKE_FIND_LIBRARY_SUFFIXES         .a                                              $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
-	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_C_FLAGS   "-static-libgcc -static-libstdc++ -static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
-	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_CXX_FLAGS "-static-libgcc -static-libstdc++ -static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_C_FLAGS   "-static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo 'SET(CMAKE_STATIC_LIBRARY_LINK_CXX_FLAGS "-static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 	#echo 'SET(CMAKE_STATIC_LINKER_FLAGS           "-static-libgcc -static-libstdc++ -static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
-	echo 'SET(CMAKE_MODULE_LINKER_FLAGS           "-static-libgcc -static-libstdc++ -s"'"         $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
-	echo 'SET(CMAKE_SHARED_LINKER_FLAGS           "-static-libgcc -static-libstdc++ -static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
-	echo 'SET(CMAKE_EXE_LINKER_FLAGS              "-static-libgcc -static-libstdc++ -static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo 'SET(CMAKE_MODULE_LINKER_FLAGS           "-s"'"         $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo 'SET(CMAKE_SHARED_LINKER_FLAGS           "-static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
+	echo 'SET(CMAKE_EXE_LINKER_FLAGS              "-static -s"'" $FORCE_CMAKE_VALUE)" >> $ROOT_PATH/$SRC_PATH/native.cmake
 
 fi
 
@@ -689,7 +689,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DZLIB_LIBRARY="$ROOT_PATH/$OUT_PATH/lib/libz.a" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0 -DCODE_COVERAGE=0 .
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DZLIB_LIBRARY="$ROOT_PATH/$OUT_PATH/lib/libz.a" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0 -DCODE_COVERAGE=0 .
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -703,7 +703,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DBUILD_SHARED_LIBS=0 -DBUILD_EXAMPLES=0 -DBUILD_TESTS=0 -DBUILD_LSR_TESTS=0 .
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DBUILD_EXAMPLES=0 -DBUILD_TESTS=0 -DBUILD_LSR_TESTS=0 .
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 		NCC_FFMPEG_EXTRA_LIBS="$NCC_FFMPEG_EXTRA_LIBS -lgomp"
@@ -808,7 +808,7 @@ then
 	then
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_C_FLAGS_RELEASE="$NCC_OPTIM -DNDEBUG" -DCMAKE_C_FLAGS="$NCC_CFLAGS" -DCMAKE_CXX_FLAGS_RELEASE="$NCC_OPTIM -DNDEBUG" -DCMAKE_CXX_FLAGS="$NCC_CFLAGS" -DCMAKE_CPP_FLAGS="$NCC_CPPFLAGS" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DAOM_TARGET_CPU="x86_64" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 -DENABLE_TOOLS=0 -DENABLE_TESTS=0 "../$SRC_NAME"
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DAOM_TARGET_CPU="x86_64" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 -DENABLE_TOOLS=0 -DENABLE_TESTS=0 "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -823,7 +823,7 @@ then
 	then
 		mkdir "$SRC_NAME"_build
 		cd "$SRC_NAME"_build
-		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_C_FLAGS_RELEASE="$NCC_OPTIM -DNDEBUG" -DCMAKE_C_FLAGS="$NCC_CFLAGS" -DCMAKE_CXX_FLAGS_RELEASE="$NCC_OPTIM -DNDEBUG" -DCMAKE_CXX_FLAGS="$NCC_CFLAGS" -DCMAKE_CPP_FLAGS="$NCC_CPPFLAGS" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 "../$SRC_NAME"
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -852,7 +852,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		RUSTFLAGS="${NCC_RUSTFLAGS}" cargo cinstall --prefix="$ROOT_PATH/$OUT_PATH" --lib --release
+		PKG_CONFIG_LIBDIR="" RUSTFLAGS="${NCC_RUSTFLAGS}" cargo cinstall --prefix="$ROOT_PATH/$OUT_PATH" --lib --release --target x86_64-unknown-linux-musl
 		[ $? -eq 0 ] || build_die "$THIS: build stage failed -> $SRC_NAME"
 	fi
 fi
@@ -897,7 +897,7 @@ then
 		build_message BM_WHITE "$SRC_NAME: configuring 12-bit"
 		mkdir "$SRC_NAME"_build_12
 		cd "$SRC_NAME"_build_12
-		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy -DENABLE_SHARED=0 -DENABLE_CLI=0 -DENABLE_TESTS=0 -DHIGH_BIT_DEPTH=1 -DMAIN12=1 -DEXPORT_C_API=0 ../source
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy -DENABLE_SHARED=0 -DENABLE_CLI=0 -DENABLE_TESTS=0 -DHIGH_BIT_DEPTH=1 -DMAIN12=1 -DEXPORT_C_API=0 ../source
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		make -j$NCC_JOBS
 		[ $? -eq 0 ] || build_die "$THIS: make stage failed -> $SRC_NAME"
@@ -905,7 +905,7 @@ then
 		build_message BM_WHITE "$SRC_NAME: configuring 10-bit"
 		mkdir ../"$SRC_NAME"_build_10
 		cd ../"$SRC_NAME"_build_10
-		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy -DENABLE_SHARED=0 -DENABLE_CLI=0 -DENABLE_TESTS=0 -DHIGH_BIT_DEPTH=1 -DEXPORT_C_API=0 ../source
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy -DENABLE_SHARED=0 -DENABLE_CLI=0 -DENABLE_TESTS=0 -DHIGH_BIT_DEPTH=1 -DEXPORT_C_API=0 ../source
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		make -j$NCC_JOBS
 		[ $? -eq 0 ] || build_die "$THIS: make stage failed -> $SRC_NAME"
@@ -915,7 +915,7 @@ then
 		cd ../"$SRC_NAME"_build
 		ln -sf ../"$SRC_NAME"_build_12/libx265.a libx265_main12.a
 		ln -sf ../"$SRC_NAME"_build_10/libx265.a libx265_main10.a
-		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy -DENABLE_SHARED=0 -DENABLE_CLI=0 -DENABLE_TESTS=0 -DLINKED_10BIT=ON -DLINKED_12BIT=ON -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS="-L." ../source
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy -DENABLE_SHARED=0 -DENABLE_CLI=0 -DENABLE_TESTS=0 -DLINKED_10BIT=ON -DLINKED_12BIT=ON -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS="-L." ../source
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		make -j$NCC_JOBS
 		[ $? -eq 0 ] || build_die "$THIS: make stage failed -> $SRC_NAME"
@@ -956,6 +956,9 @@ then
 	then
 		cd_source
 		mv .git .temp_git
+#		mkdir "$SRC_NAME"_build
+#		cd "$SRC_NAME"_build
+#		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 ..
 		CFLAGS=-DDECLSPEC= ./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" --bindir="$BIN_PATH" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
@@ -1062,6 +1065,7 @@ then
 		  --pkg-config="pkg-config" \
 		  --pkg-config-flags="--static" \
 		  --extra-cflags="$NCC_OPTIM $NCC_CFLAGS" \
+		  --extra-cxxflags="-fpermissive" \
 		  --extra-ldflags="-no-pie" \
 		  --extra-ldflags="-L$ROOT_PATH/$OUT_PATH/lib" \
 		  --extra-libs="$NCC_FFMPEG_EXTRA_LIBS" \
