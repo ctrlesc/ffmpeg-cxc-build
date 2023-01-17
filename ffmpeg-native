@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.8.4"
+SCRIPT_VERSION="1.8.5"
 THIS="ffmpeg-native"
 
 #build paths
@@ -1045,7 +1045,24 @@ if [ "$BUILD" -ne 0 ]
 then
 	#move shared libs to 'misc' to hide from linker
 	find "$ROOT_PATH/$OUT_PATH/lib" -type f -a -! -path "*/frei0r-1/*" -a -\( -name "*.so" -o -name "*.so.*" -\) -exec mv -t "$ROOT_PATH/$OUT_PATH/misc" '{}' \;
-	find "$ROOT_PATH/$OUT_PATH/lib" -type l -a -\( -name "*.so" -o -name "*.so.*" -\) -exec rm '{}' \;
+	find "$ROOT_PATH/$OUT_PATH/lib" -type l -a -\( -name "*.so" -o -name "*.so.*" -\) -delete \;
+
+	if [ ! -z "$MFX_DEV" ] 
+	then
+		#try to find libmfx & libva at the specified locations and make files available to the build
+		while read lp 
+		do
+			build_message BM_YELLOW "enable-libmfx: searching path '$lp'"
+			rsync -rvt -R --files-from=<(find "$lp" -type f \( -path "*/lib*" -o -path "*/include/*" \) -a  \( -name "*libmfx[.-]*" -o -path "*/mfx/*" -o -name "*libva[.-]*" -o -path "*/va/*" \)  -a -! \( -name "*.so.*" -o -name "*.so" \) 2>/dev/null |\
+				sed -r "s#^${lp}/#/${lp}/./#") / "$ROOT_PATH/$OUT_PATH"
+		done < <(awk -F':' '{for (i = 1 ; i <= NF ; i++) { print $i }}' <<< ${MFX_DEV})
+		[ $? -eq 0 ] || build_die "$THIS: install stage failed -> enable-libmfx"
+
+		#make links if the *.pc files are not in .../lib/pkgconfig
+		find $ROOT_PATH/$OUT_PATH/lib* -type f \( -name "*libmfx[.-]*" -o -name "*libva[.-]*" \) -name "*.pc" -! -path "*/lib/pkgconfig/*" | tee >(cat 1>&2) | while read f ; do ln -sf "$f" "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/${f##*/}" ; done
+		NCC_FFMPEG_LIB_OPTIONS="$NCC_FFMPEG_LIB_OPTIONS --enable-vaapi --enable-libmfx"
+		build_message BM_GREEN "enable-libmfx: success"
+	fi
 fi
 
 #ffmpeg
