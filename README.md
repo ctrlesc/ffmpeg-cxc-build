@@ -9,15 +9,15 @@ amf aom ass/ssa avisynth bzip2 dav1d decklink fdk-aac fontconfig freetype frei0r
 
 Debian/Ubuntu/Mint:
 
-sudo apt-get -y install autoconf automake autopoint build-essential libarchive-tools cmake git-core gperf g++-mingw-w64 libtool mercurial meson nasm pkg-config python3-lxml ragel subversion texinfo yasm wget
+sudo apt-get -y install autoconf automake autopoint build-essential libarchive-tools cmake git-core gperf g++-mingw-w64 libssl-dev libtool mercurial meson nasm pkg-config python3-lxml ragel subversion texinfo yasm wget
   
 Fedora:
 
-sudo yum install make autogen automake bsdtar cmake gcc gcc-c++ git gettext-devel gperf kernel-devel libtool mercurial meson mingw64-gcc mingw64-gcc-c++ mingw64-libgomp mingw64-winpthreads-static nasm perl-FindBin python3-lxml ragel subversion uuid-devel yasm
+sudo yum install make autogen automake bsdtar cmake gcc gcc-c++ git gettext-devel gperf kernel-devel libtool mercurial meson mingw64-gcc mingw64-gcc-c++ mingw64-libgomp mingw64-winpthreads-static nasm openssl-devel perl-FindBin python3-lxml ragel subversion uuid-devel yasm
 
 Arch/Manjaro:
 
-autoconf automake bsdtar cmake git gperf libtool mercurial meson mingw-w64-binutils mingw-w64-crt mingw-w64-gcc mingw-w64-headers mingw-w64-tools mingw-w64-winpthreads nasm python-lxml ragel subversion wget yasm
+autoconf automake bsdtar cmake git gperf libtool mercurial meson mingw-w64-binutils mingw-w64-crt mingw-w64-gcc mingw-w64-headers mingw-w64-tools mingw-w64-winpthreads nasm openssl-1.1 python-lxml ragel subversion wget yasm
   
 Cygwin:
   
@@ -37,7 +37,9 @@ If you want to enable the rav1e AV1 encoder, you will need to install the rust t
 
 	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 	source "$HOME/.cargo/env"
-	cargo install cargo-c
+	rustup install 1.65.0
+	rustup default 1.65.0
+	cargo install --version 0.9.14 cargo-c
 	rustup target add x86_64-pc-windows-gnu
 **Example Build Procedure**
 
