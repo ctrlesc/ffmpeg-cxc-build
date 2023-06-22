@@ -1,5 +1,5 @@
 #---------------------------------------------------------
-#ffmpeg-native-build-hints-slim - 2023-05-25 working build
+#ffmpeg-native-build-hints-slim - 2023-06-21 working build
 #---------------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -31,47 +31,47 @@ NCC	RUSTFLAGS	-C target-feature=+avx2,+fma
 #source	enable	
 
 #disabled
-#aom	disable	
-#ass	disable	
-#bzip2	disable	
-#decklink-linux	disable	
-#fftw3	disable	
-#fontconfig	disable	
-#freetype	disable	
-#frei0r	disable	
-#fribidi	disable	
-#harfbuzz	disable	
-#ladspa	disable	
-#nv-codec-headers	disable	
-#png	disable	
-#rav1e	disable	
-#rubberband	disable	
-#samplerate	disable	
-#sofa	disable	
-#srt	disable	
-#svt-av1	disable	
-#theora	disable	
-#vmaf	disable	
-#vpx	disable	
-#webp	disable	
-#xml2	disable	
+aom	disable	
+ass	disable	
+bzip2	disable	
+decklink-linux	disable	
+fftw3	disable	
+fontconfig	disable	
+freetype	disable	
+frei0r	disable	
+fribidi	disable	
+harfbuzz	disable	
+ladspa	disable	
+nv-codec-headers	disable	
+png	disable	
+rav1e	disable	
+rubberband	disable	
+samplerate	disable	
+sofa	disable	
+srt	disable	
+svt-av1	disable	
+theora	disable	
+vmaf	disable	
+vpx	disable	
+webp	disable	
+xml2	disable	
 
 #enabled
-#dav1d	enable	
-#fdk-aac	enable	
-#ffmpeg	enable	
-#lame	enable	
-##lame	make	1
-#ogg	enable	
-#openssl	enable	
-#openssl	make	1
-#opus	enable	
-#sdl	enable	
-#soxr	enable	
-#vorbis	enable	
-#x264	enable	
-#x265	enable	
-#zlib	enable	
+dav1d	enable	
+fdk-aac	enable	
+ffmpeg	enable	
+lame	enable	
+#lame	make	1
+ogg	enable	
+openssl	enable	
+openssl	make	1
+opus	enable	
+sdl	enable	
+soxr	enable	
+vorbis	enable	
+x264	enable	
+x265	enable	
+zlib	enable	
 
 #---------------------------
 #set override URL for source
@@ -79,62 +79,62 @@ NCC	RUSTFLAGS	-C target-feature=+avx2,+fma
 #source	url	url_string
 #ffmpeg	url	https://git.videolan.org/git/ffmpeg.git
 
-aom	url	file://~/src/aom
-ass	url	file://~/src/ass
-bzip2	url	file://~/src/bzip2
-decklink-linux	url	file://~/src/decklink-linux
-fftw3	url	file://~/src/fftw3
-fontconfig	url	file://~/src/fontconfig
-freetype	url	file://~/src/freetype
-frei0r	url	file://~/src/frei0r
-fribidi	url	file://~/src/fribidi
-harfbuzz	url	file://~/src/harfbuzz
-ladspa	url	file://~/src/ladspa
-nv-codec-headers	url	file://~/src/nv-codec-headers
-png	url	file://~/src/png
-rav1e	url	file://~/src/rav1e
-rubberband	url	file://~/src/rubberband
-samplerate	url	file://~/src/samplerate
-sofa	url	file://~/src/sofa
-srt	url	file://~/src/srt
-svt-av1	url	file://~/src/svt-av1
-theora	url	file://~/src/theora
-vmaf	url	file://~/src/vmaf
-vpx	url	file://~/src/vpx
-webp	url	file://~/src/webp
-xml2	url	file://~/src/xml2
-
-dav1d	url	file://~/src/dav1d
-fdk-aac	url	file://~/src/fdk-aac
-ffmpeg	url	file://~/src/ffmpeg
-lame	url	file://~/src/lame
-ogg	url	file://~/src/ogg
-openssl	url	file://~/src/openssl
-opus	url	file://~/src/opus
-sdl	url	file://~/src/sdl
-soxr	url	file://~/src/soxr
-vorbis	url	file://~/src/vorbis
-x264	url	file://~/src/x264
-x265	url	file://~/src/x265
-zlib	url	file://~/src/zlib
+#aom	url	file://~/src/aom
+#ass	url	file://~/src/ass
+#bzip2	url	file://~/src/bzip2
+#decklink-linux	url	file://~/src/decklink-linux
+#fftw3	url	file://~/src/fftw3
+#fontconfig	url	file://~/src/fontconfig
+#freetype	url	file://~/src/freetype
+#frei0r	url	file://~/src/frei0r
+#fribidi	url	file://~/src/fribidi
+#harfbuzz	url	file://~/src/harfbuzz
+#ladspa	url	file://~/src/ladspa
+#nv-codec-headers	url	file://~/src/nv-codec-headers
+#png	url	file://~/src/png
+#rav1e	url	file://~/src/rav1e
+#rubberband	url	file://~/src/rubberband
+#samplerate	url	file://~/src/samplerate
+#sofa	url	file://~/src/sofa
+#srt	url	file://~/src/srt
+#svt-av1	url	file://~/src/svt-av1
+#theora	url	file://~/src/theora
+#vmaf	url	file://~/src/vmaf
+#vpx	url	file://~/src/vpx
+#webp	url	file://~/src/webp
+#xml2	url	file://~/src/xml2
+#
+#dav1d	url	file://~/src/dav1d
+#fdk-aac	url	file://~/src/fdk-aac
+#ffmpeg	url	file://~/src/ffmpeg
+#lame	url	file://~/src/lame
+#ogg	url	file://~/src/ogg
+#openssl	url	file://~/src/openssl
+#opus	url	file://~/src/opus
+#sdl	url	file://~/src/sdl
+#soxr	url	file://~/src/soxr
+#vorbis	url	file://~/src/vorbis
+#x264	url	file://~/src/x264
+#x265	url	file://~/src/x265
+#zlib	url	file://~/src/zlib
 
 #------------------------
 #fetch specified revision
 #------------------------
 #source	fetch_method	revision_id
-aom	git	fee1ffa788939d3d8a2ec64dc8bbbe555771d1ae
+aom	git	9501f5562279e74e9f1e2250c961f2a92756dbd2
 ass	git	1a599b1db748dfc07df98cd37d8603edb87da2fd
 bzip2	git	9de658d248f9fd304afa3321dd7a9de1280356ec
-dav1d	git	f8ae94eca0f53502a2cddd29a263c1edea4822a0
+dav1d	git	2373fda303d46489c1ec269dc66369a31663cb25
 decklink-linux	git	6e9b591d9a3ad7946d2f401cae9832fef722889e
 fdk-aac	git	3f864cce9736cc8e9312835465fae18428d76295
-ffmpeg	git	a2a0a81184df586d7b567d7b60d55d0e86376963
+ffmpeg	git	1bcb8a73382a253cee8b2b9e704e5a2fa3369593
 fftw3	wget	fftw-3.3.10.tar.gz
-fontconfig	git	175159676812b061b3f042ca60391f3cd2d236f7
-freetype	git	99dadd56a40e6d9ae23b395225ecf9997432d22c
-frei0r	git	2c45f1f09398d6242f166eb05b156021594bc3e5
+fontconfig	git	7e2a1b2577e8d90ea5be3f14091e809ac7742438
+freetype	git	5c00a46805d6423fc45b4ba2c0f2e22dd0450d73
+frei0r	git	c3f987c4cc8c1a7f6928e574f4cb272a7770ca6f
 fribidi	git	b54871c339dabb7434718da3fed2fa63320997e5
-harfbuzz	git	2f21dc23b51043bb95343d3c6a910a105536f8c2
+harfbuzz	git	244f3224b9a6e9e22f65796a984ef7058e7af930
 ladspa	git	7559ebea07eb289ca90a40f72ec2b9d3844b33c3
 lame	svn	6507
 #v9
@@ -144,12 +144,12 @@ lame	svn	6507
 #v11
 nv-codec-headers	git	f8ae7a49bfef2f99d2c931a791dc3863fda67bf3
 ogg	git	db5c7a49ce7ebda47b15b78471e78fb7f2483e22
-#commit below is for openssl 1.1.1.t, head may not build/work as expected
-openssl	git	830bf8e1e4749ad65c51b6a1d0d769ae689404ba
-opus	git	82ac57d9f1aaf575800cf17373348e45b7ce6c0d
-png	git	e519af8b49f52c4ac400f50f23b48ebe36a5f4df
-rav1e	git	be88146f3fedbc10fa7589b277c93ce0259657a7
-rubberband	hg	2041cbd43cf7
+#commit below is for openssl 1.1.1.1u, head may not build/work as expected
+openssl	git	70c2912f635aac8ab28629a2b5ea0c09740d2bda
+opus	git	9fc8fc4cf432640f284113ba502ee027268b0d9f
+png	git	e6c5bf46c4fa3e3738a2ed0896ce33fc270e0cac
+rav1e	git	ba7ed562b01e47dcdb428a44edd0c26a61e8950c
+rubberband	hg	b2cf9c4b0eb5
 samplerate	git	22bd06eb114850ebe31981eb794d150a95439fef
 #commit below is for sdl release-2.26.2, head may not build/work as expected
 sdl	git	f070c83a6059c604cbd098680ddaee391b0a7341
@@ -157,15 +157,15 @@ sofa	git	9c419b6adf3737ffc33ba894e1017335aa6b9998
 soxr	git	945b592b70470e29f917f4de89b4281fbbd540c0
 #commit below is for srt v1.5.1, head may not build/work as expected
 srt	git	0bc3b03202b3159fc9b085b3ae6d66ec071c25d6
-svt-av1	git	0482fa7bfedcb73d1d75d1b0ae4748b6633975ec
+svt-av1	git	08c18ba0768ed3dbbff0903adc326fb3a7549bd9
 theora	git	7180717276af1ebc7da15c83162d6c5d6203aabf
 #commit below is for vmaf v2.3.1, head may not build/work as expected
 vmaf	git	f2661673a078718ddfc1ddb6042048c1b1284946
 vorbis	git	84c023699cdf023a32fa4ded32019f194afcdad0
-vpx	git	7a5f328a6656bc09ff23031e344c94aa61012909
-webp	git	cba300781f4eea9dd957990c6db3977718d4338a
+vpx	git	14e52008edbf2e91386423fdd53310fe49654991
+webp	git	14a9dbfba00e84f722c82668580b1866311b7d11
 x264	git	a8b68ebfaa68621b5ac8907610d3335971839d52
 x265	git	34532bda12a3a3141880582aa186a59cd4538ae6
-xml2	git	981093abd1c5d2fd2045511b384bb42a63caeeea
+xml2	git	2473b4855ea139e91f790a35539fe7da54022360
 zlib	git	04f42ceca40f73e2978b50e93806c2a18c1281fc
 
