@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.8.4"
+SCRIPT_VERSION="1.8.6"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -250,7 +250,7 @@ get_CXC_hints() {
 	#initialize enabled builds based on enable/disable default
 	for h in "${CXC_SOURCE_LIST[@]}"
 	do
-		var="CXC_ENABLE_$h"
+		var="CXC_ENABLE_${h}"
 		var="${var//[^A-Za-z0-9]/_}"
 		var="${var^^}"
 		#echo "$var"
@@ -271,14 +271,14 @@ get_CXC_hints() {
 			val="$(get_hint "CXC" "$h")"
 			if [ $? -eq 0 ]
 			then
-				var="CXC_$h"
+				var="CXC_${h}"
 				eval "$var=\$val"
 			fi
 		done
 
 		for h in "${CXC_SOURCE_LIST[@]}"
 		do
-			var="CXC_ENABLE_$h"
+			var="CXC_ENABLE_${h}"
 			var="${var//[^A-Za-z0-9]/_}"
 			var="${var^^}"
 			#echo "$var"
@@ -319,7 +319,7 @@ set_source() {
 	fi
 
 	shift
-	SRC_ENABLE="CXC_ENABLE_$SRC_NAME"
+	SRC_ENABLE="CXC_ENABLE_${SRC_NAME}"
 	SRC_ENABLE="${SRC_ENABLE//[^A-Za-z0-9]/_}"
 	SRC_ENABLE="${SRC_ENABLE^^}"
 	SRC_URL=$(get_hint "$SRC_NAME" "url")
@@ -366,14 +366,14 @@ then
 	{
 	for i in "${CXC_OPTION_LIST[@]}"
 	do
-		var="CXC_$i"
+		var="CXC_${i}"
 		echo "$var: ${!var}"
 	done
 	} | sort
 	{
 	for i in "${CXC_SOURCE_LIST[@]}"
 	do
-		var="CXC_ENABLE_$i"
+		var="CXC_ENABLE_${i}"
 		var="${var//[^A-Za-z0-9]/_}"
 		var="${var^^}"
 		echo "$var: ${!var} ($i)"
@@ -481,7 +481,7 @@ if [ "$BUILD" -ne 0 ]
 then
 	for i in "${CXC_SYSTEM_LIST[@]}"
 	do
-		var="CXC_$i"
+		var="CXC_${i}"
 		echo "$var: ${!var}"
 	done
 	echo -n "HINTS_FILE: $HINTS_FILE"
@@ -548,8 +548,8 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		mkdir "$SRC_NAME"_build
-		cd "$SRC_NAME"_build
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
 		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DWEBP_BUILD_EXTRAS=0 -DWEBP_BUILD_WEBP_JS=0 ..
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
@@ -579,8 +579,8 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		CXC_CPPFLAGS="$CXC_CPPFLAGS -DFRIBIDI_LIB_STATIC"
-		mkdir "$SRC_NAME"_build
-		cd "$SRC_NAME"_build
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
 		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Ddocs=false -Dtests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
@@ -625,8 +625,8 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		mkdir "$SRC_NAME"_build
-		cd "$SRC_NAME"_build
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
 		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Dfreetype=enabled -Dcairo=disabled -Dglib=disabled -Dicu=disabled -Dintrospection=disabled -Dbenchmark=disabled -Ddocs=disabled -Dtests=disabled --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" ".."
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
@@ -708,9 +708,9 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		mkdir "$SRC_NAME"_build
+		mkdir "${SRC_NAME}_build"
 		sed -r -i 's/^system = build_machine\.system\(\)/system = host_machine.system()/' meson.build
-		cd "$SRC_NAME"_build
+		cd "${SRC_NAME}_build"
 		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Dfft=fftw --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" ".."
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS && \
@@ -846,8 +846,8 @@ then
 	fetch_source
 	if [ "$BUILD" -ne 0 ]
 	then
-		mkdir "$SRC_NAME"_build
-		cd "$SRC_NAME"_build
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
 		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_C_FLAGS_RELEASE="$CXC_OPTIM -DNDEBUG" -DCMAKE_C_FLAGS="$CXC_CFLAGS" -DCMAKE_CXX_FLAGS_RELEASE="$CXC_OPTIM -DNDEBUG" -DCMAKE_CXX_FLAGS="$CXC_CFLAGS" -DCMAKE_CPP_FLAGS="$CXC_CPPFLAGS" -DCMAKE_TOOLCHAIN_FILE="../aom/build/cmake/toolchains/x86_64-mingw-gcc.cmake" -DAOM_TARGET_CPU="x86_64" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 -DENABLE_DOCS=0 -DENABLE_EXAMPLES=0 -DENABLE_TOOLS=0 -DENABLE_TESTS=0 "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
@@ -861,8 +861,8 @@ then
 	fetch_source
 	if [ "$BUILD" -ne 0 ]
 	then
-		mkdir "$SRC_NAME"_build
-		cd "$SRC_NAME"_build
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
 		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DENABLE_NASM=1 "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
@@ -876,8 +876,8 @@ then
 	fetch_source
 	if [ "$BUILD" -ne 0 ]
 	then
-		mkdir "$SRC_NAME"_build
-		cd "$SRC_NAME"_build
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
 		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Denable_tools=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
@@ -892,7 +892,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		PKG_CONFIG_LIBDIR="" RUSTFLAGS="${CXC_RUSTFLAGS}" cargo cinstall --prefix="$ROOT_PATH/$OUT_PATH" --lib --release --target x86_64-pc-windows-gnu --dlltool=/usr/bin/x86_64-w64-mingw32-dlltool
+		PKG_CONFIG_LIBDIR="" RUSTFLAGS="$CXC_RUSTFLAGS" cargo cinstall --prefix="$ROOT_PATH/$OUT_PATH" --lib --release --target x86_64-pc-windows-gnu --dlltool=/usr/bin/x86_64-w64-mingw32-dlltool
 		[ $? -eq 0 ] || build_die "$THIS: build stage failed -> $SRC_NAME"
 	fi
 fi
@@ -937,26 +937,26 @@ then
 		cd_source
 
 		build_message BM_WHITE "$SRC_NAME: configuring 12-bit"
-		mkdir "$SRC_NAME"_build_12
-		cd "$SRC_NAME"_build_12
+		mkdir "${SRC_NAME}_build_12"
+		cd "${SRC_NAME}_build_12"
 		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy -DENABLE_SHARED=0 -DENABLE_CLI=0 -DENABLE_TESTS=0 -DHIGH_BIT_DEPTH=1 -DMAIN12=1 -DEXPORT_C_API=0 ../source
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		make -j$CXC_JOBS
 		[ $? -eq 0 ] || build_die "$THIS: make stage failed -> $SRC_NAME"
 
 		build_message BM_WHITE "$SRC_NAME: configuring 10-bit"
-		mkdir ../"$SRC_NAME"_build_10
-		cd ../"$SRC_NAME"_build_10
+		mkdir "../${SRC_NAME}_build_10"
+		cd "../${SRC_NAME}_build_10"
 		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy -DENABLE_SHARED=0 -DENABLE_CLI=0 -DENABLE_TESTS=0 -DHIGH_BIT_DEPTH=1 -DEXPORT_C_API=0 ../source
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		make -j$CXC_JOBS
 		[ $? -eq 0 ] || build_die "$THIS: make stage failed -> $SRC_NAME"
 
 		build_message BM_WHITE "$SRC_NAME: configuring 8-bit"
-		mkdir ../"$SRC_NAME"_build
-		cd ../"$SRC_NAME"_build
-		ln -sf ../"$SRC_NAME"_build_12/libx265.a libx265_main12.a
-		ln -sf ../"$SRC_NAME"_build_10/libx265.a libx265_main10.a
+		mkdir "../${SRC_NAME}_build"
+		cd "../${SRC_NAME}_build"
+		ln -sf "../${SRC_NAME}_build_12/libx265.a" libx265_main12.a
+		ln -sf "../${SRC_NAME}_build_10/libx265.a" libx265_main10.a
 		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy -DENABLE_SHARED=0 -DENABLE_CLI=0 -DENABLE_TESTS=0 -DLINKED_10BIT=ON -DLINKED_12BIT=ON -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS="-L." ../source
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		make -j$CXC_JOBS
@@ -1010,8 +1010,8 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		mkdir "$SRC_NAME"_build
-		cd "$SRC_NAME"_build
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
 		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 ..
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
@@ -1069,8 +1069,8 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		mkdir "$SRC_NAME"_build
-		cd "$SRC_NAME"_build
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
 		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DHEADERS_ONLY=1 ..
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS VersionGen install
@@ -1125,8 +1125,8 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		mkdir "$SRC_NAME"_build
-		cd "$SRC_NAME"_build
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
 		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Denable_docs=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../lib$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
