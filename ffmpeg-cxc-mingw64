@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.8.6"
+SCRIPT_VERSION="1.8.7"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -1142,27 +1142,29 @@ set_source "ffmpeg" "git" "https://git.ffmpeg.org/ffmpeg.git" "gpl" "version3" "
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
 	fetch_source
+	BUILD_CMD="CPPFLAGS=\"$CXC_CPPFLAGS\" ./configure\
+		--cross-prefix=\"$CXC_HOST\"-\
+		--arch=\"x86_64\"\
+		--target-os=\"mingw64\"\
+		--disable-debug\
+		--disable-w32threads\
+		--disable-shared\
+		--enable-static\
+		--prefix=\"$ROOT_PATH/$OUT_PATH\"\
+		--pkg-config=\"pkg-config\"\
+		--pkg-config-flags=\"--static\"\
+		--extra-cflags=\"$CXC_OPTIM $CXC_CFLAGS\"\
+		--extra-cxxflags=\"-fpermissive\"\
+		--extra-ldflags=\"-static-libgcc -static-libstdc++ -static -s\"\
+		--extra-ldflags=\"-L$ROOT_PATH/$OUT_PATH/lib\"\
+		--extra-libs=\"$CXC_FFMPEG_EXTRA_LIBS\"\
+		--bindir=\"$BIN_PATH\"\
+		$CXC_FFMPEG_LIB_OPTIONS"
+	echo $BUILD_CMD
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		CPPFLAGS="$CXC_CPPFLAGS" ./configure \
-		  --cross-prefix="$CXC_HOST"- \
-		  --arch="x86_64" \
-		  --target-os="mingw64" \
-		  --disable-debug \
-		  --disable-w32threads \
-		  --disable-shared \
-		  --enable-static \
-		  --prefix="$ROOT_PATH/$OUT_PATH" \
-		  --pkg-config="pkg-config" \
-		  --pkg-config-flags="--static" \
-		  --extra-cflags="$CXC_OPTIM $CXC_CFLAGS" \
-		  --extra-cxxflags="-fpermissive" \
-		  --extra-ldflags="-static-libgcc -static-libstdc++ -static -s" \
-		  --extra-ldflags="-L$ROOT_PATH/$OUT_PATH/lib" \
-		  --extra-libs="$CXC_FFMPEG_EXTRA_LIBS" \
-		  --bindir="$BIN_PATH"\
-		  $CXC_FFMPEG_LIB_OPTIONS
+		eval $BUILD_CMD
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
