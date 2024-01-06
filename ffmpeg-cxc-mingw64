@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.8.7"
+SCRIPT_VERSION="1.8.9"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -448,7 +448,7 @@ then
 	echo "windres = 'x86_64-w64-mingw32-windres'"              >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "strip = 'x86_64-w64-mingw32-strip'"                  >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "pkgconfig = 'pkg-config'"                            >> $ROOT_PATH/$SRC_PATH/cross.meson
-	echo "[properties]"                                        >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "[built-in options]"                                  >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "c_args = ['$(echo "$CXC_OPTIM $CXC_CFLAGS $CXC_CPPFLAGS" | sed -r "s/\s+/','/g")']"        >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "cpp_args = ['$(echo "$CXC_OPTIM $CXC_CFLAGS $CXC_CPPFLAGS -fpermissive" | sed -r "s/\s+/','/g")']"      >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "c_link_args = ['-static-libgcc','-static','-s']"                             >> $ROOT_PATH/$SRC_PATH/cross.meson
@@ -461,7 +461,7 @@ then
 
 fi
 
-#test and fix cross for cygwin build environment
+#test and fix cross for build environments
 if [[ "$CXC_OS" == *cygwin* ]]
 then
 	if [[ "$PATH" == *x86_64*mingw*sys-root*mingw/bin* ]]
@@ -474,6 +474,11 @@ then
 elif [[ "$CXC_OS" == *linux* ]]
 then
 	CXC_BUILD='--build=x86_64-pc-linux-gnu'
+	if [ ! -z "$(x86_64-w64-mingw32-gcc -print-sysroot)" ] && [ ! -d "$(x86_64-w64-mingw32-gcc -print-sysroot)/mingw$ROOT_PATH" ]
+	then
+		build_message BM_YELLOW "$THIS: Linux build detected - ensure '$(x86_64-w64-mingw32-gcc -print-sysroot)/mingw$ROOT_PATH' is accessible"
+		build_die "$THIS: $(x86_64-w64-mingw32-gcc -print-sysroot)/mingw$ROOT_PATH/$OUT_PATH/include' not found"
+	fi
 fi
 
 #display the detected system type and hints file in use
@@ -581,7 +586,7 @@ then
 		CXC_CPPFLAGS="$CXC_CPPFLAGS -DFRIBIDI_LIB_STATIC"
 		mkdir "${SRC_NAME}_build"
 		cd "${SRC_NAME}_build"
-		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Ddocs=false -Dtests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
+		meson setup --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Ddocs=false -Dtests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
 	fi
@@ -596,7 +601,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS -D_FORTIFY_SOURCE=0" LDFLAGS="-lssp" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared --with-python=no
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS -D_FORTIFY_SOURCE=0" LDFLAGS="-lssp -L$ROOT_PATH/$OUT_PATH/lib" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared --with-python=no
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -610,8 +615,11 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
+		#mkdir "${SRC_NAME}_build"
+		#cd "${SRC_NAME}_build"
+		#meson setup --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Dtools=disabled -Ddoc=disabled -Dtests=disabled --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" ".."
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared --disable-docs --enable-libxml2 --disable-nls
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" LDFLAGS="-lxml2 -lm -lws2_32 -lbcrypt -L$ROOT_PATH/$OUT_PATH/lib" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared --disable-docs --enable-libxml2 --disable-nls
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -627,7 +635,7 @@ then
 		cd_source
 		mkdir "${SRC_NAME}_build"
 		cd "${SRC_NAME}_build"
-		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Dfreetype=enabled -Dcairo=disabled -Dglib=disabled -Dicu=disabled -Dintrospection=disabled -Dbenchmark=disabled -Ddocs=disabled -Dtests=disabled --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" ".."
+		meson setup --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Dfreetype=enabled -Dcairo=disabled -Dglib=disabled -Dicu=disabled -Dintrospection=disabled -Dbenchmark=disabled -Ddocs=disabled -Dtests=disabled --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" ".."
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
 		#now rebuild freetype to be harfbuzz aware
@@ -638,7 +646,7 @@ then
 		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" LDFLAGS="-L$ROOT_PATH/$OUT_PATH/lib" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
-		CXC_FFMPEG_EXTRA_LIBS="$CXC_FFMPEG_EXTRA_LIBS -lfreetype"
+		CXC_FFMPEG_EXTRA_LIBS="-lharfbuzz -lfreetype -lpng16 -lz $CXC_FFMPEG_EXTRA_LIBS"
 	fi
 fi
 
@@ -711,7 +719,7 @@ then
 		mkdir "${SRC_NAME}_build"
 		sed -r -i 's/^system = build_machine\.system\(\)/system = host_machine.system()/' meson.build
 		cd "${SRC_NAME}_build"
-		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Dfft=fftw --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" ".."
+		meson setup --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Dfft=fftw --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" ".."
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS && \
 		cp -pv -r "../rubberband/" "$ROOT_PATH/$OUT_PATH/include" && \
@@ -878,7 +886,7 @@ then
 	then
 		mkdir "${SRC_NAME}_build"
 		cd "${SRC_NAME}_build"
-		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Denable_tools=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
+		meson setup --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Denable_tools=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
 	fi
@@ -1127,7 +1135,7 @@ then
 		cd_source
 		mkdir "${SRC_NAME}_build"
 		cd "${SRC_NAME}_build"
-		meson --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Denable_docs=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../lib$SRC_NAME"
+		meson setup --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Denable_docs=false -Denable_tests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../lib$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
 		if [[ "$CXC_FFMPEG_EXTRA_LIBS" != *"lstdc++"* ]]

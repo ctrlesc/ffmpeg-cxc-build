@@ -15,6 +15,12 @@ Fedora:
 
 sudo yum install make autogen automake bsdtar cmake gcc gcc-c++ git gettext-devel gperf kernel-devel libtool libunwind-devel mercurial meson mingw64-gcc mingw64-gcc-c++ mingw64-libgomp mingw64-winpthreads-static nasm openssl-devel perl-FindBin python3-lxml ragel subversion uuid-devel yasm
 
+*Fedora Preconditions:*
+
+With FC39, a link from the mingw sys-root directory to the sandbox build path must be created (not pretty but works for now). Assuming the default configuration is used for the ROOT_PATH variable:
+
+	sudo ln -s /home /usr/x86_64-w64-mingw32/sys-root/home
+
 Arch/Manjaro:
 
 autoconf automake bsdtar cmake git gperf libtool mercurial meson mingw-w64-binutils mingw-w64-crt mingw-w64-gcc mingw-w64-headers mingw-w64-tools mingw-w64-winpthreads nasm openssl-1.1 python-lxml ragel subversion wget yasm
@@ -25,7 +31,7 @@ Cygwin:
  
 *Cygwin Preconditions:*
  
-The mingw toolchain files must be in the path, and a link from the mingw sys-root directory to the sanbox build path must be created.  As an example, assuming the default configuration is used for the ROOT_PATH variable,  *ffmpeg-cxc-build-hints* has been placed in the user's home directory, and *ffmpeg-cxc-mingw64* is executable in the environment's path:
+The mingw toolchain files must be in the path, and a link from the mingw sys-root directory to the sandbox build path must be created.  As an example, assuming the default configuration is used for the ROOT_PATH variable,  *ffmpeg-cxc-build-hints* has been placed in the user's home directory, and *ffmpeg-cxc-mingw64* is executable in the environment's path:
  
 	ln -s /home /usr/x86_64-w64-mingw32/sys-root/home
 	export PATH=$PATH:/usr/x86_64-w64-mingw32/sys-root/mingw/bin
