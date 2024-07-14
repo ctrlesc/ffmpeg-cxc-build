@@ -9,15 +9,15 @@ amf aom ass/ssa avisynth bzip2 dav1d decklink fdk-aac fontconfig freetype frei0r
 
 Debian/Ubuntu/Mint:
 
-sudo apt-get -y install autoconf automake autopoint build-essential libarchive-tools cmake git-core gperf g++-mingw-w64 libssl-dev libtool libunwind-dev mercurial meson nasm pkg-config python3-lxml ragel subversion texinfo yasm wget
+sudo apt-get -y install autoconf automake autopoint build-essential libarchive-tools cmake git-core gperf g++-mingw-w64 libssl-dev libtool libunwind-dev mercurial meson nasm pkg-config python3-lxml ragel subversion texinfo yasm wget win-iconv-mingw-w64-dev
   
 Fedora:
 
-sudo yum install make autogen automake bsdtar cmake gcc gcc-c++ git gettext-devel gperf kernel-devel libtool libunwind-devel mercurial meson mingw64-gcc mingw64-gcc-c++ mingw64-libgomp mingw64-winpthreads-static nasm openssl-devel perl-FindBin python3-lxml ragel subversion uuid-devel yasm
+sudo yum install make autogen automake bsdtar cmake gcc gcc-c++ git gettext-devel gperf kernel-devel libtool libunwind-devel mercurial meson mingw64-gcc mingw64-gcc-c++ mingw64-libgomp mingw64-winpthreads-static mingw64-win-iconv-static nasm openssl-devel perl-FindBin python3-lxml ragel subversion uuid-devel yasm
 
 *Fedora Preconditions:*
 
-With FC39, a link from the mingw sys-root directory to the sandbox build path must be created (not pretty but works for now). Assuming the default configuration is used for the ROOT_PATH variable:
+With FC39 and later, a link from the mingw sys-root directory to the sandbox build path must be created (not pretty but works for now). Assuming the default configuration is used for the ROOT_PATH variable:
 
 	sudo ln -s /home /usr/x86_64-w64-mingw32/sys-root/home
 
