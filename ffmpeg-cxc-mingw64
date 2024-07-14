@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.8.14"
+SCRIPT_VERSION="1.8.15"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -659,7 +659,7 @@ then
 	then
 		cd_source
 		autoreconf -fiv
-		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared
+		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS -Wno-error=incompatible-pointer-types" --host="$CXC_HOST" "$CXC_BUILD" --enable-static --disable-shared
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 	fi
@@ -1150,7 +1150,7 @@ set_source "ffmpeg" "git" "https://git.ffmpeg.org/ffmpeg.git" "gpl" "version3" "
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
 	fetch_source
-	BUILD_CMD="CPPFLAGS=\"$CXC_CPPFLAGS\" ./configure\
+	BUILD_CMD="CPPFLAGS=\"$CXC_CPPFLAGS -Wno-error=incompatible-pointer-types\" ./configure\
 		--cross-prefix=\"$CXC_HOST\"-\
 		--arch=\"x86_64\"\
 		--target-os=\"mingw64\"\
