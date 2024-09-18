@@ -53,12 +53,16 @@ If you want to enable the rav1e AV1 encoder, you will need to install the rust t
 
 Assumptions: ROOT_PATH is left to the default ($HOME) and *ffmpeg-cxc-mingw64* is executable in the environment's path.
 
-	
 	#fetch the source projects to the ~/src directory
 	ROOT_PATH=~/ SRC_PATH=src HINTS_FILE=/dev/null CXC_FETCH_ONLY=1 ffmpeg-cxc-mingw64
 	#copy ffmpeg-cxc-build-hints to ~/ and edit to fetch files from ~/src via URL override
 	ffmpeg-cxc-mingw64
-Using this technique, the script *update-repo* can be used to maintain up to date repositories by cd'ing into ~/src and running it.  Subsequent builds will then pull via the file URL override allowing up to date builds of ffmpeg and libraries if you edit the hints file and remove the commit hashes (empty means latest).  Note that fontconfig and openssl will likely require the hashes specified in the hints file to build and operate as expected.
+
+Similarly, a native (linux) version of ffmpeg can be built as below assuming the SRC_PATH has a complete set of repositories. If desired, the VPL package should be installed as per your distro, and the prefix path, usually /usr, should be specified as a variable before the script. The native build script should find the VPL files to copy and patch allowing the sanboxed build to work. An MFX (deprecated) build works essentially the same, but VPL should cover all options at this point.
+
+	HINTS_FILE=~/ffmpeg-native-build-hints-slim VPL_DEV=/usr ffmpeg-native
+
+Using these techniques, the script *update-repo* can be used to maintain up to date repositories by cd'ing into ~/src and running it.  Subsequent builds will then pull via the file URL override allowing up to date builds of ffmpeg and libraries if you edit the hints file and remove the commit hashes (empty means latest).  Note that fontconfig and openssl will likely require the hashes specified in the hints file to build and operate as expected.
 
 **FFmpeg Latest Build Procedure**
 
