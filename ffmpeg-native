@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.8.15"
+SCRIPT_VERSION="1.9.0"
 THIS="ffmpeg-native"
 
 #build paths
@@ -1046,13 +1046,13 @@ fi
 if [ "$BUILD" -ne 0 ]
 then
 	#move shared libs to 'misc' to hide from linker
-	find "$ROOT_PATH/$OUT_PATH/lib" -type f -a -! -path "*/frei0r-1/*" -a -\( -name "*.so" -o -name "*.so.*" -\) -exec mv -t "$ROOT_PATH/$OUT_PATH/misc" '{}' \;
-	find "$ROOT_PATH/$OUT_PATH/lib" -type l -a -\( -name "*.so" -o -name "*.so.*" -\) -delete \;
+	find "$ROOT_PATH/$OUT_PATH/lib" -type f -a -! -path "*/frei0r-1/*" -a -\( -name "*.so" -o -name "*.so.*" -\) -exec mv -t "$ROOT_PATH/$OUT_PATH/misc" '{}' \; 2>/dev/null
+	find "$ROOT_PATH/$OUT_PATH/lib" -type l -a -\( -name "*.so" -o -name "*.so.*" -\) -delete \; 2>/dev/null
 
-	if [ ! -z "$MFX_DEV" ] 
+	if [ ! -z "$MFX_DEV" ]
 	then
 		#try to find libmfx & libva at the specified locations and make files available to the build
-		while read lp 
+		while read lp
 		do
 			build_message BM_YELLOW "enable-libmfx: searching path '$lp'"
 			rsync -rvt -R --files-from=<(find "$lp" -type f \( -path "*/lib*" -o -path "*/include/*" \) -a  \( -name "*libmfx[.-]*" -o -path "*/mfx/*" -o -name "*libva[.-]*" -o -path "*/va/*" \)  -a -! \( -name "*.so.*" -o -name "*.so" \) 2>/dev/null |\
@@ -1064,6 +1064,45 @@ then
 		find $ROOT_PATH/$OUT_PATH/lib* -type f \( -name "*libmfx[.-]*" -o -name "*libva[.-]*" \) -name "*.pc" -! -path "*/lib/pkgconfig/*" | tee >(cat 1>&2) | while read f ; do ln -sf "$f" "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/${f##*/}" ; done
 		NCC_FFMPEG_LIB_OPTIONS="$NCC_FFMPEG_LIB_OPTIONS --enable-vaapi --enable-libmfx"
 		build_message BM_GREEN "enable-libmfx: success"
+	fi
+
+	if [ ! -z "$VPL_DEV" ]
+	then
+		#try to find libvpl & libva at the specified locations and make files available to the build
+		while read lp
+		do
+			build_message BM_YELLOW "enable-libvpl: searching path '$lp'"
+			#verify the VPL lib install
+			if [ -z "$VPL_PREFIX" ]
+			then
+				CHKPC=$(find "$lp" -path "*/lib*" -name vpl.pc | head -n 1 | sed -r 's#/[^/]+$##' | sed -r "s#^${lp}##")
+				CHKLIB=$(find "$lp" -path "*/lib*" -name "libvpl.so*" | head -n 1 | sed -r 's#/[^/]+$##' | sed -r "s#^${lp}##")
+				CHKINC=$(find "$lp" -path "*/include/*" -name "vpl" | head -n 1 |sed -r 's#/[^/]+$##' | sed -r "s#^${lp}##")
+				#find the actual prefix since vpl.pc might be configured with relative paths?
+				if  [ ! -z "$CHKPC" ] && [ ! -z "$CHKLIB" ] && [ ! -z "$CHKINC" ]
+				then
+					build_message BM_WHITE "enable-libvpl: configure -> $(printf 'prefix=%s\tlibdir=%s\tincludedir=%s\tpc=%s' $lp $CHKLIB $CHKINC $CHKPC)"
+					VPL_PREFIX="$lp"
+				fi
+			fi
+			rsync -rvt -R --files-from=<(find "$lp" -type f \( -path "*/lib*" -o -path "*/include/*" \) -a  \( -name "*libvpl[.-]*" -o -name "*vpl*" -o -path "*/vpl/*" -o -name "*libva[.-]*" -o -path "*/va/*" \)  -a -! \( -name "*.so.*" -o -name "*.so" \) 2>/dev/null |\
+				sed -r "s#^${lp}/#/${lp}/./#") / "$ROOT_PATH/$OUT_PATH"
+		done < <(awk -F':' '{for (i = 1 ; i <= NF ; i++) { print $i }}' <<< ${VPL_DEV})
+		[ $? -eq 0 ] && [ ! -z "$VPL_PREFIX" ] || build_die "$THIS: install stage failed -> enable-libvpl - verify prefix"
+
+		#make links if the *.pc files are not in .../lib/pkgconfig
+		find $ROOT_PATH/$OUT_PATH/lib* -type f \( -name "*libvpl[.-]*" -o -name "*libva[.-]*" -o -name "*vpl*" \) -name "*.pc" -! -path "*/lib/pkgconfig/*" | tee >(cat 1>&2) | while read f ; do ln -sf "$f" "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/${f##*/}" ; done
+		#fix/force absolute paths in the copied .pc file?
+		if [ -e "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/vpl.pc" ]
+		then
+			sed -i -r "s#^(prefix=).+#\1${VPL_PREFIX}#" "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/vpl.pc"
+			sed -i -r "s#^(includedir=).+#\1\$\{prefix\}${CHKINC}#" "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/vpl.pc"
+			sed -i -r "s#^(libdir=).+#\1\$\{prefix\}${CHKLIB}#" "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/vpl.pc"
+			NCC_FFMPEG_LIB_OPTIONS="$NCC_FFMPEG_LIB_OPTIONS --enable-vaapi --enable-libvpl"
+			build_message BM_GREEN "enable-libvpl: success"
+		else
+			build_die "$THIS: install stage failed -> enable-libvpl - modify pc file"
+		fi
 	fi
 fi
 

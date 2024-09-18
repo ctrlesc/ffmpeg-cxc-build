@@ -77,6 +77,7 @@ svt-av1	url	file://~/src/svt-av1
 theora	url	file://~/src/theora
 vmaf	url	file://~/src/vmaf
 vorbis	url	file://~/src/vorbis
+vpl	url	file://~/src/vpx
 vpx	url	file://~/src/vpx
 webp	url	file://~/src/webp
 x264	url	file://~/src/x264
@@ -98,7 +99,7 @@ decklink	git
 dlfcn	git	
 fdk-aac	git	
 ffmpeg	git	
-fftw3	wget	
+fftw3	wget	fftw-3.3.10.tar.gz
 fontconfig	git	
 freetype	git	
 frei0r	git	
@@ -123,9 +124,11 @@ svt-av1	git
 theora	git	
 vmaf	git	
 vorbis	git	
+vpl	git	
 vpx	git	
 webp	git	
 x264	git	
 x265	git	
 xml2	git	
 zlib	git	
+

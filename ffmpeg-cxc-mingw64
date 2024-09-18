@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.8.15"
+SCRIPT_VERSION="1.9.0"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -44,7 +44,7 @@ CXC_SOURCE_LIST=\
 "fftw3" "fontconfig" "freetype" "frei0r" "fribidi" "harfbuzz" "ladspa" \
 "lame" "mfx" "nv-codec-headers" "ogg" "openssl" "opus" "png" "rav1e" \
 "rubberband" "samplerate" "sdl" "sofa" "soxr" "srt" "svt-av1" "theora" "vmaf" \
-"vorbis" "vpx" "webp" "xml2" "x264" "x265" "zlib" \
+"vorbis" "vpl" "vpx" "webp" "xml2" "x264" "x265" "zlib" \
 )
 
 #lib options
@@ -511,7 +511,7 @@ then
 		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 .
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
-		cp -pv "$ROOT_PATH/$OUT_PATH/lib/libzlibstatic.a" "$ROOT_PATH/$OUT_PATH/lib/libz.a"
+		ln -s "$ROOT_PATH/$OUT_PATH/lib/libzlibstatic.a" "$ROOT_PATH/$OUT_PATH/lib/libz.a"
 	fi
 fi
 
@@ -1053,7 +1053,24 @@ then
 		autoreconf -fiv
 		./configure --prefix="$ROOT_PATH/$OUT_PATH" CFLAGS="$CXC_OPTIM $CXC_CFLAGS" CXXFLAGS="$CXC_OPTIM $CXC_CFLAGS" CPPFLAGS="$CXC_CPPFLAGS" --host="$CXC_HOST" "$CXC_BUILD" --bindir="$BIN_PATH" --enable-static --disable-shared
 		build_make $CXC_JOBS
-		cp -pv "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/libmfx.pc" "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/mfx.pc"
+		ln -s "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/libmfx.pc" "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/mfx.pc"
+	fi
+fi
+
+#vpl
+set_source "vpl" "git" "https://github.com/intel/libvpl.git" "libvpl"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" ".."
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+		ln -s "$ROOT_PATH/$OUT_PATH/lib/libvpl.dll.a" "$ROOT_PATH/$OUT_PATH/lib/libvpl.a"
 	fi
 fi
 
