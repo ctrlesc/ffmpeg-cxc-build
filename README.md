@@ -43,9 +43,9 @@ If you want to enable the rav1e AV1 encoder, you will need to install the rust t
 
 	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 	source "$HOME/.cargo/env"
-	rustup install 1.70.0
-	rustup default 1.70.0
-	cargo install --version 0.9.20+cargo-0.71 cargo-c
+	rustup install 1.81.0
+	rustup default 1.81.0
+	cargo install --version 0.10.7+cargo-0.84.0 cargo-c
 	rustup target add x86_64-pc-windows-gnu
  	rustup target add x86_64-unknown-linux-musl
 
