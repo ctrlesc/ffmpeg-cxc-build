@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.9.0"
+SCRIPT_VERSION="1.9.1"
 THIS="ffmpeg-native"
 
 #build paths
@@ -42,7 +42,7 @@ NCC_SOURCE_LIST=\
 "fontconfig" "freetype" "frei0r" "fribidi" "harfbuzz" "ladspa" \
 "lame" "nv-codec-headers" "ogg" "openssl" "opus" "png" "rav1e" "rubberband" \
 "samplerate" "sdl" "sofa" "soxr" "srt" "svt-av1" "theora" "vmaf" "vorbis" \
-"vpx" "webp" "xml2" "x264" "x265" "zlib" \
+"vpx" "vulkan-headers" "webp" "xml2" "x264" "x265" "zlib" \
 )
 
 #lib options
@@ -978,6 +978,22 @@ then
 	then
 		cd_source
 		build_make $NCC_JOBS PREFIX="$ROOT_PATH/$OUT_PATH" install
+	fi
+fi
+
+#vulkan
+set_source "vulkan-headers" "git" "https://github.com/KhronosGroup/Vulkan-Headers.git" "vulkan"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" ".."
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make
 	fi
 fi
 
