@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.9.1"
+SCRIPT_VERSION="1.9.2"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -563,7 +563,7 @@ then
 fi
 
 #freetype
-set_source "freetype" "git" "https://git.savannah.gnu.org/git/freetype/freetype2.git" "libfreetype"
+set_source "freetype" "git" "https://gitlab.freedesktop.org/freetype/freetype.git" "libfreetype"
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
 	fetch_source
@@ -1120,7 +1120,7 @@ then
 fi
 
 #decklink
-set_source "decklink" "git" "https://notabug.org/RiCON/decklink-headers.git" "decklink"
+set_source "decklink" "git" "https://github.com/nanake/decklink-headers.git" "decklink"
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
 	fetch_source
