@@ -19,7 +19,7 @@ sudo yum install make autogen automake bsdtar cmake gcc gcc-c++ git gettext-deve
 
 With FC39 and later, a link from the mingw sys-root directory to the sandbox build path must be created (not pretty but works for now). Assuming the default configuration is used for the ROOT_PATH variable:
 
-	sudo ln -s /home /usr/x86_64-w64-mingw32/sys-root/home
+	sudo ln -s /home /usr/x86_64-w64-mingw32/sys-root/mingw/home
 
 Arch/Manjaro:
 
@@ -43,8 +43,8 @@ If you want to enable the rav1e AV1 encoder, you will need to install the rust t
 
 	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 	source "$HOME/.cargo/env"
-	rustup install 1.83.0
-	rustup default 1.83.0
+	rustup install 1.87.0
+	rustup default 1.87.0
 	cargo install --version 0.10.7+cargo-0.84.0 cargo-c
 	rustup target add x86_64-pc-windows-gnu
  	rustup target add x86_64-unknown-linux-musl
