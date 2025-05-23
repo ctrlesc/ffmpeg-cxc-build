@@ -66,6 +66,7 @@ nv-codec-headers	url	file://~/src/nv-codec-headers
 ogg	url	file://~/src/ogg
 openssl	url	file://~/src/openssl
 opus	url	file://~/src/opus
+placebo	url	file://~/src/placebo
 png	url	file://~/src/png
 rav1e	url	file://~/src/rav1e
 rubberband	url	file://~/src/rubberband
@@ -114,6 +115,7 @@ nv-codec-headers	git
 ogg	git	
 openssl	git	
 opus	git	
+placebo	git	
 png	git	
 rav1e	git	
 rubberband	hg	
