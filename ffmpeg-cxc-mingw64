@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.9.2"
+SCRIPT_VERSION="1.9.3"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -42,7 +42,7 @@ CXC_SOURCE_LIST=\
 ( \
 "amf" "aom" "ass" "avisynth" "bzip2" "dav1d" "decklink" "dlfcn" "fdk-aac" "ffmpeg" \
 "fftw3" "fontconfig" "freetype" "frei0r" "fribidi" "harfbuzz" "ladspa" \
-"lame" "mfx" "nv-codec-headers" "ogg" "openssl" "opus" "png" "rav1e" \
+"lame" "mfx" "nv-codec-headers" "ogg" "openssl" "opus" "placebo" "png" "rav1e" \
 "rubberband" "samplerate" "sdl" "sofa" "soxr" "srt" "svt-av1" "theora" "vmaf" \
 "vorbis" "vpl" "vpx" "vulkan-headers" "webp" "xml2" "x264" "x265" "zlib" \
 )
@@ -143,7 +143,7 @@ fetch_source() {
 		git)
 			if [ "$scheme" != "file://" ]
 			then
-				git clone "$url" "$SRC_NAME"
+				git clone --recursive "$url" "$SRC_NAME"
 				status=$?
 			fi
 
@@ -446,6 +446,7 @@ then
 	echo "c = 'x86_64-w64-mingw32-gcc'"                        >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "cpp = 'x86_64-w64-mingw32-g++'"                      >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "windres = 'x86_64-w64-mingw32-windres'"              >> $ROOT_PATH/$SRC_PATH/cross.meson
+	echo "dlltool = 'x86_64-w64-mingw32-dlltool'"              >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "strip = 'x86_64-w64-mingw32-strip'"                  >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "pkgconfig = 'pkg-config'"                            >> $ROOT_PATH/$SRC_PATH/cross.meson
 	echo "[built-in options]"                                  >> $ROOT_PATH/$SRC_PATH/cross.meson
@@ -1084,6 +1085,25 @@ then
 	then
 		cd_source
 		build_make $CXC_JOBS PREFIX="$ROOT_PATH/$OUT_PATH" install
+	fi
+fi
+
+#placebo
+set_source "placebo" "git" "https://code.videolan.org/videolan/libplacebo.git" "libplacebo"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
+		meson setup --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_meson $CXC_JOBS
+		if [[ "$CXC_FFMPEG_EXTRA_LIBS" != *"lstdc++"* ]]
+		then
+			CXC_FFMPEG_EXTRA_LIBS="$CXC_FFMPEG_EXTRA_LIBS -lstdc++"
+		fi
 	fi
 fi
 

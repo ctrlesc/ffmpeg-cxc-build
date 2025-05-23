@@ -1,5 +1,5 @@
 #-------------------------------------------------
-#ffmpeg-cxc-build-hints - 2025-05-08 working build
+#ffmpeg-cxc-build-hints - 2025-05-23 working build
 #-------------------------------------------------
 
 #place this file in the directory specified by the script's ROOT_PATH or
@@ -66,6 +66,7 @@ mfx	disable
 #ogg	url	file://~/src/ogg
 #openssl	url	file://~/src/openssl
 #opus	url	file://~/src/opus
+#placebo	url	file://~/src/placebo
 #png	url	file://~/src/png
 #rav1e	url	file://~/src/rav1e
 #rubberband	url	file://~/src/rubberband
@@ -92,15 +93,15 @@ mfx	disable
 #------------------------
 #source	fetch_method	revision_id
 amf	git	d7311e30a53b7d36fb401d2efa3b04fe5d942e28
-aom	git	4c983381cd254becfb17435cdeecfdc56c982e37
+aom	git	eecb55e22a7dc6731cfb6273fbebe7426a10cb37
 ass	git	695509365f152bd28720a0c0e036d46836ee9345
-avisynth	git	7bbd0a6392115402cc57b437d27b64a497815f7e
+avisynth	git	c506611e5ed0fbe97b24ee898cabafa178b4687a
 bzip2	git	fbc4b11da543753b3b803e5546f56e26ec90c2a7
 dav1d	git	8d956180934f16244bdb58b39175824775125e55
 decklink	git	23194d695a3ae4aca7bc6c2f16dd6e7325a41c27
 dlfcn	git	8bfddb5aa345ce10ba98e925acbc7bfb53639679
 fdk-aac	git	2ef9a141c40bf254bde7d22c197c615db5b265ed
-ffmpeg	git	1b643e3f65d75a4e6a25986466254bdd4fc1a01a
+ffmpeg	git	f414038779217034b4d062d538df3e0d3ca48343
 fftw3	wget	fftw-3.3.10.tar.gz
 fontconfig	git	3454d29ef0761978897de5f28e388e5b0a3489f4
 freetype	git	f35bb7595462af6588c59a866b354a72e4f4be4b
@@ -121,6 +122,7 @@ ogg	git	fa80aae9d50096160f2b56ada35527d7aee3f746
 openssl	git	e04bd3433fd84e1861bf258ea37928d9845e6a86
 opus	git	08bcc6e46227fca01aa3de3f3512f8b692d8d36b
 png	git	b4800bae3379f1abf82359703c28e727b5df4135
+placebo	git	3188549fba13bbdf3a5a98de2a38c2e71f04e21e
 #commit below is for rav1e 0.8.x, head may not build/work as expected
 rav1e	git	cda12985b9bebd2f4d940ac5d32c945b78752e5b
 rubberband	hg	6fca9f344e6d
@@ -141,7 +143,7 @@ vpx	git	e922e894bd44017f091e19b8f3bbe97e31e42657
 vulkan-headers	git	9c77de5c3dd216f28e407eec65ed9c0a296c1f74
 webp	git	eb3ff781599e311cc27f1d34c6ba8953cf8d7e5b
 x264	git	32c3b801191522961102d4bea292cdb61068d0dd
-x265	git	f8be4634f6db0b67d149552386559095a840ccf2
+x265	git	78e5ac35c13c5cbccc5933083edceb0d3eaeaa21
 xml2	git	38ea8fa9dea1ff4777c17581350795a3691ee88a
 zlib	git	5a82f71ed1dfc0bec044d9702463dbdf84ea3b71
 

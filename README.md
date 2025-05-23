@@ -3,7 +3,7 @@ Fast cross-compile ffmpeg for Windows with MinGW on Linux and Cygwin to produce 
 
 **Enabled Features**
 
-amf aom ass/ssa avisynth bzip2 dav1d decklink fdk-aac fontconfig freetype frei0r fribidi harfbuzz lame mfx/qsv nvenc/nvdec ogg openssl opus png rav1e rubberband sdl sofalizer soxr srt svt-av1 theora vmaf vorbis vpl vpx vulkan webp x264 x265(8/10/12-bit) xml2 zlib
+amf aom ass/ssa avisynth bzip2 dav1d decklink fdk-aac fontconfig freetype frei0r fribidi harfbuzz lame mfx/qsv nvenc/nvdec ogg openssl opus placebo png rubberband sdl sofalizer soxr srt svt-av1 theora vmaf vorbis vpx webp x264 x265(8/10/12-bit) xml2 zlib
 
 **Package Requirements**
 
