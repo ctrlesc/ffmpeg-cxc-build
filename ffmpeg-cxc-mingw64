@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.9.4"
+SCRIPT_VERSION="1.9.5"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -588,7 +588,9 @@ then
 		CXC_CPPFLAGS="$CXC_CPPFLAGS -DFRIBIDI_LIB_STATIC"
 		mkdir "${SRC_NAME}_build"
 		cd "${SRC_NAME}_build"
+		sed -i -r "s/^(c_args = \[[^]]+)\]$/\1,'-std=gnu17']/" "$ROOT_PATH/$SRC_PATH/cross.meson"
 		meson setup --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release -Ddocs=false -Dtests=false --strip --cross-file="$ROOT_PATH/$SRC_PATH/cross.meson" "../$SRC_NAME"
+		sed -i -r "s/^(c_args = .+),'-std=gnu17'\]$/\1\]/" "$ROOT_PATH/$SRC_PATH/cross.meson"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_meson $CXC_JOBS
 	fi
