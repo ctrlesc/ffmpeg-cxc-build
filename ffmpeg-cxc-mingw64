@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.9.5"
+SCRIPT_VERSION="1.10.0"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -44,7 +44,7 @@ CXC_SOURCE_LIST=\
 "fftw3" "fontconfig" "freetype" "frei0r" "fribidi" "harfbuzz" "ladspa" \
 "lame" "mfx" "nv-codec-headers" "ogg" "openssl" "opus" "placebo" "png" "rav1e" \
 "rubberband" "samplerate" "sdl" "sofa" "soxr" "srt" "svt-av1" "theora" "vmaf" \
-"vorbis" "vpl" "vpx" "vulkan-headers" "webp" "xml2" "x264" "x265" "zlib" \
+"vorbis" "vpl" "vpx" "vulkan-headers" "webp" "whisper" "xml2" "x264" "x265" "zlib" \
 )
 
 #lib options
@@ -651,6 +651,27 @@ then
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $CXC_JOBS
 		CXC_FFMPEG_EXTRA_LIBS="-lharfbuzz -lfreetype -lpng16 -lz $CXC_FFMPEG_EXTRA_LIBS"
+	fi
+fi
+
+#whisper
+set_source "whisper" "git" "https://github.com/ggml-org/whisper.cpp" "whisper"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		sed -r -i 's/^(\s+#if )(_WIN32_WINNT >= 0x0602)$/\1defined(_MSC_VER) \&\& \2/' ggml/src/ggml-cpu/ggml-cpu.c
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/cross.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 ..
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $CXC_JOBS
+		ln -s "$ROOT_PATH/$OUT_PATH/lib/ggml.a" "$ROOT_PATH/$OUT_PATH/lib/libggml.a"
+		ln -s "$ROOT_PATH/$OUT_PATH/lib/ggml-base.a" "$ROOT_PATH/$OUT_PATH/lib/libggml-base.a"
+		ln -s "$ROOT_PATH/$OUT_PATH/lib/ggml-cpu.a" "$ROOT_PATH/$OUT_PATH/lib/libggml-cpu.a"
+		CXC_FFMPEG_EXTRA_LIBS="-lwhisper -lggml -lggml-base -lggml-cpu $CXC_FFMPEG_EXTRA_LIBS"
 	fi
 fi
 
