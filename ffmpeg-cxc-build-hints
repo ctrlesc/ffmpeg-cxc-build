@@ -106,7 +106,7 @@ ffmpeg	git	ff63d4865bc553ca58b923d77df566b6979d2f2d
 fftw3	wget	fftw-3.3.10.tar.gz
 fontconfig	git	a9fd30d226322f7f9b674a74d3782eea03c29453
 freetype	git	83f543a82bcf84cb679057971ab3853573c697fa
-frei0r	git	74edaeb1b69081017f0c80dd4cebac15cf375e62
+frei0r	git	6d272815f25baa6daafacdd132a43e36a94ff21c
 fribidi	git	b28f43bd3e8e31a5967830f721bab218c1aa114c
 harfbuzz	git	8a481237ec2dbd48cbc6c76c294e058d8b409cb3
 ladspa	git	0f54d2430febb4d5f02d13132dd91d7345e080b5
