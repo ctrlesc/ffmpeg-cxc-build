@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.10.2"
+SCRIPT_VERSION="1.10.3"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -925,7 +925,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		PKG_CONFIG_LIBDIR="" RUSTFLAGS="$CXC_RUSTFLAGS" cargo cinstall --prefix="$ROOT_PATH/$OUT_PATH" --lib --release --target x86_64-pc-windows-gnu --dlltool=/usr/bin/x86_64-w64-mingw32-dlltool
+		PKG_CONFIG_LIBDIR="" RUSTFLAGS="$CXC_RUSTFLAGS" cargo cinstall --prefix="$ROOT_PATH/$OUT_PATH" --lib --library-type staticlib --release --target x86_64-pc-windows-gnu --dlltool=/usr/bin/x86_64-w64-mingw32-dlltool
 		[ $? -eq 0 ] || build_die "$THIS: build stage failed -> $SRC_NAME"
 	fi
 fi

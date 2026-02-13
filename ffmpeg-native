@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.9.2"
+SCRIPT_VERSION="1.9.4"
 THIS="ffmpeg-native"
 
 #build paths
@@ -466,7 +466,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		CFLAGS="$NCC_OPTIM $NCC_CFLAGS" CXXFLAGS="$NCC_OPTIM $NCC_CFLAGS" CPPFLAGS="$NCC_CPPFLAGS" LDFLAGS="-L$ROOT_PATH/$OUT_PATH/lib -l:libz.a" ./configure --prefix="$ROOT_PATH/$OUT_PATH" --static
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DZLIB_BUILD_SHARED=0 -DZLIB_BUILD_TESTING=0 .
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -855,7 +855,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		PKG_CONFIG_LIBDIR="" RUSTFLAGS="$NCC_RUSTFLAGS" cargo cinstall --prefix="$ROOT_PATH/$OUT_PATH" --lib --release --target x86_64-unknown-linux-musl
+		PKG_CONFIG_LIBDIR="" RUSTFLAGS="$NCC_RUSTFLAGS" cargo cinstall --prefix="$ROOT_PATH/$OUT_PATH" --lib --library-type staticlib --release --target x86_64-unknown-linux-musl
 		[ $? -eq 0 ] || build_die "$THIS: build stage failed -> $SRC_NAME"
 	fi
 fi
