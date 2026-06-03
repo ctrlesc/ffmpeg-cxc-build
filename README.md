@@ -3,17 +3,17 @@ Fast cross-compile ffmpeg for Windows with MinGW on Linux and Cygwin to produce 
 
 **Enabled Features**
 
-amf aom ass/ssa avisynth bzip2 dav1d decklink fdk-aac fontconfig freetype frei0r fribidi harfbuzz lame mfx/qsv nvenc/nvdec ogg openssl opus placebo png rubberband sdl sofalizer soxr srt svt-av1 theora vmaf vorbis vpx webp x264 x265(8/10/12-bit) xml2 zlib
+amf aom ass/ssa avisynth bzip2 dav1d decklink fdk-aac fontconfig freetype frei0r fribidi harfbuzz lame mfx/qsv nvenc/nvdec ogg openssl opus placebo png rubberband sdl sofalizer soxr srt svt-av1 theora vmaf vorbis vpl vpx vulkan webp x264 x265(8/10/12-bit) xml2 zlib
 
 **Package Requirements**
 
 Debian/Ubuntu/Mint:
 
-sudo apt-get -y install autoconf automake autopoint build-essential libarchive-tools cmake git-core gperf g++-mingw-w64 libssl-dev libtool libunwind-dev mercurial meson nasm pkg-config python3-lxml ragel subversion texinfo yasm wget win-iconv-mingw-w64-dev
+sudo apt-get -y install autoconf automake autopoint build-essential libarchive-tools cmake cuda-toolkit git-core gperf g++-mingw-w64 glslang-tools libssl-dev libtool libunwind-dev mercurial meson nasm pkg-config python3-lxml ragel spirv-tools spirv-headers subversion texinfo yasm wget win-iconv-mingw-w64-dev
   
 Fedora:
 
-sudo yum install make autogen automake bsdtar cmake gcc gcc-c++ git gettext-devel gperf kernel-devel libtool libunwind-devel mercurial meson mingw64-gcc mingw64-gcc-c++ mingw64-libgomp mingw64-winpthreads-static mingw64-win-iconv-static nasm openssl-devel perl-FindBin python3-lxml ragel subversion uuid-devel yasm
+sudo yum install make autogen automake bsdtar cmake cuda-toolkit gcc gcc-c++ git gettext-devel gperf glslang kernel-devel libtool libunwind-devel mercurial meson mingw64-gcc mingw64-gcc-c++ mingw64-libgomp mingw64-winpthreads-static mingw64-win-iconv-static nasm openssl-devel perl-FindBin python3-lxml ragel spirv-tools spirv-headers-devel subversion uuid-devel yasm
 
 *Fedora Preconditions:*
 

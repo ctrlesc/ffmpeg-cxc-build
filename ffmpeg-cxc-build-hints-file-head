@@ -34,8 +34,9 @@ CXC	RUSTFLAGS	-C target-feature=+avx2,+fma
 #fontconfig	make	1
 #freetype	make	1
 #harfbuzz	make	1
-openssl	make	2
+openssl	make	1
 mfx	disable	
+shaderc	disable	
 
 #---------------------------
 #set override URL for source
@@ -58,6 +59,7 @@ fontconfig	url	file://~/src/fontconfig
 freetype	url	file://~/src/freetype
 frei0r	url	file://~/src/frei0r
 fribidi	url	file://~/src/fribidi
+glslang	url	file://~/src/glslang
 harfbuzz	url	file://~/src/harfbuzz
 ladspa	url	file://~/src/ladspa
 lame	url	file://~/src/lame
@@ -72,8 +74,11 @@ rav1e	url	file://~/src/rav1e
 rubberband	url	file://~/src/rubberband
 sdl	url	file://~/src/sdl
 samplerate	url	file://~/src/samplerate
+shaderc	url	file://~/src/shaderc
 sofa	url	file://~/src/sofa
 soxr	url	file://~/src/soxr
+spirv-headers	url	file://~/src/spirv-headers
+spirv-tools	url	file://~/src/spirv-tools
 srt	url	file://~/src/srt
 svt-av1	url	file://~/src/svt-av1
 theora	url	file://~/src/theora
@@ -103,11 +108,12 @@ decklink	git
 dlfcn	git	
 fdk-aac	git	
 ffmpeg	git	
-fftw3	wget	fftw-3.3.10.tar.gz
+fftw3	wget	fftw-3.3.11.tar.gz
 fontconfig	git	
 freetype	git	
 frei0r	git	
 fribidi	git	
+glslang	git	
 harfbuzz	git	
 ladspa	git	
 lame	svn	
@@ -122,8 +128,11 @@ rav1e	git
 rubberband	hg	
 samplerate	git	
 sdl	git	
+shaderc	git	
 sofa	git	
 soxr	git	
+spirv-headers	git	
+spirv-tools	git	
 srt	git	
 svt-av1	git	
 theora	git	

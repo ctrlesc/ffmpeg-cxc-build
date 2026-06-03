@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.9.4"
+SCRIPT_VERSION="1.11.0"
 THIS="ffmpeg-native"
 
 #build paths
@@ -39,9 +39,9 @@ NCC_SYSTEM_LIST=\
 NCC_SOURCE_LIST=\
 ( \
 "aom" "ass" "bzip2" "dav1d" "decklink-linux" "fdk-aac" "ffmpeg" "fftw3" \
-"fontconfig" "freetype" "frei0r" "fribidi" "harfbuzz" "ladspa" \
-"lame" "nv-codec-headers" "ogg" "openssl" "opus" "png" "rav1e" "rubberband" \
-"samplerate" "sdl" "sofa" "soxr" "srt" "svt-av1" "theora" "vmaf" "vorbis" \
+"fontconfig" "freetype" "frei0r" "fribidi" "glslang" "harfbuzz" "ladspa" \
+"lame" "nv-codec-headers" "ogg" "openssl" "opus" "placebo" "png" "rav1e" "rubberband" \
+"samplerate" "sdl" "sofa" "soxr" "spirv-headers" "spirv-tools" "srt" "svt-av1" "theora" "vmaf" "vorbis" \
 "vpx" "vulkan-headers" "webp" "xml2" "x264" "x265" "zlib" \
 )
 
@@ -636,14 +636,14 @@ then
 fi
 
 #fftw3
-set_source "fftw3" "wget" "http://fftw.org/fftw-3.3.10.tar.gz"
+set_source "fftw3" "wget" "http://fftw.org/fftw-3.3.11.tar.gz"
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
 	fetch_source
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source "fftw-"
-		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DBUILD_TESTS=0 -DDISABLE_FORTRAN=1 .
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_TESTS=0 -DDISABLE_FORTRAN=1 .
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 		ln -s "$ROOT_PATH/$OUT_PATH"/lib/pkgconfig/fftw*.pc "$ROOT_PATH/$OUT_PATH"/lib/pkgconfig/fftw3.pc
@@ -706,7 +706,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DBUILD_EXAMPLES=0 -DBUILD_TESTS=0 -DBUILD_LSR_TESTS=0 .
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DBUILD_EXAMPLES=0 -DBUILD_TESTS=0 -DBUILD_LSR_TESTS=0 .
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 		NCC_FFMPEG_EXTRA_LIBS="$NCC_FFMPEG_EXTRA_LIBS -lgomp"
@@ -941,8 +941,9 @@ then
 	fetch_source
 	if [ "$BUILD" -ne 0 ]
 	then
-		cd_source
-		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DWITHOUT_OPENCV=1 -DBUILD_SHARED_LIBS=0 .
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DCMAKE_CXX_STANDARD=11 -DWITHOUT_OPENCV=1 -DWITHOUT_CAIRO=1 -DWITHOUT_GAVL=1 "../$SRC_NAME"
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 		find "$ROOT_PATH/$OUT_PATH/lib/frei0r-1" -type f -name "*.so" -print0 | xargs -0 strip
@@ -981,8 +982,94 @@ then
 	fi
 fi
 
+#placebo
+set_source "placebo" "git" "https://code.videolan.org/videolan/libplacebo.git" "libplacebo"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
+		meson setup --prefix="$ROOT_PATH/$OUT_PATH" --libdir="lib" -Ddefault_library=static --buildtype=release --strip "../$SRC_NAME"
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_meson $NCC_JOBS
+		if [[ "$NCC_FFMPEG_EXTRA_LIBS" != *"lstdc++"* ]]
+		then
+			NCC_FFMPEG_EXTRA_LIBS="$NCC_FFMPEG_EXTRA_LIBS -lstdc++"
+		fi
+	fi
+fi
+
+#spirv-headers
+set_source "spirv-headers" "git" "https://github.com/KhronosGroup/SPIRV-Headers.git"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" "../$SRC_NAME"
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $NCC_JOBS
+	fi
+fi
+
+#spirv-tools
+set_source "spirv-tools" "git" "https://github.com/KhronosGroup/SPIRV-Tools.git"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		cd "external"
+		ln -s "../../spirv-headers" spirv-headers
+		cd ../../
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DSPIRV_TOOLS_BUILD_STATIC=1 -DSPIRV_TOOLS_LIBRARY_TYPE="STATIC" -DBUILD_SHARED_LIBS=0 "../$SRC_NAME"
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $NCC_JOBS
+	fi
+fi
+
+#glslang
+set_source "glslang" "git" "https://github.com/KhronosGroup/glslang.git" "libglslang"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_PREFIX_PATH="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DENABLE_OPT=0 -DALLOW_EXTERNAL_SPIRV_TOOLS=1 "../$SRC_NAME"
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $NCC_JOBS
+	fi
+fi
+
+#shaderc
+set_source "shaderc" "git" "https://github.com/google/shaderc.git" "libshaderc"
+if [ "${!SRC_ENABLE}" -ne 0 ]
+then
+	fetch_source
+	if [ "$BUILD" -ne 0 ]
+	then
+		cd_source
+		mkdir "${SRC_NAME}_build"
+		cd "${SRC_NAME}_build"
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_PREFIX_PATH="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DBUILD_SHARED_LIBS=0 -DSHADERC_SPIRV_TOOLS_DIR="../../spirv-tools" -DSHADERC_GLSLANG_DIR="../../glslang" -DSHADERC_SKIP_TESTS=1 -DSPIRV_SKIP_TESTS=1 -DGLSLANG_TESTS=0 ".."
+		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
+		build_make $NCC_JOBS
+		mv "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/shaderc.pc" "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/shaderc_shared.pc"
+		ln -s "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/shaderc_combined.pc" "$ROOT_PATH/$OUT_PATH/lib/pkgconfig/shaderc.pc"
+	fi
+fi
+
 #vulkan
-set_source "vulkan-headers" "git" "https://github.com/KhronosGroup/Vulkan-Headers.git" "vulkan"
+set_source "vulkan-headers" "git" "https://github.com/KhronosGroup/Vulkan-Headers.git" "vulkan" "cuda-nvcc"
 if [ "${!SRC_ENABLE}" -ne 0 ]
 then
 	fetch_source
@@ -1033,7 +1120,7 @@ then
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
-		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DENABLE_SHARED=0 -DENABLE_APPS=0 -DENABLE_PROFILE=0 .
+		cmake -DCMAKE_INSTALL_PREFIX="$ROOT_PATH/$OUT_PATH" -DCMAKE_TOOLCHAIN_FILE="$ROOT_PATH/$SRC_PATH/native.cmake" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_FIND_ROOT_PATH="$ROOT_PATH/$OUT_PATH" -DENABLE_SHARED=0 -DENABLE_APPS=0 -DENABLE_PROFILE=0 .
 		[ $? -eq 0 ] || build_die "$THIS: configure stage failed -> $SRC_NAME"
 		build_make $NCC_JOBS
 	fi
@@ -1143,7 +1230,6 @@ then
 		--bindir=\"$BIN_PATH\"\
 		$NCC_FFMPEG_LIB_OPTIONS"
 	echo $BUILD_CMD
-	#exit 1
 	if [ "$BUILD" -ne 0 ]
 	then
 		cd_source
