@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.11.0"
+SCRIPT_VERSION="1.11.1"
 THIS="ffmpeg-native"
 
 #build paths
@@ -1158,8 +1158,8 @@ then
 		while read lp
 		do
 			build_message BM_YELLOW "enable-libmfx: searching path '$lp'"
-			rsync -rvt -R --files-from=<(find "$lp" -type f \( -path "*/lib*" -o -path "*/include/*" \) -a  \( -name "*libmfx[.-]*" -o -path "*/mfx/*" -o -name "*libva[.-]*" -o -path "*/va/*" \)  -a -! \( -name "*.so.*" -o -name "*.so" \) 2>/dev/null |\
-				sed -r "s#^${lp}/#/${lp}/./#") / "$ROOT_PATH/$OUT_PATH"
+			find "$lp" -type f \( -path "*/lib*" -o -path "*/include/*" \) -a  \( -name "*libmfx[.-]*" -o -path "*/mfx/*" -o -name "*libva[.-]*" -o -path "*/va/*" \)  -a -! \( -name "*.so.*" -o -name "*.so" \) 2>/dev/null |\
+				sed -r "s#^${lp}/#/${lp}/./#" | rsync -rvt -R --files-from=- / "$ROOT_PATH/$OUT_PATH"
 		done < <(awk -F':' '{for (i = 1 ; i <= NF ; i++) { print $i }}' <<< ${MFX_DEV})
 		[ $? -eq 0 ] || build_die "$THIS: install stage failed -> enable-libmfx"
 
@@ -1188,8 +1188,8 @@ then
 					VPL_PREFIX="$lp"
 				fi
 			fi
-			rsync -rvt -R --files-from=<(find "$lp" -type f \( -path "*/lib*" -o -path "*/include/*" \) -a  \( -name "*libvpl[.-]*" -o -name "*vpl*" -o -path "*/vpl/*" -o -name "*libva[.-]*" -o -path "*/va/*" \)  -a -! \( -name "*.so.*" -o -name "*.so" \) 2>/dev/null |\
-				sed -r "s#^${lp}/#/${lp}/./#") / "$ROOT_PATH/$OUT_PATH"
+			find "$lp" -type f \( -path "*/lib*" -o -path "*/include/*" \) -a  \( -name "*libvpl[.-]*" -o -name "*vpl*" -o -path "*/vpl/*" -o -name "*libva[.-]*" -o -path "*/va/*" \)  -a -! \( -name "*.so.*" -o -name "*.so" \) 2>/dev/null |\
+				sed -r "s#^${lp}/#/${lp}/./#" | rsync -rvt -R --files-from=- / "$ROOT_PATH/$OUT_PATH"
 		done < <(awk -F':' '{for (i = 1 ; i <= NF ; i++) { print $i }}' <<< ${VPL_DEV})
 		[ $? -eq 0 ] && [ ! -z "$VPL_PREFIX" ] || build_die "$THIS: install stage failed -> enable-libvpl - verify prefix"
 
