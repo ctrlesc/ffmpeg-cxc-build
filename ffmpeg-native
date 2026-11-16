@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.11.1"
+SCRIPT_VERSION="1.11.2"
 THIS="ffmpeg-native"
 
 #build paths
@@ -141,7 +141,7 @@ fetch_source() {
 		git)
 			if [ "$scheme" != "file://" ]
 			then
-				git clone "$url" "$SRC_NAME"
+				git clone --recursive "$url" "$SRC_NAME"
 				status=$?
 			fi
 

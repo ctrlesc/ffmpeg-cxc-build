@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.11.0"
+SCRIPT_VERSION="1.11.1"
 THIS="ffmpeg-cxc-mingw64"
 
 #build paths
@@ -48,7 +48,8 @@ CXC_SOURCE_LIST=\
 )
 
 #lib options
-CXC_FFMPEG_EXTRA_LIBS="-lwinpthread -lssp"
+#CXC_FFMPEG_EXTRA_LIBS="-lwinpthread -lssp"
+CXC_FFMPEG_EXTRA_LIBS="-lwinpthread"
 
 #fix pkg-config env
 export PKG_CONFIG_DIR=
